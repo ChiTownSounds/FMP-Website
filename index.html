@@ -561,7 +561,7 @@
     /* MAXELL CASSETTE (Hyper-Real 1.6:1 Ratio) */
     .skin-cassette-body {
       width: 395px;
-      height: var(--tape-height, 250px);
+      height: 250px; /* Locked Factory Height */
       background: #1a1a1a;
       border-radius: 8px;
       border-top: 2px solid #333;
@@ -574,7 +574,7 @@
       position: relative;
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 0 30px #000;
       z-index: 10;
-      transform: rotate(var(--rotate-tape, 90deg)) scale(var(--scale-tape, 1.26));
+      transform: rotate(90deg) scale(var(--scale-tape, 1.26)); /* Global Sideways Lock */
       margin: var(--margin-tape, 180px 0);
     }
 
@@ -758,7 +758,7 @@
 
     .tape-window {
       position: absolute;
-      top: var(--tape-window-top, 25px); /* Responsive mechanical lock */
+      top: 25px; /* Locked Factory Center */
       left: 50%;
       transform: translateX(-50%);
       width: 275px;
@@ -1954,7 +1954,7 @@
                 <span class="text-[7px] font-black text-white italic tracking-widest">FMP RADIO</span>
                 <span class="text-[7px] font-black text-white">VOICE OF THE PEOPLE</span>
               </div>
-              <div class="tape-window" style="position: absolute; top: var(--tape-window-top, 25px); left: 50%; transform: translateX(-50%); z-index: 150;">
+              <div class="tape-window" style="position: absolute; top: 25px; left: 50%; transform: translateX(-50%); z-index: 150;">
                 <div id="tap-to-play-overlay" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 text-white text-[8px] font-black tracking-widest uppercase transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
                 <div class="tape-leader"></div>
                 <div class="reel reel-left ${isPlaying ? 'reel-spinning' : ''}">
@@ -2177,9 +2177,7 @@
         const baseW = isLandscape ? h * 0.6 : w;
 
         document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
-        document.documentElement.style.setProperty('--rotate-tape', '90deg');
-        document.documentElement.style.setProperty('--tape-height', '250px');
-        document.documentElement.style.setProperty('--tape-window-top', '25px');
+        document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
         document.documentElement.style.setProperty('--margin-tape', '180px 0');
         document.documentElement.style.setProperty('--scale-disc', (baseW - 4) / 360);
         // BREADCRUMB: Ultra Deep Zoom (40px bleed) - limit in landscape
@@ -2187,9 +2185,6 @@
         document.documentElement.style.setProperty('--scale-vinyl', vinylScale);
       } else {
         document.documentElement.style.setProperty('--scale-tape', '1.8');
-        document.documentElement.style.setProperty('--rotate-tape', '0deg');
-        document.documentElement.style.setProperty('--tape-height', '235px');
-        document.documentElement.style.setProperty('--tape-window-top', '95px');
         document.documentElement.style.setProperty('--margin-tape', '60px 0');
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
