@@ -759,7 +759,7 @@
 
     .tape-window {
       position: absolute;
-      top: 25px !important; /* Absolute Factory Lock */
+      top: 25px !important; /* Mobile Factory Lock */
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: 275px;
@@ -779,6 +779,12 @@
       padding: 0 20px;
       overflow: hidden;
       z-index: 150; /* Shield the reels from handwriting */
+    }
+
+    @media (min-width: 1025px) {
+      .tape-window {
+        top: 45px !important; /* Recalibrated Center for PC */
+      }
     }
 
     .tape-leader {
@@ -1955,7 +1961,7 @@
                 <span class="text-[7px] font-black text-white italic tracking-widest">FMP RADIO</span>
                 <span class="text-[7px] font-black text-white">VOICE OF THE PEOPLE</span>
               </div>
-              <div class="tape-window" style="position: absolute; top: 25px; left: 50%; transform: translateX(-50%); z-index: 150;">
+              <div class="tape-window" style="z-index: 150;">
                 <div id="tap-to-play-overlay" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 text-white text-[8px] font-black tracking-widest uppercase transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
                 <div class="tape-leader"></div>
                 <div class="reel reel-left ${isPlaying ? 'reel-spinning' : ''}">
@@ -2185,7 +2191,7 @@
         const vinylScale = isLandscape ? (h / 380) * 0.9 : (w + 80) / 380;
         document.documentElement.style.setProperty('--scale-vinyl', vinylScale);
       } else {
-        document.documentElement.style.setProperty('--scale-tape', '1.8');
+        document.documentElement.style.setProperty('--scale-tape', '1.6');
         document.documentElement.style.setProperty('--margin-tape', '60px 0');
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
