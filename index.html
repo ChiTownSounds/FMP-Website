@@ -1,7 +1,21 @@
 <!doctype html>
 <html lang="en" class="h-full">
 
+<!-- 
+  FMP RADIO - FRONTEND ARCHITECTURE HIERARCHY
+  ===========================================
+  1.  GLOBAL STYLES & TOKEN SYSTEM (Tailwind + Custom CSS)
+  2.  ATMOSPHERIC BACKGROUND (Mesh Gradients + Atmospheric Float)
+  3.  NAVIGATION (Glassmorphism Sticky Header)
+  4.  HERO SECTION (High-Impact Branding)
+  5.  DYNAMIC CONTENT SECTIONS (Live, Schedule, Hosts, Community)
+  6.  STICKY MINI-PLAYER (Always-On Control)
+  7.  MOBILE DEVICE OVERLAY (Smart Era Engine: Modern, Vinyl, Cassette, Discman, iPod)
+  8.  CORE ENGINE (Watchtower API Sync, Smart Era Detection, PWA Logic)
+-->
+
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FMP RADIO</title>
@@ -449,8 +463,9 @@
       transform-origin: 20px 20px;
       transform: rotate(-10deg);
       transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 20;
+      z-index: 50;
     }
+
 
     .tonearm-playing {
       transform: rotate(10deg);
@@ -541,9 +556,8 @@
       position: relative;
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 0 30px #000;
       z-index: 10;
-      transform: rotate(90deg) scale(var(--scale-tape, 1.26));
-      margin-top: 180px;
-      margin-bottom: 180px;
+      transform: rotate(var(--rotate-tape, 90deg)) scale(var(--scale-tape, 1.26));
+      margin: var(--margin-tape, 180px 0);
     }
 
     .tape-window {
@@ -1214,7 +1228,9 @@
           <div class="rounded-lg border border-white/10 bg-gray-900 p-6 flex gap-4 items-start">
             <img id="main-cover-art" data-widget="mcp-cover-image" data-name="fmpradio"
               style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;transition: opacity 0.4s ease;"
-              onerror="this.src='./assets/logo.png'; this.onerror=null;" />
+              onerror="this.src='./assets/logo.png'; this.onerror=null;" 
+              alt="Now Playing Cover Art" loading="lazy" />
+
             <div>
               <div class="text-xs font-bold text-yellow-500 mb-2">NOW PLAYING</div>
               <div class="text-2xl font-black text-white">
@@ -1307,7 +1323,8 @@
 
     <footer class="w-full py-8 bg-gray-950 border-t border-white/5 mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <img src="./assets/logo.png" alt="FMP Radio" class="h-16 w-auto mb-2">
+        <img src="./assets/logo.svg" alt="FMP Radio" class="h-16 w-auto mb-2">
+
         <p class="text-xs text-gray-500 mb-3">© 2026 FMP Media Group</p>
       </div>
     </footer>
@@ -1317,9 +1334,12 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3 cursor-pointer group" onclick="toggleDeviceView()">
           <div class="relative">
-            <img id="cover-art" src="./assets/logo.png"
+            <img id="cover-art" src="./assets/logo.svg"
+
               style="width:40px;height:40px;object-fit:cover;border-radius:4px;flex-shrink:0;"
-              onerror="this.src='./assets/logo.png'; this.onerror=null;" />
+              onerror="this.src='./assets/logo.png'; this.onerror=null;" 
+              alt="Mini Player Album Art" loading="lazy" />
+
             <div
               class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[4px]">
               <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1373,7 +1393,8 @@
 
       <!-- Artwork -->
       <div class="artwork-container">
-        <img id="device-cover" src="./assets/logo.png" class="w-full h-full object-cover">
+        <img id="device-cover" src="./assets/logo.svg" class="w-full h-full object-cover">
+
       </div>
 
       <!-- Info & Controls -->
@@ -1384,9 +1405,10 @@
         </div>
 
         <div class="flex items-center justify-center">
-          <button onclick="togglePlay()" class="w-20 h-20 glass-btn text-white">
+          <button onclick="togglePlay()" class="w-20 h-20 glass-btn text-white" aria-label="Toggle Playback">
             <span id="device-play-icon" class="text-2xl">▶</span>
           </button>
+
         </div>
 
         <!-- Progress Simulation -->
@@ -1421,6 +1443,11 @@
       { name: 'ChiTown', role: 'Midmorning', show: 'The Bridge', time: '10AM–12PM', img: 'https://i.imgur.com/AFySV6g.jpeg' },
       { name: 'Kimberla', role: 'Weekend', show: 'Sunday Soul', time: 'Weekends', img: 'assets/hosts/kimberla.png' }
     ];
+
+    // BREADCRUMB: Optimized Asset Sync
+    const DEFAULT_COVER = './assets/logo.svg';
+
+
 
     const SCHEDULE = {
       'Mon–Fri': [
@@ -1688,15 +1715,16 @@
 
       if (currentEra === 'modern') {
         skinHTML = `
-          <div class="w-full text-center">
-            <div class="text-[12px] font-black tracking-[0.4em] text-yellow-500 uppercase mb-2">Broadcasting Live</div>
-            <div class="text-[14px] text-white/60">from Chicago's Austin Community</div>
+          <div class="w-full flex flex-col items-center">
+            <div class="text-[12px] font-black tracking-[1.15em] text-red-600 uppercase -mr-[1.15em] mb-0.5">FMP RADIO</div>
+            <div class="text-[10px] font-black tracking-[0.4em] text-yellow-500 uppercase mb-1">Broadcasting Live</div>
+            <div class="text-[12px] text-white/60 font-medium">Chicago's Austin Community</div>
           </div>
           <div class="artwork-container"><img id="device-cover" src="${cover}" class="w-full h-full object-cover"></div>
           <div class="player-controls mt-6">
             <div class="text-center px-4">
               <h2 id="device-title" class="text-2xl font-black text-white mb-2 leading-tight">${title}</h2>
-              <div class="text-yellow-500 font-bold text-sm tracking-widest uppercase">The Voice of the People</div>
+              <div class="text-yellow-500 font-bold text-xs tracking-[0.2em] uppercase">The Voice of the People</div>
             </div>
             <div class="flex items-center justify-center">
                <button onclick="togglePlay()" class="w-20 h-20 glass-btn text-white"><span id="device-play-icon" class="text-2xl">${isPlaying ? '⏸' : '▶'}</span></button>
@@ -1706,6 +1734,11 @@
       } else if (currentEra === 'vinyl') {
         skinHTML = `
           <div class="turntable-chassis">
+            <div class="absolute top-4 left-6 z-10">
+              <div class="text-white/30 font-black text-[9px] tracking-[0.3em] uppercase">FMP-1200</div>
+              <div class="text-white/10 font-bold text-[7px] tracking-widest uppercase">Direct Drive System</div>
+            </div>
+
             <div class="turntable-platter">
               <div id="vinyl-spinner" onclick="togglePlay()" class="record-spinner cursor-pointer group relative ${isPlaying ? 'record-spinning' : ''}">
                 <div id="skin-cover" class="record-label" style="background-image: url('${cover}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
@@ -1728,6 +1761,7 @@
             </div>
           </div>
           <div class="mt-14 text-center px-4 relative z-20">
+            <div class="text-yellow-500/50 font-black text-[10px] tracking-[0.4em] uppercase mb-1">FMP Vinyl Series</div>
             <h2 id="skin-title" class="text-white font-black text-xl leading-tight drop-shadow-lg">${title}</h2>
           </div>
         `;
@@ -1750,8 +1784,8 @@
 
             <div id="skin-cover" class="cassette-label" style="background: linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('${cover}'); background-size: cover; background-position: center;">
               <div class="maxell-stripe">
-                <span class="text-[7px] font-black text-white italic">maxell</span>
-                <span class="text-[7px] font-black text-white">UR 90</span>
+                <span class="text-[7px] font-black text-white italic tracking-widest">FMP RADIO</span>
+                <span class="text-[7px] font-black text-white">VOICE OF THE PEOPLE</span>
               </div>
               <div class="tape-window relative">
                 <div id="tap-to-play-overlay" class="absolute inset-0 z-30 flex items-center justify-center bg-black/40 text-white text-[8px] font-black tracking-widest uppercase transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
@@ -1767,7 +1801,7 @@
               </div>
               <div class="w-full text-center px-4 mb-2">
                 <div id="skin-title" class="text-[12px] text-gray-900 font-black tracking-tight uppercase leading-tight border-b-2 border-gray-300 pb-1">${title}</div>
-                <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em]">POSITION · NORMAL</div>
+                <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em]">POSITION · FMP MASTER</div>
               </div>
             </div>
           </div>
@@ -1781,7 +1815,7 @@
               <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
             </div>
             <div class="discman-lcd">
-              <div class="text-[7px] text-[#1a2e1a] font-bold tracking-widest uppercase mb-0.5 opacity-60">Anti-Skip ESP</div>
+              <div class="text-[7px] text-[#1a2e1a] font-black tracking-widest uppercase mb-0.5 opacity-80">FMP RADIO · ESP</div>
               <div id="skin-title" class="discman-lcd-text">${title}</div>
             </div>
             <div class="discman-controls">
@@ -1792,6 +1826,7 @@
       } else if (currentEra === 'ipod') {
         skinHTML = `
           <div class="ipod-screen-refined">
+            <div class="absolute top-1 left-2 text-[7px] text-white/40 font-bold uppercase tracking-widest">FMP Radio</div>
             <img id="skin-cover" src="${cover}" class="w-full h-full object-contain object-center bg-black">
             <div class="ipod-text-overlay">
               <div id="skin-title" class="text-white font-black text-lg leading-tight mb-1">${title}</div>
@@ -1831,20 +1866,29 @@
       `;
     }
 
+
+
     function updateDeviceUI() {
-      const title = document.getElementById('now-playing-title').innerText;
-      const cover = document.getElementById('main-cover-art').src;
-      const listeners = document.querySelector('[data-format="%connections%"]').innerText;
+      const titleEl = document.getElementById('now-playing-title');
+      const title = titleEl ? titleEl.innerText : 'FMP RADIO';
+      const coverEl = document.getElementById('main-cover-art');
+      const cover = coverEl ? coverEl.src : './assets/logo.png';
+      const listenerEl = document.querySelector('[data-format="%connections%"]');
+      const listeners = listenerEl ? listenerEl.innerText : '0';
 
       // Modern View
-      if (document.getElementById('device-title')) document.getElementById('device-title').innerText = title;
-      if (document.getElementById('device-cover')) document.getElementById('device-cover').src = cover;
-      if (document.getElementById('device-listeners')) document.getElementById('device-listeners').innerText = listeners + ' Listeners';
+      const devTitle = document.getElementById('device-title');
+      if (devTitle) devTitle.innerText = title;
+      const devCover = document.getElementById('device-cover');
+      if (devCover) devCover.src = cover;
+      const devListeners = document.getElementById('device-listeners');
+      if (devListeners) devListeners.innerText = listeners + ' Listeners';
 
       // Hardware Skins Internal Sync
       const skinTitle = document.getElementById('skin-title');
       if (skinTitle) skinTitle.innerText = title;
 
+      const skinCover = document.getElementById('skin-cover');
       if (skinCover) {
         if (skinCover.tagName === 'IMG') skinCover.src = cover;
         else skinCover.style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0)), url('${cover}')`;
@@ -1857,12 +1901,27 @@
       const devicePlayIcon = document.getElementById('device-play-icon');
       if (devicePlayIcon) devicePlayIcon.textContent = isPlaying ? '⏸' : '▶';
     }
+
     function animateVUMeters() {
-      if (!isPlaying) { document.getElementById('needle-l').style.transform = 'rotate(-45deg)'; document.getElementById('needle-r').style.transform = 'rotate(-45deg)'; return; }
-      document.getElementById('needle-l').style.transform = `rotate(${-30 + Math.random() * 40}deg)`;
-      document.getElementById('needle-r').style.transform = `rotate(${-30 + Math.random() * 40}deg)`;
+      // BREADCRUMB: Performance Optimization - Only animate if tab is active to save resources
+      if (document.hidden) return;
+
+      const needleL = document.getElementById('needle-l');
+      const needleR = document.getElementById('needle-r');
+      if (!needleL || !needleR) return;
+
+      if (!isPlaying) { 
+        needleL.style.transform = 'rotate(-45deg)'; 
+        needleR.style.transform = 'rotate(-45deg)'; 
+        return; 
+      }
+      // Mechanical jitter simulation
+      needleL.style.transform = `rotate(${-30 + Math.random() * 40}deg)`;
+      needleR.style.transform = `rotate(${-30 + Math.random() * 40}deg)`;
     }
+
     setInterval(animateVUMeters, 150);
+
 
     // ── The Watchtower: Direct Citrus API Sync ──────────────
     async function fetchCitrusData() {
@@ -1871,7 +1930,7 @@
         const data = await response.json();
         if (data && data.nowplaying) {
           const title = data.nowplaying;
-          const cover = data.coverart || './assets/logo.png';
+          const cover = data.coverart || './assets/logo.svg';
           const listeners = data.connections || 0;
 
           // Update Global State
@@ -1922,12 +1981,16 @@
         const baseW = isLandscape ? h * 0.6 : w;
 
         document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
+        document.documentElement.style.setProperty('--rotate-tape', '90deg');
+        document.documentElement.style.setProperty('--margin-tape', '180px 0');
         document.documentElement.style.setProperty('--scale-disc', (baseW - 4) / 360);
         // BREADCRUMB: Ultra Deep Zoom (40px bleed) - limit in landscape
         const vinylScale = isLandscape ? (h / 380) * 0.9 : (w + 80) / 380;
         document.documentElement.style.setProperty('--scale-vinyl', vinylScale);
       } else {
-        document.documentElement.style.setProperty('--scale-tape', '1.32');
+        document.documentElement.style.setProperty('--scale-tape', '1.8');
+        document.documentElement.style.setProperty('--rotate-tape', '0deg');
+        document.documentElement.style.setProperty('--margin-tape', '60px 0');
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
       }
