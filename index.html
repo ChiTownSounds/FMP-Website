@@ -576,7 +576,7 @@
       z-index: 10;
       /* Forced Global Sideways Lock */
       transform: rotate(90deg) scale(var(--scale-tape, 1.26)) !important;
-      margin: var(--margin-tape, 180px 0);
+      margin: 0 !important; /* Let container handle centering */
     }
 
     .tape-window {
@@ -2185,14 +2185,12 @@
 
         document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
         document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
-        document.documentElement.style.setProperty('--margin-tape', '180px 0');
         document.documentElement.style.setProperty('--scale-disc', (baseW - 4) / 360);
         // BREADCRUMB: Ultra Deep Zoom (40px bleed) - limit in landscape
         const vinylScale = isLandscape ? (h / 380) * 0.9 : (w + 80) / 380;
         document.documentElement.style.setProperty('--scale-vinyl', vinylScale);
       } else {
         document.documentElement.style.setProperty('--scale-tape', '1.4');
-        document.documentElement.style.setProperty('--margin-tape', '60px 0');
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
       }
