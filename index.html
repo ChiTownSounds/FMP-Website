@@ -1743,6 +1743,7 @@
                 <div id="skin-cover" class="record-label" style="background-image: url('${cover}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
                 <div class="record-center-hole"></div>
                 <div class="record-spindle"></div>
+                <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
               </div>
             </div>
             <div class="speed-selector">
@@ -1823,8 +1824,9 @@
         `;
       } else if (currentEra === 'ipod') {
         skinHTML = `
-          <div class="ipod-screen-refined">
+          <div class="ipod-screen-refined cursor-pointer relative" onclick="togglePlay()">
             <img id="skin-cover" src="${cover}" class="w-full h-full object-contain object-center bg-black">
+            <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-30 transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
             <div class="ipod-text-overlay">
               <div id="skin-title" class="text-white font-black text-lg leading-tight mb-1">${title}</div>
               <div class="text-yellow-500 text-[10px] tracking-[0.3em] font-bold uppercase">Now Playing on FMP Radio</div>
