@@ -742,9 +742,7 @@
       overflow: hidden;
       border: 1px solid #ddd;
       box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 35px;
+      /* Mechanical Lock: Elements now use absolute positioning */
     }
 
     .maxell-stripe {
@@ -759,6 +757,10 @@
     }
 
     .tape-window {
+      position: absolute;
+      top: 45px;
+      left: 50%;
+      transform: translateX(-50%);
       width: 275px;
       height: 62px;
       flex-shrink: 0;
@@ -768,10 +770,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: relative;
       box-shadow: inset 0 0 40px #000, 0 0 10px rgba(0, 0, 0, 0.5);
       padding: 0 20px;
-      margin: 15px auto;
       overflow: hidden;
     }
 
@@ -1961,9 +1961,9 @@
                   <div class="reel-gear"></div>
                 </div>
               </div>
-              <div class="w-full text-center px-4 mb-2">
-                <div class="border-b border-gray-400/50 pb-1">
-                  <div id="skin-title" class="text-[14px] text-blue-900/80 font-normal leading-tight" style="font-family: 'Permanent Marker', cursive; transform: rotate(-1.5deg); letter-spacing: 0px;">${title}</div>
+              <div class="w-full text-center px-4" style="position: absolute; top: 125px; left: 0;">
+                <div class="border-b border-gray-400/50 pb-1 mx-6">
+                  <div id="skin-title" class="text-[14px] text-blue-900/80 font-normal leading-tight" style="font-family: 'Permanent Marker', cursive; transform: rotate(-1.5deg); letter-spacing: 0px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
                 </div>
                 <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em] uppercase">POSITION · FMP MASTER</div>
               </div>
