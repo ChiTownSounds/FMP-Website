@@ -28,7 +28,7 @@
   <meta name="theme-color" content="#0a0e1a">
   <meta name="description" content="For My People Radio — The Voice of the People. Chicago's Austin Community.">
   <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
-  <link rel="apple-touch-icon" href="./assets/logo.png">
+  <link rel="apple-touch-icon" href="./assets/logo.svg">
 
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -1156,7 +1156,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
           <div class="flex items-center gap-2">
-            <img src="./assets/logo.png" alt="FMP Radio Logo"
+            <img src="./assets/logo.svg" alt="FMP Radio Logo"
               class="h-12 w-auto hover:scale-110 transition-transform cursor-pointer">
           </div>
           <div class="hidden md:flex items-center space-x-8">
@@ -1232,7 +1232,7 @@
           <div class="rounded-lg border border-white/10 bg-gray-900 p-6 flex gap-4 items-start">
             <img id="main-cover-art" data-widget="mcp-cover-image" data-name="fmpradio"
               style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;transition: opacity 0.4s ease;"
-              onerror="this.src='./assets/logo.png'; this.onerror=null;" 
+              onerror="this.src='./assets/logo.svg'; this.onerror=null;" 
               alt="Now Playing Cover Art" loading="lazy" />
 
             <div>
@@ -1327,7 +1327,7 @@
 
     <footer class="w-full py-8 bg-gray-950 border-t border-white/5 mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <img src="./assets/logo.png" alt="FMP Radio" class="h-16 w-auto mb-2">
+        <img src="./assets/logo.svg" alt="FMP Radio" class="h-16 w-auto mb-2">
 
         <p class="text-xs text-gray-500 mb-3">© 2026 FMP Media Group</p>
       </div>
@@ -1338,10 +1338,10 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3 cursor-pointer group" onclick="toggleDeviceView()">
           <div class="relative">
-            <img id="cover-art" src="./assets/logo.png"
+            <img id="cover-art" src="./assets/logo.svg"
 
               style="width:40px;height:40px;object-fit:cover;border-radius:4px;flex-shrink:0;"
-              onerror="this.src='./assets/logo.png'; this.onerror=null;" 
+              onerror="this.src='./assets/logo.svg'; this.onerror=null;" 
               alt="Mini Player Album Art" loading="lazy" />
 
             <div
@@ -1397,7 +1397,7 @@
 
       <!-- Artwork -->
       <div class="artwork-container">
-        <img id="device-cover" src="./assets/logo.png" class="w-full h-full object-cover">
+        <img id="device-cover" src="./assets/logo.svg" class="w-full h-full object-cover">
 
       </div>
 
@@ -1449,7 +1449,7 @@
     ];
 
     // BREADCRUMB: Optimized Asset Sync
-    const DEFAULT_COVER = './assets/logo.png';
+    const DEFAULT_COVER = './assets/logo.svg';
 
 
 
@@ -1871,7 +1871,7 @@
       const titleEl = document.getElementById('now-playing-title');
       const title = titleEl ? titleEl.innerText : 'FMP RADIO';
       const coverEl = document.getElementById('main-cover-art');
-      const cover = coverEl ? coverEl.src : './assets/logo.png';
+      const cover = coverEl ? coverEl.src : './assets/logo.svg';
       const listenerEl = document.querySelector('[data-format="%connections%"]');
       const listeners = listenerEl ? listenerEl.innerText : '0';
 
@@ -1929,7 +1929,7 @@
         const data = await response.json();
         if (data && data.nowplaying) {
           const title = data.nowplaying;
-          const cover = data.coverart || './assets/logo.png';
+          const cover = data.coverart || './assets/logo.svg';
           const listeners = data.connections || 0;
 
           // Update Global State
