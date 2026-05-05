@@ -33,7 +33,7 @@
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Source+Sans+3:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Source+Sans+3:wght@400;500&family=Permanent+Marker&family=Outfit:wght@300;400;700;900&display=swap"
     rel="stylesheet">
   <style>
     .hero-bg {
@@ -49,10 +49,27 @@
     }
 
     body {
-      background-color: #000;
+      background-color: #050507;
       color: #fff;
       font-family: 'Outfit', sans-serif;
       overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Subtle Noise Texture Overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.02;
+      pointer-events: none;
+      z-index: 0;
     }
 
     /* Global Legibility Fix */
@@ -81,7 +98,8 @@
       width: 100%;
       height: 100%;
       z-index: -2;
-      background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 100%);
+      /* Deep Night Plum Spotlight */
+      background: radial-gradient(circle at 50% 40%, #1a1a2e 0%, #050507 100%);
     }
 
     .bg-glow {
@@ -92,10 +110,10 @@
       height: 100%;
       z-index: -1;
       background:
-        radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.05) 0%, transparent 50%);
+        radial-gradient(circle at 20% 30%, rgba(234, 179, 8, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.03) 0%, transparent 50%);
       filter: blur(80px);
-      animation: atmosphericFloat 20s ease-in-out infinite alternate;
+      animation: atmosphericFloat 25s ease-in-out infinite alternate;
     }
 
     @keyframes atmosphericFloat {
@@ -576,15 +594,26 @@
       overflow: hidden;
     }
 
-    .tape-leader {
+    /* Magnetic Tape Spools */
+    .reel-tape {
       position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, #333 0%, #1a1a1a 100%);
+      z-index: -1;
+      box-shadow: inset 0 0 15px #000;
       top: 50%;
-      left: 0;
-      width: 100%;
-      height: 14px;
-      background: linear-gradient(to bottom, #4e342e, #3e2723, #4e342e);
-      transform: translateY(-50%);
-      opacity: 0.6;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .reel-left .reel-tape {
+      width: 100px;
+      height: 100px;
+    }
+
+    .reel-right .reel-tape {
+      width: 70px;
+      height: 70px;
     }
 
     /* The "Industrial Trapezoid" (Accurate Geometric Replica) */
@@ -731,7 +760,8 @@
 
     .tape-window {
       width: 275px;
-      height: 58px;
+      height: 62px;
+      flex-shrink: 0;
       background: rgba(0, 0, 0, 0.95);
       border-radius: 4px;
       border: 4px solid #111;
@@ -739,10 +769,9 @@
       justify-content: space-between;
       align-items: center;
       position: relative;
-      top: 10px;
       box-shadow: inset 0 0 40px #000, 0 0 10px rgba(0, 0, 0, 0.5);
       padding: 0 20px;
-      margin: auto;
+      margin: 15px auto;
       overflow: hidden;
     }
 
@@ -776,30 +805,7 @@
       animation: spin 4s linear infinite;
     }
 
-    /* Magnetic Tape Spools */
-    .reel-tape {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle, #333 0%, #1a1a1a 100%);
-      z-index: -1;
-      box-shadow: inset 0 0 15px #000;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .reel-left .reel-tape {
-      width: 100px;
-      height: 100px;
-    }
-
-    /* More tape */
-    .reel-right .reel-tape {
-      width: 70px;
-      height: 70px;
-    }
-
-    /* Less tape */
+    /* (Spool animations and gear styles removed from here to clean up duplicates) */
 
     .reel-gear {
       width: 24px;
@@ -858,16 +864,17 @@
 
     /* DISCMAN SKIN (90s / 00s) - Hyper-Real */
     .skin-discman {
-      /* Scope class - do not override container dimensions */
+      perspective: 1500px;
     }
 
     .discman-body {
       width: 360px;
-      height: 390px;
-      background: radial-gradient(ellipse at 50% 10%, #d1d5db, #9ca3af 60%, #4b5563);
-      border-radius: 50%;
-      border: 4px solid #6b7280;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 4px 10px rgba(255, 255, 255, 0.7), inset 0 -10px 20px rgba(0, 0, 0, 0.5);
+      height: 420px;
+      background: #111;
+      background: radial-gradient(ellipse at 50% 10%, #333, #111 60%, #050505);
+      border-radius: 180px 180px 20px 20px; /* Rounded top, squared bottom */
+      border: 4px solid #000;
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 2px 5px rgba(255, 255, 255, 0.05), inset 0 -10px 20px rgba(0, 0, 0, 0.5);
       position: relative;
       display: flex;
       flex-direction: column;
@@ -879,13 +886,14 @@
     }
 
     .discman-window {
-      width: 250px;
-      height: 250px;
+      width: 310px;
+      height: 310px;
       border-radius: 50%;
-      background: #111;
-      border: 6px solid #374151;
-      box-shadow: inset 0 0 30px #000, 0 2px 5px rgba(255, 255, 255, 0.5);
+      background: #000;
+      border: 5px solid #1a1a1a;
+      box-shadow: inset 0 0 50px #000, 0 2px 5px rgba(255, 255, 255, 0.05);
       position: relative;
+      margin-top: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -894,12 +902,12 @@
     }
 
     .cd-disc {
-      width: 230px;
-      height: 230px;
+      width: 290px;
+      height: 290px;
       border-radius: 50%;
       background-size: cover !important;
       background-position: center !important;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 1);
       position: relative;
       mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
       -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
@@ -932,20 +940,166 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
+    .discman-lid-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 360px;
+      z-index: 30;
+      transform-origin: center 40px;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .is-paused .discman-lid-container {
+      transform: rotateX(65deg);
+    }
+
+    .discman-lid-plastic {
+      position: relative;
+      width: 354px;
+      height: 354px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 20%, #2a2f35, #111);
+      /* High-Depth Bezel & Sidewall */
+      border: 1px solid #000;
+      box-shadow: 
+        0 1px 0 rgba(255, 255, 255, 0.1), /* Rim highlight */
+        0 2px 4px rgba(0, 0, 0, 0.5),    /* Soft drop shadow */
+        0 4px 0 #000,                   /* Sidewall thickness */
+        0 8px 15px rgba(0, 0, 0, 0.8);   /* Depth shadow */
+      
+      /* New composite mask: Top half has a hole, Bottom half is solid */
+      -webkit-mask-image: linear-gradient(to top, black 50%, transparent 50.1%),
+                          radial-gradient(circle at 50% 175px, transparent 135px, black 136px);
+      mask-image: linear-gradient(to top, black 50%, transparent 50.1%),
+                  radial-gradient(circle at 50% 175px, transparent 135px, black 136px);
+      
+      -webkit-mask-composite: destination-over;
+      mask-composite: destination-over;
+    }
+
+    /* The Decorative Mechanical Ridge */
+    .discman-lid-ridge {
+      position: absolute;
+      top: 174px;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(to bottom, #333, #000, #222);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+      z-index: 35;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .discman-lid-logo {
+      position: absolute;
+      top: 166px; /* 5px further up */
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      font-size: 110px;
+      letter-spacing: 12px;
+      padding-left: 22px; /* One space left */
+      color: #0a0a0a;
+      /* Engraving Effect scaled for massive size */
+      text-shadow: 
+        1px 2px 2px rgba(255, 255, 255, 0.05),
+        -1px -2px 1px rgba(0, 0, 0, 0.9);
+      opacity: 0.9;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .discman-lid-glass {
+      position: absolute;
+      top: 40px;
+      left: calc(50% - 135px);
+      width: 270px;
+      height: 135px;
+      border-radius: 135px 135px 0 0;
+      background: radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.4) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: none;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+      z-index: 25;
+    }
+
+    /* Edge highlight for the straight cut of the plastic */
+    .discman-lid-glass::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .discman-dashboard {
+      position: absolute;
+      bottom: 12px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 15px;
+      z-index: 40;
+    }
+
+    .discman-btn-well {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #050505;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .discman-btn-round {
+      background: linear-gradient(135deg, #333, #111);
+      border: 1px solid #000;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #71717a;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.8);
+      cursor: pointer;
+    }
+
     .discman-lcd {
       background: #8b9a8b;
-      border-radius: 4px;
-      padding: 4px 8px;
-      width: 150px;
+      border: 2px solid #000;
+      border-radius: 1px;
+      padding: 4px 10px;
+      flex-grow: 1;
       height: 36px;
-      box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 -1px 2px rgba(255, 255, 255, 0.2), 0 1px 1px rgba(255, 255, 255, 0.6);
+      /* Deep recessed shadows */
+      box-shadow: 
+        inset 0 4px 10px rgba(0, 0, 0, 0.8),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.2);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      position: absolute;
-      bottom: 55px;
-      z-index: 20;
       overflow: hidden;
+      margin-bottom: 0;
+      transform: translateX(-2px);
     }
 
     .discman-lcd-text {
@@ -955,40 +1109,41 @@
       font-size: 11px;
       text-transform: uppercase;
       white-space: nowrap;
-      display: inline-block;
       animation: marquee 10s linear infinite;
+      letter-spacing: -0.5px;
     }
 
-    .discman-controls {
-      position: absolute;
-      bottom: 12px;
-      display: flex;
-      gap: 8px;
-      z-index: 20;
-      background: #8a93a1;
-      padding: 4px 10px;
-      border-radius: 20px;
-      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.7), 0 1px 1px rgba(255, 255, 255, 0.6);
-    }
-
-    .discman-btn {
-      background: linear-gradient(to bottom, #e5e7eb, #9ca3af);
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.9);
-      color: #374151;
+    .discman-lcd-label {
+      font-size: 5px;
       font-weight: 900;
-      font-size: 9px;
-      padding: 4px 14px;
+      color: #1a2e1a;
+      opacity: 0.6;
+      margin-bottom: 1px;
       text-transform: uppercase;
       letter-spacing: 1px;
-      transition: all 0.1s;
-      cursor: pointer;
+    }
+
+    .discman-chassis-label {
+      position: absolute;
+      top: -14px;
+      width: 100%;
+      text-align: center;
+      font-size: 6px;
+      font-weight: 900;
+      color: #52525b;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .discman-btn:hover {
+      border-color: #60a5fa;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
     }
 
     .discman-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+      transform: scale(0.9);
+      background: #000;
+      box-shadow: inset 0 2px 5px #000;
     }
 
     /* IPOD SKIN (Refined) */
@@ -1232,8 +1387,7 @@
           <div class="rounded-lg border border-white/10 bg-gray-900 p-6 flex gap-4 items-start">
             <img id="main-cover-art" data-widget="mcp-cover-image" data-name="fmpradio"
               style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;transition: opacity 0.4s ease;"
-              onerror="this.src='./assets/logo.svg'; this.onerror=null;" 
-              alt="Now Playing Cover Art" loading="lazy" />
+              onerror="this.src='./assets/logo.svg'; this.onerror=null;" alt="Now Playing Cover Art" loading="lazy" />
 
             <div>
               <div class="text-xs font-bold text-yellow-500 mb-2">NOW PLAYING</div>
@@ -1339,10 +1493,8 @@
         <div class="flex items-center gap-3 cursor-pointer group" onclick="toggleDeviceView()">
           <div class="relative">
             <img id="cover-art" src="./assets/logo.svg"
-
               style="width:40px;height:40px;object-fit:cover;border-radius:4px;flex-shrink:0;"
-              onerror="this.src='./assets/logo.svg'; this.onerror=null;" 
-              alt="Mini Player Album Art" loading="lazy" />
+              onerror="this.src='./assets/logo.svg'; this.onerror=null;" alt="Mini Player Album Art" loading="lazy" />
 
             <div
               class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[4px]">
@@ -1578,6 +1730,17 @@
         else cdDisc.classList.remove('cd-spinning');
       }
 
+      const discmanBody = document.querySelector('.discman-body');
+      if (discmanBody) {
+        if (isPlaying) {
+          discmanBody.classList.remove('is-paused');
+          discmanBody.classList.add('is-playing');
+        } else {
+          discmanBody.classList.remove('is-playing');
+          discmanBody.classList.add('is-paused');
+        }
+      }
+
       const vinylSpinner = document.getElementById('vinyl-spinner');
       if (vinylSpinner) {
         if (isPlaying) vinylSpinner.classList.add('record-spinning');
@@ -1799,26 +1962,45 @@
                 </div>
               </div>
               <div class="w-full text-center px-4 mb-2">
-                <div id="skin-title" class="text-[12px] text-gray-900 font-black tracking-tight uppercase leading-tight border-b-2 border-gray-300 pb-1">${title}</div>
-                <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em]">POSITION · FMP MASTER</div>
+                <div class="border-b border-gray-400/50 pb-1">
+                  <div id="skin-title" class="text-[14px] text-blue-900/80 font-normal leading-tight" style="font-family: 'Permanent Marker', cursive; transform: rotate(-1.5deg); letter-spacing: 0px;">${title}</div>
+                </div>
+                <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em] uppercase">POSITION · FMP MASTER</div>
               </div>
             </div>
           </div>
         `;
       } else if (currentEra === 'discman') {
         skinHTML = `
-          <div class="discman-body">
+          <div class="discman-body ${isPlaying ? 'is-playing' : 'is-paused'}">
             <div class="discman-window" onclick="togglePlay()">
               <div id="skin-cover" class="cd-disc ${isPlaying ? 'cd-spinning' : ''}" style="background: url('${cover}')"></div>
               <div class="cd-spindle"></div>
               <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
             </div>
-            <div class="discman-lcd">
-              <div class="text-[7px] text-[#1a2e1a] font-black tracking-widest uppercase mb-0.5 opacity-80">FMP RADIO · ESP</div>
-              <div id="skin-title" class="discman-lcd-text">${title}</div>
+            
+            <div class="discman-lid-container">
+               <div class="discman-lid-plastic"></div>
+               <div class="discman-lid-glass"></div>
+               <div class="discman-lid-ridge"></div>
+               <div class="discman-lid-logo">FMP</div>
             </div>
-            <div class="discman-controls">
-              <button onclick="togglePlay()" class="discman-btn">⏯ PLAY/PAUSE</button>
+
+            <div class="discman-dashboard">
+              <div class="discman-btn-well">
+                <div class="discman-chassis-label">Open</div>
+                <button class="discman-btn-round">⏏</button>
+              </div>
+
+              <div class="discman-lcd">
+                <div class="discman-lcd-label">FMP-D250 ESP PRO</div>
+                <div id="skin-title" class="discman-lcd-text">${title}</div>
+              </div>
+
+              <div class="discman-btn-well">
+                <div class="discman-chassis-label">${isPlaying ? 'Pause' : 'Play'}</div>
+                <button onclick="togglePlay()" class="discman-btn-round">${isPlaying ? '⏸' : '▶'}</button>
+              </div>
             </div>
           </div>
         `;
@@ -1850,16 +2032,16 @@
 
       // Append Unified Navigation to ALL skins
       container.innerHTML = skinHTML + `
-        <div class="w-full mt-auto pt-8 flex flex-col items-center gap-4 relative z-[999]">
-          <div class="flex justify-center gap-6">
-            <button onclick="setEra('vinyl')" class="px-3 py-3 text-[16px] uppercase tracking-widest font-black transition-colors ${!isManualSkin ? 'text-white/40' : (currentEra === 'vinyl' ? 'nav-btn-active' : 'text-white/40')}">Vinyl</button>
-            <button onclick="setEra('cassette')" class="px-3 py-3 text-[16px] uppercase tracking-widest font-black transition-colors ${!isManualSkin ? 'text-white/40' : (currentEra === 'cassette' ? 'nav-btn-active' : 'text-white/40')}">Tape</button>
-            <button onclick="setEra('discman')" class="px-3 py-3 text-[16px] uppercase tracking-widest font-black transition-colors ${!isManualSkin ? 'text-white/40' : (currentEra === 'discman' ? 'nav-btn-active' : 'text-white/40')}">Disc</button>
-            <button onclick="setEra('ipod')" class="px-3 py-3 text-[16px] uppercase tracking-widest font-black transition-colors ${!isManualSkin ? 'text-white/40' : (currentEra === 'ipod' ? 'nav-btn-active' : 'text-white/40')}">MP3</button>
+        <div class="w-full mt-auto pt-8 pb-4 flex flex-col items-center gap-4 relative z-[999]">
+          <div class="flex justify-center gap-3 p-2 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl">
+            <button onclick="setEra('vinyl')" class="px-4 py-2 text-[14px] uppercase tracking-widest font-black transition-all rounded-lg ${!isManualSkin ? 'text-white/30' : (currentEra === 'vinyl' ? 'bg-white/10 text-white shadow-lg' : 'text-white/30 hover:text-white/60')}">Vinyl</button>
+            <button onclick="setEra('cassette')" class="px-4 py-2 text-[14px] uppercase tracking-widest font-black transition-all rounded-lg ${!isManualSkin ? 'text-white/30' : (currentEra === 'cassette' ? 'bg-white/10 text-white shadow-lg' : 'text-white/30 hover:text-white/60')}">Tape</button>
+            <button onclick="setEra('discman')" class="px-4 py-2 text-[14px] uppercase tracking-widest font-black transition-all rounded-lg ${!isManualSkin ? 'text-white/30' : (currentEra === 'discman' ? 'bg-white/10 text-white shadow-lg' : 'text-white/30 hover:text-white/60')}">Disc</button>
+            <button onclick="setEra('ipod')" class="px-4 py-2 text-[14px] uppercase tracking-widest font-black transition-all rounded-lg ${!isManualSkin ? 'text-white/30' : (currentEra === 'ipod' ? 'bg-white/10 text-white shadow-lg' : 'text-white/30 hover:text-white/60')}">MP3</button>
           </div>
-          <div class="flex gap-6">
-            <button onclick="setEra('auto')" class="px-4 py-1.5 rounded-full border text-[9px] font-black tracking-widest uppercase transition-all ${!isManualSkin ? 'nav-btn-active' : 'border-white/10 text-white/40'}">✨ Auto Era</button>
-            <button onclick="setEra('modern')" class="px-4 py-1.5 rounded-full border text-[9px] font-black tracking-widest uppercase transition-all ${(isManualSkin && currentEra === 'modern') ? 'nav-btn-active' : 'border-white/10 text-white/40'}">Stream</button>
+          <div class="flex gap-4">
+            <button onclick="setEra('auto')" class="px-5 py-2 rounded-full border text-[10px] font-black tracking-widest uppercase transition-all backdrop-blur-sm ${!isManualSkin ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-white/10 text-white/30 hover:border-white/30'}">✨ Auto Era</button>
+            <button onclick="setEra('modern')" class="px-5 py-2 rounded-full border text-[10px] font-black tracking-widest uppercase transition-all backdrop-blur-sm ${(isManualSkin && currentEra === 'modern') ? 'bg-white/10 border-white/40 text-white' : 'border-white/10 text-white/30 hover:border-white/30'}">Stream</button>
           </div>
         </div>
       `;
@@ -1919,10 +2101,10 @@
       const needleR = document.getElementById('needle-r');
       if (!needleL || !needleR) return;
 
-      if (!isPlaying) { 
-        needleL.style.transform = 'rotate(-45deg)'; 
-        needleR.style.transform = 'rotate(-45deg)'; 
-        return; 
+      if (!isPlaying) {
+        needleL.style.transform = 'rotate(-45deg)';
+        needleR.style.transform = 'rotate(-45deg)';
+        return;
       }
       // Mechanical jitter simulation
       needleL.style.transform = `rotate(${-30 + Math.random() * 40}deg)`;
