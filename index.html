@@ -1734,17 +1734,11 @@
       } else if (currentEra === 'vinyl') {
         skinHTML = `
           <div class="turntable-chassis">
-            <div class="absolute top-4 left-6 z-10">
-              <div class="text-white/30 font-black text-[9px] tracking-[0.3em] uppercase">FMP-1200</div>
-              <div class="text-white/10 font-bold text-[7px] tracking-widest uppercase">Direct Drive System</div>
-            </div>
-
             <div class="turntable-platter">
               <div id="vinyl-spinner" onclick="togglePlay()" class="record-spinner cursor-pointer group relative ${isPlaying ? 'record-spinning' : ''}">
                 <div id="skin-cover" class="record-label" style="background-image: url('${cover}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
                 <div class="record-center-hole"></div>
                 <div class="record-spindle"></div>
-                <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
               </div>
             </div>
             <div class="speed-selector">
@@ -1826,11 +1820,10 @@
       } else if (currentEra === 'ipod') {
         skinHTML = `
           <div class="ipod-screen-refined">
-            <div class="absolute top-1 left-2 text-[7px] text-white/40 font-bold uppercase tracking-widest">FMP Radio</div>
             <img id="skin-cover" src="${cover}" class="w-full h-full object-contain object-center bg-black">
             <div class="ipod-text-overlay">
               <div id="skin-title" class="text-white font-black text-lg leading-tight mb-1">${title}</div>
-              <div class="text-yellow-500 text-[10px] tracking-[0.3em] font-bold uppercase">Now Playing</div>
+              <div class="text-yellow-500 text-[10px] tracking-[0.3em] font-bold uppercase">Now Playing on FMP Radio</div>
             </div>
             <!-- BREADCRUMB: EQ Bar Array -->
             <div class="ipod-eq-wide ${isPlaying ? 'eq-animating' : ''}">
