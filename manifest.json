@@ -1,0 +1,46 @@
+{
+  "id": "com.fmpradio.app",
+  "name": "For My People Radio",
+  "short_name": "FMPRADIO",
+  "description": "The Voice of the People — Chicago's Austin Community",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#0a0e1a",
+  "orientation": "portrait-primary",
+  "categories": ["music", "entertainment", "community"],
+  "icons": [
+    {
+      "src": "https://i.imgur.com/BlZJJvu.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.imgur.com/BlZJJvu.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.imgur.com/BlZJJvu.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Stream",
+      "short_name": "Live",
+      "url": "./index.html#now-playing",
+      "icons": [{ "src": "https://i.imgur.com/BlZJJvu.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Schedule",
+      "short_name": "Schedule",
+      "url": "./index.html#schedule",
+      "icons": [{ "src": "https://i.imgur.com/BlZJJvu.png", "sizes": "192x192" }]
+    }
+  ]
+}
