@@ -561,7 +561,7 @@
     /* MAXELL CASSETTE (Hyper-Real 1.6:1 Ratio) */
     .skin-cassette-body {
       width: 395px;
-      height: 250px;
+      height: var(--tape-height, 250px);
       background: #1a1a1a;
       border-radius: 8px;
       border-top: 2px solid #333;
@@ -2178,6 +2178,7 @@
 
         document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
         document.documentElement.style.setProperty('--rotate-tape', '90deg');
+        document.documentElement.style.setProperty('--tape-height', '250px');
         document.documentElement.style.setProperty('--tape-window-top', '25px');
         document.documentElement.style.setProperty('--margin-tape', '180px 0');
         document.documentElement.style.setProperty('--scale-disc', (baseW - 4) / 360);
@@ -2187,7 +2188,8 @@
       } else {
         document.documentElement.style.setProperty('--scale-tape', '1.8');
         document.documentElement.style.setProperty('--rotate-tape', '0deg');
-        document.documentElement.style.setProperty('--tape-window-top', '85px');
+        document.documentElement.style.setProperty('--tape-height', '235px');
+        document.documentElement.style.setProperty('--tape-window-top', '95px');
         document.documentElement.style.setProperty('--margin-tape', '60px 0');
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
