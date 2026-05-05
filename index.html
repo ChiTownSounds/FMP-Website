@@ -1889,8 +1889,16 @@
 
       const skinCover = document.getElementById('skin-cover');
       if (skinCover) {
-        if (skinCover.tagName === 'IMG') skinCover.src = cover;
-        else skinCover.style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0)), url('${cover}')`;
+        if (skinCover.tagName === 'IMG') {
+          skinCover.src = cover;
+        } else {
+          // Maintain skin-specific overlays
+          if (currentEra === 'cassette') {
+            skinCover.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)), url('${cover}')`;
+          } else {
+            skinCover.style.backgroundImage = `url('${cover}')`;
+          }
+        }
       }
 
       // Sync the Era Engine on metadata change
