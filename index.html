@@ -561,7 +561,7 @@
     /* MAXELL CASSETTE (Hyper-Real 1.6:1 Ratio) */
     .skin-cassette-body {
       width: 395px;
-      height: 250px; /* Locked Factory Height */
+      height: 250px;
       background: #1a1a1a;
       border-radius: 8px;
       border-top: 2px solid #333;
@@ -574,7 +574,8 @@
       position: relative;
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 0 30px #000;
       z-index: 10;
-      transform: rotate(90deg) scale(var(--scale-tape, 1.26)); /* Global Sideways Lock */
+      /* Forced Global Sideways Lock */
+      transform: rotate(90deg) scale(var(--scale-tape, 1.26)) !important;
       margin: var(--margin-tape, 180px 0);
     }
 
@@ -758,9 +759,9 @@
 
     .tape-window {
       position: absolute;
-      top: 25px; /* Locked Factory Center */
-      left: 50%;
-      transform: translateX(-50%);
+      top: 25px !important; /* Absolute Factory Lock */
+      left: 50% !important;
+      transform: translateX(-50%) !important;
       width: 275px;
       height: 62px;
       flex-shrink: 0;
