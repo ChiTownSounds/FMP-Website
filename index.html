@@ -948,6 +948,19 @@
       cursor: pointer;
     }
 
+    .discman-tray {
+      position: absolute;
+      inset: 0;
+      background: #050505;
+      border-radius: 50%;
+      box-shadow: inset 0 5px 20px rgba(0,0,0,0.8);
+      transform: translateY(-6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
     .cd-disc {
       width: 290px;
       height: 290px;
@@ -956,9 +969,9 @@
       background-position: center !important;
       box-shadow: 0 0 30px rgba(0, 0, 0, 1);
       position: relative;
-      transform: translateY(-6px);
       mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
       -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
+      pointer-events: auto;
     }
 
     .cd-disc::after {
@@ -978,7 +991,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, calc(-50% - 6px));
+      transform: translate(-50%, -50%);
       width: 34px;
       height: 34px;
       background: #222;
@@ -2174,8 +2187,10 @@
         skinHTML = `
           <div class="discman-body ${isPlaying ? 'is-playing' : 'is-paused'}">
             <div class="discman-window" onclick="togglePlay()">
-              <div id="skin-cover" class="cd-disc ${isPlaying ? 'cd-spinning' : ''}" style="background: url('${cover}')"></div>
-              <div class="cd-spindle"></div>
+              <div class="discman-tray">
+                <div id="skin-cover" class="cd-disc ${isPlaying ? 'cd-spinning' : ''}" style="background: url('${cover}')"></div>
+                <div class="cd-spindle"></div>
+              </div>
               <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
             </div>
             
