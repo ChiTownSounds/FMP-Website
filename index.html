@@ -785,11 +785,16 @@
       .tape-window {
         top: 33px !important; /* Nudged 3px closer to words */
       }
-      .skin-title-container {
-        top: 135px !important; /* Aggressively separated for PC */
-      }
       .ipod-screen-refined {
-        height: 320px !important; /* Larger screen for PC */
+        height: 420px !important; /* Huge screen for PC */
+      }
+      .skin-ipod {
+        width: 480px !important;
+        height: 780px !important;
+      }
+      .click-wheel-refined {
+        width: 300px !important;
+        height: 300px !important;
       }
     }
 
@@ -2206,8 +2211,8 @@
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
         
-        // iPod PC Scaling
-        const ipodScale = Math.min((h - 150) / 620, 1);
+        // iPod PC Scaling (Optimized for larger 480x780 base)
+        const ipodScale = Math.min((h - 100) / 780, 1);
         document.documentElement.style.setProperty('--scale-ipod', ipodScale);
       }
     }
