@@ -1888,7 +1888,7 @@
       const title = document.getElementById('now-playing-title').innerText;
       const cover = document.getElementById('main-cover-art').src;
 
-      container.className = `skin-${currentEra} flex flex-col items-center justify-between py-10 h-full`;
+      container.className = `skin-${currentEra} flex flex-col items-center justify-center py-10 h-full relative`;
 
       let skinHTML = '';
 
@@ -2044,7 +2044,7 @@
 
       // Append Unified Navigation to ALL skins
       container.innerHTML = skinHTML + `
-        <div class="w-full mt-auto pt-8 pb-4 flex flex-col items-center gap-4 relative z-[999]">
+        <div class="w-full mt-auto pb-8 flex flex-col items-center gap-4 absolute bottom-0 left-0 z-[999]">
           <div class="flex justify-center gap-3 p-2 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl">
             <button onclick="setEra('vinyl')" class="px-4 py-2 text-[14px] uppercase tracking-widest font-black transition-all rounded-lg ${!isManualSkin ? 'text-white/30' : (currentEra === 'vinyl' ? 'bg-white/10 text-white shadow-lg' : 'text-white/30 hover:text-white/60')}">Vinyl</button>
             <button onclick="setEra('cassette')" class="px-4 py-2 text-[14px] uppercase tracking-widest font-black transition-all rounded-lg ${!isManualSkin ? 'text-white/30' : (currentEra === 'cassette' ? 'bg-white/10 text-white shadow-lg' : 'text-white/30 hover:text-white/60')}">Tape</button>
@@ -2190,7 +2190,7 @@
         const vinylScale = isLandscape ? (h / 380) * 0.9 : (w + 80) / 380;
         document.documentElement.style.setProperty('--scale-vinyl', vinylScale);
       } else {
-        document.documentElement.style.setProperty('--scale-tape', '1.4');
+        document.documentElement.style.setProperty('--scale-tape', '1.2');
         document.documentElement.style.setProperty('--scale-disc', '1');
         document.documentElement.style.setProperty('--scale-vinyl', '1.2');
       }
