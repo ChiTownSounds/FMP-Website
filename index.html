@@ -1605,11 +1605,11 @@
         </div>
       </div>
 
-      <!-- Era Selector (Modern Drawer Style) -->
+      <!-- Era Selector (Smart Mode) -->
       <div class="w-full mt-8 flex justify-center gap-6">
-        <button onclick="setEra('retro')"
-          class="px-4 py-2 rounded-full border border-white/10 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase">
-          ✨ Retro Modes
+        <button onclick="setEra('auto')"
+          class="px-4 py-2 rounded-full border border-yellow-500/30 text-[10px] font-black tracking-widest text-yellow-500 hover:bg-yellow-500/10 transition-all uppercase">
+          ✨ Enable Auto Era
         </button>
       </div>
     </div>
@@ -1836,27 +1836,102 @@
     // ── Smart Era Engine ──────────────────────────────────────
     let isManualSkin = false;
     let currentEra = 'modern';
+    let libraryData = [];
+
+    async function loadLibraryData() {
+      const LIVE_URL = 'https://raw.githubusercontent.com/ChiTownSounds/FMP-Radio/main/fmp_data_7718.csv';
+      const LOCAL_PATH = './fmp_data_7718.csv';
+
+      try {
+        console.log("[Library Engine] Sourcing live data from FMP-Radio repo...");
+        let resp = await fetch(LIVE_URL);
+        if (!resp.ok) throw new Error("GitHub fetch failed");
+        
+        const csv = await resp.text();
+        parseLibraryCSV(csv);
+      } catch (e) {
+        console.warn("[Library Engine] Live sync failed, attempting local fallback...", e);
+        try {
+          const resp = await fetch(LOCAL_PATH);
+          const csv = await resp.text();
+          parseLibraryCSV(csv);
+        } catch (localErr) {
+          console.error("[Library Engine] Total failure. Heuristics active.");
+        }
+      }
+    }
+
+    function parseLibraryCSV(csv) {
+      const lines = csv.split('\n');
+      libraryData = lines.slice(1).map(line => {
+        let parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        if (parts.length < 2) return null;
+        let cat = parts[0].trim();
+        let name = parts[1].replace(/^"|"$/g, '').trim();
+        let cleanName = name.replace(/\.[^/.]+$/, "").replace(/^cbr_/, "").replace(/^cbr_/, "");
+        return { category: cat, name: cleanName.toLowerCase() };
+      }).filter(item => item !== null);
+      
+      console.log(`[Library Engine] Verified ${libraryData.length} tracks loaded.`);
+      syncEra();
+    }
 
     function detectEra(title) {
-      const lower = title.toLowerCase();
-      // BREADCRUMB: Legend Artist Heuristics
-      const isVinyl = /chic|slave|gap band|zapp|con funk|parliament|funkadelic|bar-kays|cameo|isley|earth wind|stevie wonder|marvin gaye|chaka khan|motown|disco|funk|soul|whispers|shalamar|kool|commodores|70's/.test(lower);
-      const isTape = /rick james|bobby brown|billy ocean|keith sweat|guy|new edition|debarge|janet jackson|prince|michael jackson|80s|90s|r&b|swing|new jack|80's|90's/.test(lower);
-      const isDisc = /usher|alicia keys|beyonce|jay-z|luther vandross|mary j|2000|2001|2002|2003|2004|hip hop|rkelly|r kelly/.test(lower);
+      if (!title || title.toLowerCase().includes('loading')) return 'modern';
+      const lower = title.toLowerCase().trim();
 
-      if (lower.match(/196|197|60s|70s/) || isVinyl) return 'vinyl';
-      if (lower.match(/198|199[0-5]|80s/) || isTape) return 'cassette';
-      if (lower.match(/199[6-9]|200[0-4]|cd|discman/) || isDisc) return 'discman';
-      if (lower.match(/200[5-9]|201|202|ipod|pop|modern|new/)) return 'ipod';
+      // STEP 1: Accurate Lookup (Leveraging fmp-data-7718)
+      const match = libraryData.find(item => lower.includes(item.name) || item.name.includes(lower));
+      if (match) {
+        const cat = match.category;
+        if (cat.includes("70's")) return 'vinyl';
+        if (cat.includes("90s")) {
+          // 90s could be Tape or Disc. Split by mid-point.
+          if (lower.match(/199[0-5]|90s/)) return 'cassette';
+          return 'discman';
+        }
+        if (cat.includes("2010+")) {
+          if (lower.match(/200[5-9]|201[0-2]/)) return 'ipod';
+          return 'modern';
+        }
+        if (cat.includes("Live")) {
+           // Live tracks usually go to the most aesthetic retro mode if available
+           if (lower.match(/19[67]/)) return 'vinyl';
+           if (lower.match(/198|199/)) return 'cassette';
+        }
+      }
+
+      // STEP 2: Heuristic Fallback
+      // BREADCRUMB: Legend Artist Heuristics
+      const isVinyl = /chic|slave|gap band|zapp|con funk|parliament|funkadelic|bar-kays|cameo|isley|earth wind|stevie wonder|marvin gaye|chaka khan|motown|disco|funk|soul|whispers|shalamar|kool|commodores|70's|60's|james brown|aretha franklin|curtis mayfield|al green|isaac hayes|the spinners|barry white/.test(lower);
+      const isTape = /rick james|bobby brown|billy ocean|keith sweat|guy|new edition|debarge|janet jackson|prince|michael jackson|80s|90s|r&b|swing|new jack|80's|90's|boyz ii men|tlc|swv|whitney houston|tony toni tone|jodeci/.test(lower);
+      const isDisc = /usher|alicia keys|beyonce|jay-z|luther vandross|mary j|2000|2001|2002|2003|2004|hip hop|rkelly|r kelly|destiny's child|outkast|nelly|ashanti|50 cent|ludacris|ja rule/.test(lower);
+      const isIpod = /2005|2006|2007|2008|2009|201[0-4]|ipod|pop|modern|new|drake|rihanna|kanye west|kendrick lamar|sza|chris brown|trey songz|ne-yo/.test(lower);
+
+      // Prioritize Year/Decade Matches
+      if (lower.match(/19[67]|60s|70s|70's/)) return 'vinyl';
+      if (lower.match(/198|199[0-5]|80s|90s|80's|90's/)) return 'cassette';
+      if (lower.match(/199[6-9]|200[0-4]|cd|discman/)) return 'discman';
+      if (lower.match(/200[5-9]|201[0-2]|ipod/)) return 'ipod';
+      if (lower.match(/201[3-9]|202|new|modern/)) return 'modern';
+
+      // Fallback to Artist Heuristics
+      if (isVinyl) return 'vinyl';
+      if (isTape) return 'cassette';
+      if (isDisc) return 'discman';
+      if (isIpod) return 'ipod';
 
       return 'modern';
     }
 
     function syncEra() {
       if (isManualSkin) return;
-      const title = document.getElementById('now-playing-title').innerText;
+      const titleEl = document.getElementById('now-playing-title');
+      if (!titleEl) return;
+      const title = titleEl.innerText.trim();
       const detected = detectEra(title);
       if (detected !== currentEra) {
+        console.log(`[Smart Era] Switching to ${detected} based on: "${title}"`);
         currentEra = detected;
         if (document.getElementById('mobile-device-view').classList.contains('active')) {
           renderCurrentSkin();
@@ -2161,8 +2236,6 @@
             document.getElementById('cover-art').src = cover;
 
             updateDeviceUI();
-
-            updateDeviceUI();
           }
 
           // Always update listener count
@@ -2185,7 +2258,7 @@
       const target = document.getElementById('now-playing-title');
       if (target) {
         const observer = new MutationObserver(() => updateDeviceUI());
-        observer.observe(target, { childList: true, characterData: true });
+        observer.observe(target, { childList: true, characterData: true, subtree: true });
       }
     }
     function updateScale() {
@@ -2263,6 +2336,7 @@
     window.addEventListener('load', () => {
       updateScale();
       initWatchtower();
+      loadLibraryData(); // BREADCRUMB: Load accurate station data
       if (window.innerWidth <= 768) {
         document.getElementById('mobile-device-view').classList.add('active');
         setEra('auto');

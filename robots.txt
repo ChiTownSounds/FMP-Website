@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /fmp_data_7718.csv
+Disallow: /*.csv
