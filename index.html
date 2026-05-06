@@ -956,6 +956,7 @@
       background-position: center !important;
       box-shadow: 0 0 30px rgba(0, 0, 0, 1);
       position: relative;
+      transform: translateY(-6px);
       mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
       -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
     }
@@ -977,7 +978,7 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, calc(-50% - 6px));
       width: 34px;
       height: 34px;
       background: #222;
