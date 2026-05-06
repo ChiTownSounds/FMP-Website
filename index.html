@@ -1503,15 +1503,19 @@
           <div>
             <div class="rounded-lg border border-white/10 bg-gray-900 p-5">
               <h4 class="font-bold mb-4 text-white">Send a Shout-Out</h4>
-              <div id="shoutout-form">
-                <input id="shoutout-name" type="text" placeholder="Your Name"
+              <form id="shoutout-form" name="shoutout" data-netlify="true" netlify-honeypot="bot-field" onsubmit="submitShoutout(event)">
+                <input type="hidden" name="form-name" value="shoutout">
+                <p class="hidden">
+                  <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
+                </p>
+                <input id="shoutout-name" name="name" type="text" placeholder="Your Name" required
                   class="w-full mb-3 px-3 py-2 rounded bg-gray-800 border border-white/10 text-white text-sm">
-                <textarea id="shoutout-msg" placeholder="Your message..." rows="3"
+                <textarea id="shoutout-msg" name="message" placeholder="Your message..." rows="3" required
                   class="w-full mb-3 px-3 py-2 rounded bg-gray-800 border border-white/10 text-white text-sm resize-none"></textarea>
-                <button onclick="submitShoutout()"
+                <button type="submit" id="shoutout-submit-btn"
                   class="w-full py-2 rounded bg-red-700 hover:bg-red-600 text-white font-bold text-sm">Send It
                   In</button>
-              </div>
+              </form>
               <div id="shoutout-success"
                 class="hidden mt-3 p-3 rounded bg-yellow-500/10 border border-yellow-500/20 text-sm text-yellow-500 text-center font-semibold">
                 ✨ Got it! Listen for your shout-out on air.
@@ -1850,12 +1854,40 @@
       });
     }
 
-    async function submitShoutout() {
-      const name = document.getElementById('shoutout-name').value.trim();
-      const msg = document.getElementById('shoutout-msg').value.trim();
-      if (!name || !msg) return;
-      document.getElementById('shoutout-form').classList.add('hidden');
-      document.getElementById('shoutout-success').classList.remove('hidden');
+     async function submitShoutout(e) {
+      if (e) e.preventDefault();
+      
+      const name = document.getElementById('shoutout-name').value;
+      const message = document.getElementById('shoutout-msg').value;
+      const submitBtn = document.getElementById('shoutout-submit-btn');
+      const form = document.getElementById('shoutout-form');
+
+      if (!name || !message) return;
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Sending...";
+
+      try {
+        // BREADCRUMB: Using native Netlify AJAX form submission (0 Credits)
+        const formData = new FormData(form);
+        const response = await fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(formData).toString(),
+        });
+
+        if (response.ok) {
+          document.getElementById('shoutout-form').classList.add('hidden');
+          document.getElementById('shoutout-success').classList.remove('hidden');
+        } else {
+          throw new Error("Form submission failed");
+        }
+      } catch (err) {
+        console.error("Shout-out failed:", err);
+        alert("Shout-out didn't go through. Please try again later!");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Send It In";
+      }
     }
 
     // ── Smart Era Engine ──────────────────────────────────────
