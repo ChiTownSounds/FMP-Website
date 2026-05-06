@@ -1899,6 +1899,9 @@
       const LIVE_URL = 'https://raw.githubusercontent.com/ChiTownSounds/FMP-Radio/main/fmp_data_7718.csv';
       const LOCAL_PATH = './fmp_data_7718.csv';
 
+      // Load Schedule in parallel for performance
+      loadScheduleData();
+
       try {
         console.log("[Library Engine] Sourcing live data from FMP-Radio repo...");
         let resp = await fetch(LIVE_URL);
@@ -1915,6 +1918,44 @@
         } catch (localErr) {
           console.error("[Library Engine] Total failure. Heuristics active.");
         }
+      }
+    }
+
+    async function loadScheduleData() {
+      const SCHED_URL = 'https://raw.githubusercontent.com/ChiTownSounds/FMP-Radio/main/fmp_schedule.csv';
+      try {
+        const resp = await fetch(SCHED_URL);
+        if (!resp.ok) return;
+        const csv = await resp.text();
+        parseScheduleCSV(csv);
+      } catch (e) {
+        console.warn("[Schedule Engine] Using hardcoded fallback.");
+      }
+    }
+
+    function parseScheduleCSV(csv) {
+      const lines = csv.split('\n');
+      const newSched = {};
+      lines.slice(1).forEach(line => {
+        const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+        if (parts.length >= 5) {
+          const day = parts[0].trim();
+          if (!newSched[day]) newSched[day] = [];
+          newSched[day].push({
+            time: parts[1].trim(),
+            show: parts[2].replace(/^"|"$/g, '').trim(),
+            host: parts[3].replace(/^"|"$/g, '').trim(),
+            genre: parts[4].replace(/^"|"$/g, '').trim()
+          });
+        }
+      });
+      if (Object.keys(newSched).length > 0) {
+        console.log("[Schedule Engine] Dynamic schedule loaded.");
+        Object.keys(newSched).forEach(day => {
+            SCHEDULE[day] = newSched[day];
+        });
+        renderDayTabs();
+        renderSchedule();
       }
     }
 
