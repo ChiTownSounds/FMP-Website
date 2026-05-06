@@ -576,7 +576,13 @@
       z-index: 10;
       /* Forced Global Sideways Lock */
       transform: rotate(90deg) scale(var(--scale-tape, 1.26)) !important;
-      margin: 0 !important; /* Let container handle centering */
+      margin: 0 !important;
+    }
+
+    @media (min-width: 1025px) {
+      .skin-cassette-body {
+        margin-top: -20px !important; /* Precision Nudge Up for PC */
+      }
     }
 
     .tape-window {
