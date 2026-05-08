@@ -397,11 +397,17 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(calc(1 / var(--scale-vinyl, 1)));
-      width: 190px;
+      width: 190px; /* Big Art for Phone */
       height: 190px;
       border-radius: 50%;
       border: 4px solid #000;
-      /* BREADCRUMB: Removed mask-image to prevent rotation artifacts */
+    }
+    
+    @media (min-width: 1025px) {
+      .record-label {
+        width: 120px; /* Realistic Art for PC */
+        height: 120px;
+      }
     }
 
     .record-center-hole {
@@ -558,14 +564,12 @@
       position: absolute;
       top: 10px;
       left: -2px;
-      width: 20px;
-      height: 20px;
-      background:
-        repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 4px),
-        radial-gradient(circle at 35% 35%, #f3f4f6 0%, #9ca3af 60%, #4b5563 100%);
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle at 35% 35%, #f1f5f9 0%, #94a3b8 60%, #475569 100%);
       border-radius: 50%;
-      border: 1px solid #4b5563;
-      box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.8);
+      border: 1px solid #64748b;
+      box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.8), inset 0 0 1px 1px rgba(255, 255, 255, 0.4);
       opacity: 0;
       transition: opacity 0.1s ease 0s;
       z-index: 25;
@@ -574,14 +578,44 @@
       justify-content: center;
     }
 
+    .tonearm-nickel::before {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 40% 60% 60% 40% / 50%;
+      filter: blur(0.5px);
+      transform: rotate(-5deg) translateX(-1px);
+    }
+
     .tonearm-nickel::after {
-      content: '5¢';
-      font-size: 9px;
-      font-weight: 900;
-      font-family: 'Times New Roman', serif;
-      color: #8c96a3;
-      text-shadow: -0.5px -0.5px 0px rgba(0, 0, 0, 0.6), 0.5px 0.5px 0px rgba(255, 255, 255, 0.9);
-      transform: rotate(-10deg);
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 17px;
+      background: rgba(0, 0, 0, 0.25);
+      /* Organic Profile: Hand-tuned border-radius to mimic a minted face */
+      border-radius: 45% 55% 70% 35% / 60% 45% 75% 55%;
+      filter: blur(0.2px);
+      box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.3), 1px 1px 1px rgba(0, 0, 0, 0.1);
+      transform: rotate(-15deg) translateX(-1px);
+      z-index: 2;
+    }
+
+    .vinyl-series-label {
+      position: absolute;
+      top: -35px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-3deg);
+      font-family: 'Permanent Marker', cursive;
+      font-size: 18px;
+      color: #eab308;
+      opacity: 0.5;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
 
     .tonearm-playing .tonearm-nickel {
@@ -609,6 +643,13 @@
       transform: translateY(150px) rotate(90deg) scale(calc(var(--skin-scale, 1) * 1.3)) !important;
       margin: 0;
       flex-shrink: 0;
+    }
+
+    @media (min-width: 1025px) {
+      .skin-cassette-body {
+        /* Nudge up on PC to avoid dashboard collision, but not so much that it clips top */
+        transform: translateY(80px) rotate(90deg) scale(calc(var(--skin-scale, 1) * 1.3)) !important;
+      }
     }
 
     .tape-window {
@@ -2349,7 +2390,7 @@
                 <div id="skin-cover" class="cd-disc ${isPlaying ? 'cd-spinning' : ''}" style="background: url('${cover}')"></div>
                 <div class="cd-spindle"></div>
               </div>
-              <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-[25] transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
+              <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-[25] transition-opacity duration-300 rounded-full ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
             </div>
             
             <div class="discman-lid-container" onclick="toggleEject()">
@@ -2545,38 +2586,34 @@
       }
     }
     function updateScale() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const container = document.getElementById('device-container');
-      if (!container) return;
-
-      // Define Design dimensions for each skin (width x height)
-      // Note: for Cassette, width is 250 and height is 395 due to 90deg rotation
       const isPC = window.innerWidth > 1024;
       const designs = {
         'modern': isPC ? { w: 550, h: 550 } : { w: 420, h: 800 },
         'vinyl': { w: 380, h: 550 },
         'cassette': { w: 330, h: 620 },
-        'discman': { w: 360, h: 600 },
-        'ipod': { w: 380, h: 780 }
+        'discman': { w: 360, h: 600 }
       };
 
-      const design = designs[currentEra] || designs['modern'];
+      const design = designs[currentEra] || { w: 360, h: 600 };
       
-      // Calculate scale to fit both width and height with 20px padding
-      const scaleW = (w - 40) / design.w;
-      const scaleH = (h - 200) / design.h; // Leave room for UI/Nav
-      
-      let finalScale = Math.min(scaleW, scaleH);
-      
-      // Don't upscale too much on desktop unless it's small
-      if (w > 1024) {
-        finalScale = Math.min(finalScale, 1.2);
+      if (!isPC) {
+        // 📱 PHONE LOCK: Fluid scaling (Max 1.0)
+        const padding = 30;
+        const scaleW = (window.innerWidth - padding) / design.w;
+        const scaleH = (window.innerHeight - padding) / design.h;
+        const mobileScale = Math.min(scaleW, scaleH, 1);
+        document.documentElement.style.setProperty('--skin-scale', mobileScale);
       } else {
-        finalScale = Math.min(finalScale, 1.5);
+        // 💻 PC EXPERIENCE: Independent multipliers
+        const pcScales = {
+          'modern': 1.0,
+          'vinyl': 1.3,
+          'cassette': 1.1,  // Reduced to 1.1x for better screen fit
+          'discman': 1.0
+        };
+        const pcScale = pcScales[currentEra] || 1.0;
+        document.documentElement.style.setProperty('--skin-scale', pcScale);
       }
-
-      document.documentElement.style.setProperty('--skin-scale', finalScale);
     }
     // ── PWA Installation Logic ──────────────────────────────
     let deferredPrompt;
