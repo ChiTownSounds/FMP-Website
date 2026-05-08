@@ -46,6 +46,7 @@
 
     :root {
       --fmp-gold: #eab308;
+      --skin-scale: 1;
     }
 
     body {
@@ -223,18 +224,20 @@
     #device-container {
       width: 100%;
       height: 100%;
-      max-width: 420px;
-      max-height: 800px;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
       position: relative;
       z-index: 50;
+      /* Illusion Lock: Prevent internal element stretching */
+      flex-shrink: 0;
     }
 
     /* MODERN STREAMING SKIN */
     .skin-modern {
-      width: 100%;
-      height: 100%;
+      width: 420px;
+      height: 800px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -242,6 +245,8 @@
       padding: 3rem 1.5rem;
       position: relative;
       z-index: 10;
+      transform: scale(var(--skin-scale, 1));
+      transform-origin: center center;
     }
 
     .dynamic-bg {
@@ -287,6 +292,13 @@
 
     #mobile-device-view.active .artwork-container {
       transform: scale(1);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 50px rgba(234, 179, 8, 0.2);
+      animation: artworkPulse 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes artworkPulse {
+      0% { box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(234, 179, 8, 0.1); }
+      100% { box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 60px rgba(234, 179, 8, 0.3); }
     }
 
     .player-controls {
@@ -343,7 +355,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      transform: scale(var(--scale-vinyl, 1));
+      transform: scale(var(--skin-scale, 1));
       overflow: hidden;
       /* Contain the texture */
     }
@@ -593,9 +605,10 @@
       position: relative;
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), inset 0 0 30px #000;
       z-index: 10;
-      /* Forced Global Sideways Lock */
-      transform: rotate(90deg) scale(var(--scale-tape, 1.26)) !important;
-      margin: var(--margin-tape, 180px 0);
+      /* Illusion Lock: 30% Larger + Stabilized Top Edge */
+      transform: translateY(150px) rotate(90deg) scale(calc(var(--skin-scale, 1) * 1.3)) !important;
+      margin: 0;
+      flex-shrink: 0;
     }
 
     .tape-window {
@@ -805,6 +818,14 @@
     }
 
     @media (min-width: 1025px) {
+      .skin-modern .artwork-container {
+        width: 320px !important;
+        height: 320px !important;
+        margin-top: 10px;
+      }
+      .skin-modern .player-controls {
+        margin-top: 15px !important;
+      }
       .tape-window {
         top: 33px !important; /* Nudged 3px closer to words */
       }
@@ -858,7 +879,7 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: #eee;
+      background: #f1f5f9;
       position: absolute;
       top: 50%;
       left: 50%;
@@ -867,7 +888,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      /* Real 6-Spoke Hub Detail */
+      background-image: 
+        conic-gradient(from 0deg, transparent 0deg 25deg, #cbd5e1 25deg 35deg, transparent 35deg 85deg, #cbd5e1 85deg 95deg, transparent 95deg 145deg, #cbd5e1 145deg 155deg, transparent 155deg 205deg, #cbd5e1 205deg 215deg, transparent 215deg 265deg, #cbd5e1 265deg 275deg, transparent 275deg 325deg, #cbd5e1 325deg 335deg, transparent 335deg 360deg),
+        radial-gradient(circle at center, #000 15%, transparent 20%);
     }
 
     .reel-gear::before {
@@ -929,7 +954,7 @@
       padding-top: 20px;
       z-index: 10;
       margin: auto;
-      transform: scale(var(--scale-disc, 1));
+      transform: scale(var(--skin-scale, 1));
     }
 
     .discman-window {
@@ -944,7 +969,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow: visible; /* Allow disc to slide out */
       cursor: pointer;
     }
 
@@ -972,6 +997,7 @@
       mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
       -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 10%, black 11%);
       pointer-events: auto;
+      z-index: 20; /* Over body, under lid */
     }
 
     .cd-disc::after {
@@ -1026,12 +1052,14 @@
       border-radius: 50%;
       background: radial-gradient(circle at 50% 20%, #2a2f35, #111);
       /* High-Depth Bezel & Sidewall */
-      border: 1px solid #000;
+      border: 1px solid #080808;
       box-shadow: 
-        0 1px 0 rgba(255, 255, 255, 0.1), /* Rim highlight */
-        0 2px 4px rgba(0, 0, 0, 0.5),    /* Soft drop shadow */
-        0 4px 0 #000,                   /* Sidewall thickness */
-        0 8px 15px rgba(0, 0, 0, 0.8);   /* Depth shadow */
+        inset 0 2px 3px rgba(255, 255, 255, 0.1), /* Top-inner bevel highlight */
+        inset 0 -2px 5px rgba(0, 0, 0, 0.8),      /* Bottom-inner bevel shadow */
+        0 1px 0 rgba(255, 255, 255, 0.15),        /* Outer rim sharp highlight */
+        0 3px 0 #080808,                          /* Primary sidewall edge */
+        0 5px 0 #000,                             /* Secondary depth layer */
+        0 12px 25px rgba(0, 0, 0, 0.9);           /* Deep drop shadow on chassis */
       
       /* New composite mask: Top half has a hole, Bottom half is solid */
       -webkit-mask-image: linear-gradient(to top, black 50%, transparent 50.1%),
@@ -1067,7 +1095,7 @@
       font-weight: 900;
       font-size: 110px;
       letter-spacing: 12px;
-      padding-left: 22px; /* One space left */
+      padding-left: 0; /* Absolute centering */
       color: #0a0a0a;
       /* Engraving Effect scaled for massive size */
       text-shadow: 
@@ -1157,9 +1185,10 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      align-items: center; /* Center lines horizontally */
       overflow: hidden;
       margin-bottom: 0;
-      transform: translateX(-2px);
+      transform: none; /* Zero-drift alignment */
       position: relative;
       animation: backlightBlue 6s ease-in-out infinite alternate;
     }
@@ -1222,7 +1251,7 @@
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4), inset 0 -10px 20px rgba(0, 0, 0, 0.05);
       z-index: 10;
       transform-origin: center center;
-      transform: scale(var(--scale-ipod, 1));
+      transform: scale(var(--skin-scale, 1));
     }
 
     .ipod-screen-refined {
@@ -1362,6 +1391,70 @@
       color: #b45309 !important;
       /* Darker Gold for iPod contrast */
       border-color: rgba(180, 83, 9, 0.4) !important;
+    }
+
+    /* MODERN STREAM ANIMATIONS */
+    .particle {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.1;
+      pointer-events: none;
+      animation: floatUp var(--duration) linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      50% { opacity: 0.2; }
+      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ef4444;
+      animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    /* EDGE EQ ANIMATIONS */
+    .edge-eq-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .edge-bar {
+      position: absolute;
+      background: rgba(234, 179, 8, 0.4);
+      transition: height 0.1s ease, width 0.1s ease;
+    }
+
+    /* Top Edge */
+    .eq-top { top: 0; height: 3px; display: flex; width: 100%; justify-content: space-around; }
+    .eq-top .edge-bar { width: 15px; height: 0px; border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
+    
+    /* Bottom Edge */
+    .eq-bottom { bottom: 0; height: 3px; display: flex; width: 100%; justify-content: space-around; }
+    .eq-bottom .edge-bar { width: 15px; height: 0px; border-top-left-radius: 2px; border-top-right-radius: 2px; }
+
+    /* Left Edge */
+    .eq-left { left: 0; width: 3px; height: 100%; display: flex; flex-direction: column; justify-content: space-around; }
+    .eq-left .edge-bar { height: 15px; width: 0px; border-top-right-radius: 2px; border-bottom-right-radius: 2px; }
+
+    /* Right Edge */
+    .eq-right { right: 0; width: 3px; height: 100%; display: flex; flex-direction: column; justify-content: space-around; }
+    .eq-right .edge-bar { height: 15px; width: 0px; border-top-left-radius: 2px; border-bottom-left-radius: 2px; }
+
+    .edge-eq-active .edge-bar {
+      animation: edgeBounce 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes edgeBounce {
+      from { height: 2px; width: 2px; opacity: 0.2; }
+      to { height: 20px; width: 20px; opacity: 0.8; }
     }
   </style>
 </head>
@@ -1908,10 +2001,54 @@
     let isManualSkin = false;
     let isEjected = false;
 
+    let lastSwappedCover = '';
+
     function toggleEject() {
       isEjected = !isEjected;
-      renderSkin();
+      renderCurrentSkin();
     }
+    
+    async function triggerDiscSwap(newCover) {
+      if (currentEra !== 'discman' || isEjected) return;
+      
+      console.log("[Discman] Song change detected. Initiating mechanical swap...");
+      isEjected = true;
+      renderCurrentSkin(); // Opens the lid
+      
+      // Wait for lid animation to finish
+      await new Promise(r => setTimeout(r, 800));
+      
+      const cd = document.querySelector('.cd-disc');
+      if (cd) {
+        // Step 1: Slide Right (Old Disc exits)
+        cd.classList.remove('cd-spinning'); // Stop spinning for cleaner animation
+        cd.style.transition = 'transform 0.7s cubic-bezier(0.4, 0, 1, 1), opacity 0.4s ease';
+        cd.style.transform = 'translateX(130%) rotate(45deg)';
+        cd.style.opacity = '0';
+        await new Promise(r => setTimeout(r, 750));
+        
+        // Step 2: Swap Content and Position (Instant)
+        cd.style.transition = 'none';
+        cd.style.backgroundImage = `url('${newCover}')`;
+        cd.style.transform = 'translateX(-130%) rotate(-45deg)';
+        cd.offsetHeight; // Force reflow
+        
+        // Step 3: Slide Left (New Disc enters)
+        cd.style.transition = 'transform 0.7s cubic-bezier(0, 0, 0.2, 1), opacity 0.4s ease';
+        cd.style.transform = 'translateX(0) rotate(0deg)';
+        cd.style.opacity = '1';
+        await new Promise(r => setTimeout(r, 750));
+        
+        if (isPlaying) cd.classList.add('cd-spinning'); // Resume spinning
+      }
+      
+      // Brief pause for the new disc to "settle"
+      await new Promise(r => setTimeout(r, 600));
+      
+      isEjected = false;
+      renderCurrentSkin(); // Closes the lid
+    }
+
     let currentEra = 'modern';
     let libraryData = [];
 
@@ -2089,25 +2226,39 @@
       }
       renderCurrentSkin();
     }
-
+    
     function renderCurrentSkin() {
       const container = document.getElementById('device-container');
       const title = document.getElementById('now-playing-title').innerText;
       const cover = document.getElementById('main-cover-art').src;
 
-      container.className = `skin-${currentEra} flex flex-col items-center justify-between py-10 h-full`;
+      container.className = `skin-${currentEra} flex flex-col items-center justify-between py-10 h-full relative`;
 
       let skinHTML = '';
 
       if (currentEra === 'modern') {
         skinHTML = `
-          <div class="w-full flex flex-col items-center">
+          <div class="edge-eq-container ${isPlaying ? 'edge-eq-active' : ''}">
+            <div class="eq-top">${Array(15).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
+            <div class="eq-bottom">${Array(15).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
+            <div class="eq-left">${Array(25).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
+            <div class="eq-right">${Array(25).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
+          </div>
+          <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            ${Array(12).fill(0).map((_, i) => `<div class="particle" style="left: ${Math.random() * 100}%; --duration: ${10 + Math.random() * 20}s; width: ${2 + Math.random() * 4}px; height: ${2 + Math.random() * 4}px; animation-delay: -${Math.random() * 20}s;"></div>`).join('')}
+          </div>
+          <div class="w-full flex flex-col items-center relative z-10">
             <div class="text-[12px] font-black tracking-[1.15em] text-red-600 uppercase -mr-[1.15em] mb-0.5">FMP RADIO</div>
-            <div class="text-[10px] font-black tracking-[0.4em] text-yellow-500 uppercase mb-1">Broadcasting Live</div>
+            <div class="flex items-center gap-2 mb-1">
+              <div class="live-dot"></div>
+              <div class="text-[10px] font-black tracking-[0.4em] text-yellow-500 uppercase">Broadcasting Live</div>
+            </div>
             <div class="text-[12px] text-white/60 font-medium">Chicago's Austin Community</div>
           </div>
-          <div class="artwork-container"><img id="device-cover" src="${cover}" class="w-full h-full object-cover"></div>
-          <div class="player-controls mt-6">
+          <div class="artwork-container relative">
+            <img id="device-cover" src="${cover}" class="w-full h-full object-cover">
+          </div>
+          <div class="player-controls mt-6 relative z-10">
             <div class="text-center px-4">
               <h2 id="device-title" class="text-2xl font-black text-white mb-2 leading-tight">${title}</h2>
               <div class="text-yellow-500 font-bold text-xs tracking-[0.2em] uppercase">The Voice of the People</div>
@@ -2180,11 +2331,12 @@
                   <div class="reel-gear"></div>
                 </div>
               </div>
-              <div class="w-full text-center px-4 skin-title-container" style="position: absolute; top: 112px; left: 0; z-index: 50;">
-                <div class="border-b border-gray-400/50 pb-1 mx-[3px]">
-                  <div id="skin-title" class="text-[14px] text-blue-900/80 font-normal leading-tight" style="font-family: 'Permanent Marker', cursive; transform: rotate(-1.5deg); letter-spacing: 0.5px; overflow: visible;">${title}</div>
+              <div class="w-full text-center px-4 skin-title-container" style="position: absolute; top: 127px; left: 0; z-index: 50;">
+                <div class="border-b border-gray-400/50 pb-1 mx-[3px] relative">
+                  <!-- Illusion Lock: Independent spacing for words (+8px total) and line/red-text (+15px total) -->
+                  <div id="skin-title" class="text-[14px] text-blue-900/80 font-normal leading-[0.9] relative z-[60]" style="font-family: 'Permanent Marker', cursive; transform: rotate(-1.5deg); letter-spacing: 0.5px; overflow: visible; white-space: normal; max-height: 20px; margin-top: -7px;">${title}</div>
                 </div>
-                <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em] uppercase">POSITION · FMP MASTER</div>
+                <div class="text-[6px] text-red-700 font-black mt-1 tracking-[0.3em] uppercase relative z-40">POSITION · FMP MASTER</div>
               </div>
             </div>
           </div>
@@ -2197,7 +2349,7 @@
                 <div id="skin-cover" class="cd-disc ${isPlaying ? 'cd-spinning' : ''}" style="background: url('${cover}')"></div>
                 <div class="cd-spindle"></div>
               </div>
-              <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
+              <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-[25] transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap Play</div>
             </div>
             
             <div class="discman-lid-container" onclick="toggleEject()">
@@ -2266,6 +2418,9 @@
           </div>
         </div>
       `;
+      
+      // BREADCRUMB: Recalculate scale for the new skin layout
+      updateScale();
     }
 
 
@@ -2288,6 +2443,14 @@
 
       // Hardware Skins Internal Sync
       const skinTitle = document.getElementById('skin-title');
+
+      // AUTO-SWAP: High-fidelity detection (Art-Driven)
+      if (currentEra === 'discman' && !isEjected && cover !== lastSwappedCover) {
+        lastSwappedCover = cover;
+        console.log("[Discman] Art Change Detected -> Initiating Swap...");
+        triggerDiscSwap(cover);
+      }
+
       if (skinTitle && skinTitle.innerText !== title) {
         skinTitle.innerText = title;
       }
@@ -2384,31 +2547,36 @@
     function updateScale() {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      const isLandscape = w > h;
+      const container = document.getElementById('device-container');
+      if (!container) return;
 
-      if (w <= 1024) { // Mobile & Tablet
-        // If landscape, we scale based on height to prevent infinite width-zoom
-        const baseW = isLandscape ? h * 0.6 : w;
+      // Define Design dimensions for each skin (width x height)
+      // Note: for Cassette, width is 250 and height is 395 due to 90deg rotation
+      const isPC = window.innerWidth > 1024;
+      const designs = {
+        'modern': isPC ? { w: 550, h: 550 } : { w: 420, h: 800 },
+        'vinyl': { w: 380, h: 550 },
+        'cassette': { w: 330, h: 620 },
+        'discman': { w: 360, h: 600 },
+        'ipod': { w: 380, h: 780 }
+      };
 
-        document.documentElement.style.setProperty('--scale-tape', ((baseW - 20) / 250) * 1.05);
-        document.documentElement.style.setProperty('--margin-tape', '180px 0');
-        document.documentElement.style.setProperty('--scale-disc', (baseW - 4) / 360);
-        
-        const ipodScaleMob = (baseW - 40) / 380;
-        document.documentElement.style.setProperty('--scale-ipod', ipodScaleMob);
-
-        const vinylScale = isLandscape ? (h / 380) * 0.9 : (w + 80) / 380;
-        document.documentElement.style.setProperty('--scale-vinyl', vinylScale);
+      const design = designs[currentEra] || designs['modern'];
+      
+      // Calculate scale to fit both width and height with 20px padding
+      const scaleW = (w - 40) / design.w;
+      const scaleH = (h - 200) / design.h; // Leave room for UI/Nav
+      
+      let finalScale = Math.min(scaleW, scaleH);
+      
+      // Don't upscale too much on desktop unless it's small
+      if (w > 1024) {
+        finalScale = Math.min(finalScale, 1.2);
       } else {
-        document.documentElement.style.setProperty('--scale-tape', '1.26');
-        document.documentElement.style.setProperty('--margin-tape', '60px 0');
-        document.documentElement.style.setProperty('--scale-disc', '1');
-        document.documentElement.style.setProperty('--scale-vinyl', '1.2');
-        
-        // iPod PC Scaling (Optimized for larger 480x780 base)
-        const ipodScale = Math.min((h - 100) / 780, 1);
-        document.documentElement.style.setProperty('--scale-ipod', ipodScale);
+        finalScale = Math.min(finalScale, 1.5);
       }
+
+      document.documentElement.style.setProperty('--skin-scale', finalScale);
     }
     // ── PWA Installation Logic ──────────────────────────────
     let deferredPrompt;
