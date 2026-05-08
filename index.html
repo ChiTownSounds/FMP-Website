@@ -280,14 +280,15 @@
     }
 
     .artwork-container {
-      width: 100%;
-      aspect-ratio: 1/1;
+      width: 320px;
+      height: 320px;
       border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.7), 0 18px 36px -18px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.1);
       transform: scale(0.95);
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 20;
     }
 
     #mobile-device-view.active .artwork-container {
@@ -299,6 +300,62 @@
     @keyframes artworkPulse {
       0% { box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(234, 179, 8, 0.1); }
       100% { box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 60px rgba(234, 179, 8, 0.3); }
+    }
+
+    /* MODERN SKIN ANIMATIONS */
+    @keyframes auroraShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes eqPulse {
+      0%, 100% { height: 4px; }
+      50% { height: 25px; }
+    }
+
+    @keyframes floatArtwork {
+      0%, 100% { transform: scale(1) translateY(0) rotate(0deg); }
+      50% { transform: scale(1) translateY(-10px) rotate(1deg); }
+    }
+
+    .skin-modern {
+      background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e1b4b);
+      background-size: 400% 400%;
+      animation: auroraShift 15s ease infinite;
+    }
+
+    .modern-eq-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 3px;
+      padding-bottom: 12px;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      z-index: 20;
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+    }
+
+    .modern-eq-bar {
+      width: 3px;
+      height: 4px;
+      background: #facc15;
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+    }
+
+    .eq-animating .modern-eq-bar {
+      animation: eqPulse 0.5s ease-in-out infinite;
+    }
+
+    .artwork-floating {
+      animation: floatArtwork 6s ease-in-out infinite;
     }
 
     .player-controls {
@@ -363,7 +420,7 @@
     .turntable-platter {
       width: 320px;
       height: 320px;
-      background: radial-gradient(circle, #555 0%, #222 90%, #111 100%);
+      background: #000; /* Solid black to blend logo edges */
       border-radius: 50%;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), inset 0 1px 3px rgba(255, 255, 255, 0.2);
       display: flex;
@@ -371,12 +428,44 @@
       justify-content: center;
       position: absolute;
       left: 10px;
+      perspective: 1000px; /* 3D Depth for the lift-and-flip */
+    }
+
+    .platter-logo {
+      width: 320px;
+      height: 320px;
+      background-image: url('./assets/logo.png');
+      background-size: 85%;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: opacity(0.3);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      will-change: transform;
+    }
+
+    /* Synchronized Spin Engine */
+    .record-spinning, .platter-logo.record-spinning {
+      animation: spin 2s linear infinite !important;
+      animation-delay: -10s !important; /* Forces perfect phase synchronization */
+    }
+
+    .platter-logo-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 1;
     }
 
     .record-spinner {
       width: 310px;
       height: 310px;
-      background: repeating-radial-gradient(circle, #1a1a1a 0, #1a1a1a 2px, #0f0f0f 4px, #0f0f0f 5px);
+      background-color: #000; /* Force solid base */
+      background-image: repeating-radial-gradient(circle, #1a1a1a 0, #1a1a1a 2px, #0f0f0f 4px, #0f0f0f 5px);
       border-radius: 50%;
       box-shadow: 0 0 10px rgba(0, 0, 0, 1);
       position: relative;
@@ -648,7 +737,7 @@
     @media (min-width: 1025px) {
       .skin-cassette-body {
         /* Nudge up on PC to avoid dashboard collision, but not so much that it clips top */
-        transform: translateY(80px) rotate(90deg) scale(calc(var(--skin-scale, 1) * 1.3)) !important;
+        transform: translateY(80px) rotate(90deg) scale(calc(var(--skin-scale, 1) * 1.235)) !important;
       }
     }
 
@@ -832,7 +921,7 @@
 
     .tape-window {
       position: absolute;
-      top: 25px !important; /* Mobile Factory Lock */
+      top: 28px !important; /* Mobile Factory Lock (Nudged 3px closer to trapezoid) */
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: 275px;
@@ -868,7 +957,7 @@
         margin-top: 15px !important;
       }
       .tape-window {
-        top: 33px !important; /* Nudged 3px closer to words */
+        top: 36px !important; /* Nudged 3px closer to trapezoid (PC) */
       }
       .ipod-screen-refined {
         height: 448px !important; /* Infinite screen for PC */
@@ -881,6 +970,9 @@
       .click-wheel-refined {
         width: 300px !important;
         height: 300px !important;
+      }
+      .discman-body {
+        transform: scale(calc(var(--skin-scale, 1) * 1.15)) !important;
       }
     }
 
@@ -1074,7 +1166,7 @@
       height: 360px;
       z-index: 30;
       transform-origin: center 40px;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother, weighted mechanical motion */
       transform-style: preserve-3d;
       display: flex;
       justify-content: center;
@@ -1128,15 +1220,15 @@
 
     .discman-lid-logo {
       position: absolute;
-      top: 166px; /* 5px further up */
+      top: 162px;
       left: 0;
       width: 100%;
       text-align: center;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-weight: 900;
-      font-size: 110px;
-      letter-spacing: 12px;
-      padding-left: 0; /* Absolute centering */
+      font-size: 90px;
+      letter-spacing: 10px;
+      padding-left: 10px; /* Balance trailing letter-spacing */
       color: #0a0a0a;
       /* Engraving Effect scaled for massive size */
       text-shadow: 
@@ -1292,7 +1384,7 @@
       box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4), inset 0 -10px 20px rgba(0, 0, 0, 0.05);
       z-index: 10;
       transform-origin: center center;
-      transform: scale(var(--skin-scale, 1));
+      transform: scale(calc(var(--skin-scale, 1) * 0.9));
     }
 
     .ipod-screen-refined {
@@ -1459,44 +1551,24 @@
       animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
 
-    /* EDGE EQ ANIMATIONS */
-    .edge-eq-container {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 5;
+    /* PC SCALING & LAYOUT ENHANCEMENTS */
+    @media (min-width: 1025px) {
+      :root {
+        --skin-scale: 1.5; /* Large hardware on desktop */
+      }
+      
+      .artwork-container {
+        width: 380px !important; /* Maximized for desktop visibility */
+        height: 380px !important;
+      }
+
+      .skin-modern {
+        width: 480px; /* Slightly wider for the larger artwork */
+        height: 850px;
+      }
     }
 
-    .edge-bar {
-      position: absolute;
-      background: rgba(234, 179, 8, 0.4);
-      transition: height 0.1s ease, width 0.1s ease;
-    }
 
-    /* Top Edge */
-    .eq-top { top: 0; height: 3px; display: flex; width: 100%; justify-content: space-around; }
-    .eq-top .edge-bar { width: 15px; height: 0px; border-bottom-left-radius: 2px; border-bottom-right-radius: 2px; }
-    
-    /* Bottom Edge */
-    .eq-bottom { bottom: 0; height: 3px; display: flex; width: 100%; justify-content: space-around; }
-    .eq-bottom .edge-bar { width: 15px; height: 0px; border-top-left-radius: 2px; border-top-right-radius: 2px; }
-
-    /* Left Edge */
-    .eq-left { left: 0; width: 3px; height: 100%; display: flex; flex-direction: column; justify-content: space-around; }
-    .eq-left .edge-bar { height: 15px; width: 0px; border-top-right-radius: 2px; border-bottom-right-radius: 2px; }
-
-    /* Right Edge */
-    .eq-right { right: 0; width: 3px; height: 100%; display: flex; flex-direction: column; justify-content: space-around; }
-    .eq-right .edge-bar { height: 15px; width: 0px; border-top-left-radius: 2px; border-bottom-left-radius: 2px; }
-
-    .edge-eq-active .edge-bar {
-      animation: edgeBounce 0.8s ease-in-out infinite alternate;
-    }
-
-    @keyframes edgeBounce {
-      from { height: 2px; width: 2px; opacity: 0.2; }
-      to { height: 20px; width: 20px; opacity: 0.8; }
-    }
   </style>
 </head>
 
@@ -2041,6 +2113,7 @@
     // ── Smart Era Engine ──────────────────────────────────────
     let isManualSkin = false;
     let isEjected = false;
+    let isFlipping = false;
 
     let lastSwappedCover = '';
 
@@ -2056,8 +2129,8 @@
       isEjected = true;
       renderCurrentSkin(); // Opens the lid
       
-      // Wait for lid animation to finish
-      await new Promise(r => setTimeout(r, 800));
+      // Wait for lid animation to finish (Matched to 0.8s transition + buffer)
+      await new Promise(r => setTimeout(r, 1000));
       
       const cd = document.querySelector('.cd-disc');
       if (cd) {
@@ -2088,6 +2161,47 @@
       
       isEjected = false;
       renderCurrentSkin(); // Closes the lid
+    }
+
+    async function triggerVinylFlip(newCover) {
+      if (currentEra !== 'vinyl' || isFlipping) return;
+      
+      console.log("[Vinyl] Song change detected. Initiating mechanical flip...");
+      isFlipping = true;
+      // We don't call renderCurrentSkin() here anymore to avoid snapping the rotation
+      
+      const wrapper = document.getElementById('vinyl-flip-wrapper');
+      const platterLogo = document.getElementById('platter-logo');
+      
+      if (wrapper) {
+        // Step 1: LIFT, GROW, and TILT
+        if (platterLogo) platterLogo.style.opacity = '1';
+        
+        wrapper.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        wrapper.style.transform = 'scale(1.2) translateZ(100px) rotateX(15deg)';
+        await new Promise(r => setTimeout(r, 600));
+        
+        // Step 2: SIDE FLIP (Horizontal + Tilt)
+        wrapper.style.transition = 'transform 0.5s ease-in-out';
+        wrapper.style.transform = 'scale(1.2) translateZ(100px) rotateY(180deg) rotateX(15deg)';
+        
+        // Mid-point Art Swap
+        setTimeout(() => {
+          const label = document.getElementById('skin-cover');
+          if (label) label.style.backgroundImage = `url('${newCover}')`;
+        }, 250);
+        
+        await new Promise(r => setTimeout(r, 500));
+        
+        // Step 3: LAND
+        wrapper.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        wrapper.style.transform = 'scale(1) translateZ(0) rotateY(0deg) rotateX(0deg)';
+        await new Promise(r => setTimeout(r, 600));
+        
+        if (platterLogo) platterLogo.style.opacity = '0';
+      }
+      
+      isFlipping = false;
     }
 
     let currentEra = 'modern';
@@ -2221,17 +2335,30 @@
     }
 
     function syncEra() {
-      if (isManualSkin) return;
       const titleEl = document.getElementById('now-playing-title');
-      if (!titleEl) return;
+      const coverEl = document.getElementById('main-cover-art');
+      if (!titleEl || !coverEl) return;
+
       const title = titleEl.innerText.trim();
-      const detected = detectEra(title);
+      const cover = coverEl.src;
+      const detected = isManualSkin ? currentEra : detectEra(title);
+
       if (detected !== currentEra) {
         console.log(`[Smart Era] Switching to ${detected} based on: "${title}"`);
         currentEra = detected;
         if (document.getElementById('mobile-device-view').classList.contains('active')) {
           renderCurrentSkin();
         }
+      } else if (currentEra === 'discman' && !isEjected && cover !== lastSwappedCover && lastSwappedCover !== '') {
+        // Only trigger swap if we are STAYING in discman mode and it's not the initial load
+        console.log("[Discman] Art Change within same Era -> Initiating Swap...");
+        lastSwappedCover = cover;
+        triggerDiscSwap(cover);
+      } else if (currentEra === 'vinyl' && !isFlipping && cover !== lastSwappedCover && lastSwappedCover !== '') {
+        // High-fidelity Vinyl Flip
+        console.log("[Vinyl] Art Change within same Era -> Initiating Flip...");
+        lastSwappedCover = cover;
+        triggerVinylFlip(cover);
       }
     }
 
@@ -2279,33 +2406,36 @@
 
       if (currentEra === 'modern') {
         skinHTML = `
-          <div class="edge-eq-container ${isPlaying ? 'edge-eq-active' : ''}">
-            <div class="eq-top">${Array(15).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
-            <div class="eq-bottom">${Array(15).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
-            <div class="eq-left">${Array(25).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
-            <div class="eq-right">${Array(25).fill(0).map((_, i) => `<div class="edge-bar" style="animation-delay: -${i * 0.1}s"></div>`).join('')}</div>
-          </div>
           <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            ${Array(12).fill(0).map((_, i) => `<div class="particle" style="left: ${Math.random() * 100}%; --duration: ${10 + Math.random() * 20}s; width: ${2 + Math.random() * 4}px; height: ${2 + Math.random() * 4}px; animation-delay: -${Math.random() * 20}s;"></div>`).join('')}
+            ${Array(15).fill(0).map((_, i) => `<div class="particle" style="left: ${Math.random() * 100}%; --duration: ${10 + Math.random() * 20}s; width: ${2 + Math.random() * 4}px; height: ${2 + Math.random() * 4}px; animation-delay: -${Math.random() * 20}s; background: rgba(250, 204, 21, 0.2);"></div>`).join('')}
           </div>
-          <div class="w-full flex flex-col items-center relative z-10">
+          <div class="w-full flex flex-col items-center relative z-10 pt-4">
             <div class="text-[12px] font-black tracking-[1.15em] text-red-600 uppercase -mr-[1.15em] mb-0.5">FMP RADIO</div>
             <div class="flex items-center gap-2 mb-1">
               <div class="live-dot"></div>
               <div class="text-[10px] font-black tracking-[0.4em] text-yellow-500 uppercase">Broadcasting Live</div>
             </div>
-            <div class="text-[12px] text-white/60 font-medium">Chicago's Austin Community</div>
+            <div class="text-[12px] text-white/60 font-medium mb-4">Chicago's Austin Community</div>
           </div>
-          <div class="artwork-container relative">
-            <img id="device-cover" src="${cover}" class="w-full h-full object-cover">
+          <div class="artwork-container relative artwork-floating">
+            <div class="absolute -inset-6 bg-yellow-500/10 blur-3xl rounded-full animate-pulse"></div>
+            <div class="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10">
+              <img id="device-cover" src="${cover}" class="w-full h-full object-cover">
+              <div class="modern-eq-container ${isPlaying ? 'eq-animating' : ''}">
+                ${Array(20).fill(0).map((_, i) => `<div class="modern-eq-bar" style="animation-duration: ${0.4 + Math.random() * 0.4}s; animation-delay: -${Math.random()}s"></div>`).join('')}
+              </div>
+            </div>
           </div>
-          <div class="player-controls mt-6 relative z-10">
-            <div class="text-center px-4">
-              <h2 id="device-title" class="text-2xl font-black text-white mb-2 leading-tight">${title}</h2>
+          <div class="player-controls mt-8 relative z-10 w-full">
+            <div class="text-center px-6 mb-8">
+              <h2 id="device-title" class="text-3xl font-black text-white mb-3 leading-tight tracking-tight">${title}</h2>
               <div class="text-yellow-500 font-bold text-xs tracking-[0.2em] uppercase">The Voice of the People</div>
             </div>
             <div class="flex items-center justify-center">
-               <button onclick="togglePlay()" class="w-20 h-20 glass-btn text-white"><span id="device-play-icon" class="text-2xl">${isPlaying ? '⏸' : '▶'}</span></button>
+               <button onclick="togglePlay()" class="w-24 h-24 glass-btn text-white group relative">
+                 <div class="absolute inset-0 bg-yellow-500/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+                 <span id="device-play-icon" class="text-3xl relative z-10">${isPlaying ? '⏸' : '▶'}</span>
+               </button>
             </div>
           </div>
         `;
@@ -2313,11 +2443,16 @@
         skinHTML = `
           <div class="turntable-chassis">
             <div class="turntable-platter">
-              <div id="vinyl-spinner" onclick="togglePlay()" class="record-spinner cursor-pointer group relative ${isPlaying ? 'record-spinning' : ''}">
-                <div id="skin-cover" class="record-label" style="background-image: url('${cover}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
-                <div class="record-center-hole"></div>
-                <div class="record-spindle"></div>
-                <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
+              <div class="platter-logo-container">
+                <div id="platter-logo" class="platter-logo ${isPlaying ? 'record-spinning' : ''}"></div>
+              </div>
+              <div id="vinyl-flip-wrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d;">
+                <div id="vinyl-spinner" onclick="togglePlay()" class="record-spinner cursor-pointer group relative ${isPlaying ? 'record-spinning' : ''}">
+                  <div id="skin-cover" class="record-label" style="background-image: url('${cover}'); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+                  <div class="record-center-hole"></div>
+                  <div class="record-spindle"></div>
+                  <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
+                </div>
               </div>
             </div>
             <div class="speed-selector">
@@ -2325,7 +2460,7 @@
               <div class="speed-switch-track"><div class="speed-switch-knob"></div></div>
               <div class="speed-label">45</div>
             </div>
-            <div id="tonearm-element" class="tonearm ${isPlaying ? 'tonearm-playing' : ''}">
+            <div id="tonearm-element" class="tonearm ${isPlaying && !isFlipping ? 'tonearm-playing' : ''}">
               <div class="tonearm-base"></div>
               <div class="tonearm-rod"></div>
               <div class="tonearm-head">
@@ -2372,7 +2507,7 @@
                   <div class="reel-gear"></div>
                 </div>
               </div>
-              <div class="w-full text-center px-4 skin-title-container" style="position: absolute; top: 127px; left: 0; z-index: 50;">
+              <div class="w-full text-center px-4 skin-title-container" style="position: absolute; top: 130px; left: 0; z-index: 50;">
                 <div class="border-b border-gray-400/50 pb-1 mx-[3px] relative">
                   <!-- Illusion Lock: Independent spacing for words (+8px total) and line/red-text (+15px total) -->
                   <div id="skin-title" class="text-[14px] text-blue-900/80 font-normal leading-[0.9] relative z-[60]" style="font-family: 'Permanent Marker', cursive; transform: rotate(-1.5deg); letter-spacing: 0.5px; overflow: visible; white-space: normal; max-height: 20px; margin-top: -7px;">${title}</div>
@@ -2406,9 +2541,12 @@
                 <button onclick="toggleEject()" class="discman-btn-round">⏏</button>
               </div>
 
-              <div class="discman-lcd">
-                <div class="discman-lcd-label">FMP-D250 ESP PRO</div>
-                <div id="skin-title" class="discman-lcd-text">${title}</div>
+              <div class="discman-lcd backlight-blue">
+                ${isEjected ? 
+                  '<div class="text-red-600 font-black animate-pulse text-[10px] tracking-widest">ESP WARNING</div>' : 
+                  `<div class="discman-lcd-label">FMP-D250 ESP PRO</div>
+                   <div id="skin-title" class="discman-lcd-text">${title}</div>`
+                }
               </div>
 
               <div class="discman-btn-well">
@@ -2460,8 +2598,12 @@
         </div>
       `;
       
+      
       // BREADCRUMB: Recalculate scale for the new skin layout
       updateScale();
+
+      // Sync the swap tracker so we don't immediately trigger a swap on a new skin
+      lastSwappedCover = cover;
     }
 
 
@@ -2485,12 +2627,7 @@
       // Hardware Skins Internal Sync
       const skinTitle = document.getElementById('skin-title');
 
-      // AUTO-SWAP: High-fidelity detection (Art-Driven)
-      if (currentEra === 'discman' && !isEjected && cover !== lastSwappedCover) {
-        lastSwappedCover = cover;
-        console.log("[Discman] Art Change Detected -> Initiating Swap...");
-        triggerDiscSwap(cover);
-      }
+
 
       if (skinTitle && skinTitle.innerText !== title) {
         skinTitle.innerText = title;
