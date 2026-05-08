@@ -439,6 +439,7 @@
       background-position: center;
       background-repeat: no-repeat;
       filter: opacity(0.3);
+      mix-blend-mode: screen; /* Transparency fix for non-alpha PNGs */
       pointer-events: none;
       z-index: 1;
       opacity: 0;
@@ -2114,11 +2115,22 @@
     let isManualSkin = false;
     let isEjected = false;
     let isFlipping = false;
+    let isLidWarningActive = false; // Controls the 4-flash ESP sequence
 
     let lastSwappedCover = '';
 
     function toggleEject() {
       isEjected = !isEjected;
+      if (isEjected) {
+        isLidWarningActive = true;
+        // 4 flashes (0.8s each) = 3.2s
+        setTimeout(() => {
+          isLidWarningActive = false;
+          renderCurrentSkin();
+        }, 3200);
+      } else {
+        isLidWarningActive = false;
+      }
       renderCurrentSkin();
     }
     
@@ -2127,7 +2139,15 @@
       
       console.log("[Discman] Song change detected. Initiating mechanical swap...");
       isEjected = true;
-      renderCurrentSkin(); // Opens the lid
+      isLidWarningActive = true;
+      
+      // Clear warning after 4 flashes
+      setTimeout(() => {
+        isLidWarningActive = false;
+        renderCurrentSkin();
+      }, 3200);
+
+      renderCurrentSkin(); // Opens the lid and starts flash
       
       // Wait for lid animation to finish (Matched to 0.8s transition + buffer)
       await new Promise(r => setTimeout(r, 1000));
@@ -2542,10 +2562,10 @@
               </div>
 
               <div class="discman-lcd backlight-blue">
-                ${isEjected ? 
-                  '<div class="text-red-600 font-black animate-pulse text-[10px] tracking-widest">ESP WARNING</div>' : 
-                  `<div class="discman-lcd-label">FMP-D250 ESP PRO</div>
-                   <div id="skin-title" class="discman-lcd-text">${title}</div>`
+                <div class="discman-lcd-label ${isEjected ? 'font-[900]' : ''}">FMP-D250 ESP PRO</div>
+                ${isLidWarningActive ? 
+                  '<div class="discman-lcd-text animate-pulse">ESP WARNING</div>' : 
+                  `<div id="skin-title" class="discman-lcd-text">${title}</div>`
                 }
               </div>
 
