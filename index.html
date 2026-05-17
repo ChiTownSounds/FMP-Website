@@ -519,13 +519,13 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(calc(1 / var(--scale-vinyl, 1)));
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
-      background: #000;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 1), 0 1px 1px rgba(255, 255, 255, 0.1);
-      border: 1px solid #111;
-      z-index: 12;
+      background: linear-gradient(135deg, #f0f0f0 0%, #d0d0d0 40%, #888888 70%, #555555 100%);
+      box-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      border: 1px solid #aaa;
+      z-index: 25;
     }
 
     .record-spindle::after {
@@ -534,10 +534,11 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 3px;
-      height: 3px;
-      background: #444;
+      width: 4px;
+      height: 4px;
+      background: #eee;
       border-radius: 50%;
+      box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.4);
     }
 
     .speed-selector {
@@ -620,7 +621,7 @@
     }
 
     .tonearm-playing {
-      transform: rotate(22deg);
+      transform: rotate(var(--arm-angle, 22deg));
     }
 
     .tonearm-base {
@@ -2092,6 +2093,9 @@
     async function triggerVinylFlip(newCover) {
       if (currentEra !== 'vinyl' || isFlipping) return;
       
+      vinylTrackElapsed = 0;
+      lastTimeUpdate = Date.now();
+      
       if (speedTimeout) {
         clearTimeout(speedTimeout);
         speedTimeout = null;
@@ -2207,7 +2211,12 @@
       const tonearm = document.getElementById('tonearm-element');
       if (tonearm) {
         const isPlayingNow = tonearm.classList.contains('tonearm-playing');
-        tonearm.style.setProperty('--arm-angle', isPlayingNow ? '22deg' : '-10deg');
+        let angle = '-10deg';
+        if (isPlayingNow) {
+          const progress = Math.min(vinylTrackElapsed / 180, 1.0);
+          angle = `${22 + progress * 12}deg`;
+        }
+        tonearm.style.setProperty('--arm-angle', angle);
         
         tonearm.classList.remove('wobbling');
         tonearm.offsetHeight; // force reflow
@@ -2256,6 +2265,8 @@
 
     let currentEra = 'modern';
     let currentVinylSpeed = '33';
+    let vinylTrackElapsed = 0;
+    let lastTimeUpdate = Date.now();
     let libraryData = [];
 
     async function loadLibraryData() {
@@ -2497,10 +2508,10 @@
                   <div id="skin-cover" class="record-label" style="background-image: url('${cover}');"></div>
                   <div id="skin-cover-back" class="record-label record-label-back" style="background-image: url('${cover}');"></div>
                   <div class="record-center-hole"></div>
-                  <div class="record-spindle"></div>
                   <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}" style="transform: translateZ(2px);">Tap to Play</div>
                 </div>
               </div>
+              <div class="record-spindle" style="pointer-events: none;"></div>
             </div>
             <div id="tonearm-element" class="tonearm ${isPlaying && !isFlipping ? 'tonearm-playing' : ''}">
               <div class="tonearm-base"></div>
@@ -2675,8 +2686,37 @@
       if (devicePlayIcon) devicePlayIcon.textContent = isPlaying ? '⏸' : '▶';
     }
 
+    function updateVinylNeedleTracking() {
+      if (currentEra !== 'vinyl') return;
+      
+      if (!isPlaying || isFlipping) {
+        lastTimeUpdate = Date.now();
+        return;
+      }
+      
+      const now = Date.now();
+      const dt = (now - lastTimeUpdate) / 1000;
+      lastTimeUpdate = now;
+      
+      vinylTrackElapsed += dt;
+      
+      // Realistically tracks across the vinyl over a 3-minute (180s) song:
+      // Starts at outer groove (22deg), sweeps inward to 34deg (12 degree span).
+      const progress = Math.min(vinylTrackElapsed / 180, 1.0);
+      const angle = 22 + progress * 12;
+      
+      const tonearm = document.getElementById('tonearm-element');
+      if (tonearm && tonearm.classList.contains('tonearm-playing')) {
+        tonearm.style.setProperty('--arm-angle', `${angle}deg`);
+      }
+    }
+
     function animateVUMeters() {
       if (document.hidden) return;
+
+      if (currentEra === 'vinyl') {
+        updateVinylNeedleTracking();
+      }
 
       const needleL = document.getElementById('needle-l');
       const needleR = document.getElementById('needle-r');
