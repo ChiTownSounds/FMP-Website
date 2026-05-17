@@ -30,22 +30,7 @@
       background-repeat: no-repeat;
     }
 
-    .record-label {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      backface-visibility: hidden; /* Each face hides its back to reveal the other */
-      z-index: 2;
-    }
 
-    .record-label-back {
-      transform: rotateY(180deg);
-    }
-
-    .record-center-hole {  }
 
     :root {
       --fmp-gold: #eab308;
@@ -402,7 +387,7 @@
       justify-content: center;
       align-items: center;
       transform: scale(var(--skin-scale, 1));
-      overflow: hidden;
+      overflow: visible; /* Prevent 3D projection flattening */
     }
 
     .turntable-platter {
@@ -417,6 +402,7 @@
       position: absolute;
       left: 10px;
       perspective: 1000px; /* 3D Depth for the lift-and-flip */
+      z-index: 20;
     }
 
     .platter-logo {
@@ -427,7 +413,6 @@
       background-position: center;
       background-repeat: no-repeat;
       filter: opacity(0.3);
-      mix-blend-mode: screen; /* Transparency fix for non-alpha PNGs */
       pointer-events: none;
       z-index: 1;
       opacity: 0;
@@ -437,7 +422,7 @@
 
     /* Synchronized Spin Engine */
     .record-spinning, .platter-logo.record-spinning {
-      animation: spin 2s linear infinite !important;
+      animation: spin var(--spin-duration, 2s) linear infinite !important;
       animation-delay: -10s !important; /* Forces perfect phase synchronization */
     }
 
@@ -460,8 +445,6 @@
       position: relative;
       z-index: 5;
       will-change: transform;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
       -webkit-transform-style: preserve-3d;
       transform-style: preserve-3d;
     }
@@ -474,11 +457,20 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) scale(calc(1 / var(--scale-vinyl, 1)));
+      transform: translate(-50%, -50%) scale(calc(1 / var(--scale-vinyl, 1))) translateZ(1px);
       width: 110px; /* Realistic Art Size */
       height: 110px;
       border-radius: 50%;
       border: 4px solid #000;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      backface-visibility: hidden;
+      z-index: 2;
+    }
+
+    .record-label-back {
+      transform: translate(-50%, -50%) scale(calc(1 / var(--scale-vinyl, 1))) rotateY(180deg) translateZ(1.5px);
     }
     
     @media (min-width: 1025px) {
@@ -556,29 +548,35 @@
       flex-direction: column;
       align-items: center;
       gap: 5px;
-      z-index: 10;
+      z-index: 5;
+      cursor: pointer;
     }
 
     .speed-switch-track {
       width: 16px;
       height: 28px;
-      background: #1a1a1a;
+      background: #111;
       border-radius: 4px;
-      border: 1px solid #333;
+      border: 1px solid #222;
       position: relative;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
     }
 
     .speed-switch-knob {
       width: 12px;
       height: 12px;
-      background: #888;
+      background: linear-gradient(180deg, #aaa 0%, #666 100%);
       border-radius: 2px;
       position: absolute;
       left: 1px;
       top: 1px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-      border: 1px solid #aaa;
+      border: 1px solid #777;
+      transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .speed-selector.speed-45 .speed-switch-knob {
+      transform: translateY(12px);
     }
 
     .speed-label {
@@ -586,6 +584,28 @@
       font-weight: 900;
       color: #444;
       text-transform: uppercase;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .speed-selector.speed-33 .label-33 {
+      color: #eab308;
+      text-shadow: 0 0 6px rgba(234, 179, 8, 0.6);
+    }
+
+    .speed-selector.speed-45 .label-45 {
+      color: #eab308;
+      text-shadow: 0 0 6px rgba(234, 179, 8, 0.6);
+    }
+
+    @keyframes arm-wobble {
+      0% { transform: rotate(var(--arm-angle, 22deg)); }
+      30% { transform: rotate(calc(var(--arm-angle, 22deg) + 2deg)); }
+      60% { transform: rotate(calc(var(--arm-angle, 22deg) - 1.2deg)); }
+      100% { transform: rotate(var(--arm-angle, 22deg)); }
+    }
+
+    .tonearm.wobbling {
+      animation: arm-wobble 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .tonearm {
@@ -600,7 +620,7 @@
     }
 
     .tonearm-playing {
-      transform: rotate(10deg);
+      transform: rotate(22deg);
     }
 
     .tonearm-base {
@@ -1812,18 +1832,30 @@
     };
 
     async function togglePlay() {
+      const tonearm = document.getElementById('tonearm-element');
+      const vinylSpinner = document.getElementById('vinyl-spinner');
+      const platterLogo = document.getElementById('platter-logo');
+
       if (isPlaying) {
         audio.pause();
         isPlaying = false;
         if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
+
+        // Mechanical Sequence: Arm lifts before the turntable motor shuts off
+        if (currentEra === 'vinyl' && tonearm) {
+          tonearm.classList.remove('tonearm-playing');
+          await new Promise(r => setTimeout(r, 600)); 
+          if (vinylSpinner) vinylSpinner.classList.remove('record-spinning');
+          if (platterLogo) platterLogo.classList.remove('record-spinning');
+        }
       }
       else {
         initAudioContext();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         
         if (currentEra === 'vinyl') {
-          renderCurrentSkin();
-          const tonearm = document.getElementById('tonearm-element');
+          if (vinylSpinner) vinylSpinner.classList.add('record-spinning');
+          if (platterLogo) platterLogo.classList.add('record-spinning');
           if (tonearm) {
             tonearm.offsetHeight;
             tonearm.classList.add('tonearm-playing');
@@ -1840,7 +1872,11 @@
         }
       }
 
-      renderCurrentSkin();
+      const playBtn = document.getElementById('play-btn');
+      if (playBtn) playBtn.textContent = isPlaying ? '⏸' : '▶';
+
+      const devPlayIcon = document.getElementById('device-play-icon');
+      if (devPlayIcon) devPlayIcon.textContent = isPlaying ? '⏸' : '▶';
 
       document.querySelectorAll('[id="tap-to-play-overlay"]').forEach(overlay => {
         if (isPlaying) {
@@ -1880,17 +1916,6 @@
         }
       }
 
-      const vinylSpinner = document.getElementById('vinyl-spinner');
-      if (vinylSpinner) {
-        if (isPlaying) vinylSpinner.classList.add('record-spinning');
-        else vinylSpinner.classList.remove('record-spinning');
-      }
-
-      const tonearm = document.getElementById('tonearm-element');
-      if (tonearm) {
-        if (isPlaying) tonearm.classList.add('tonearm-playing');
-        else tonearm.classList.remove('tonearm-playing');
-      }
     }
 
     function renderDayTabs() {
@@ -2067,12 +2092,30 @@
     async function triggerVinylFlip(newCover) {
       if (currentEra !== 'vinyl' || isFlipping) return;
       
+      if (speedTimeout) {
+        clearTimeout(speedTimeout);
+        speedTimeout = null;
+      }
+      
       console.log("[Vinyl] Song change detected. Initiating mechanical flip...");
       isFlipping = true;
       
-      const wrapper = document.getElementById('vinyl-flip-wrapper');
+      const tonearm = document.getElementById('tonearm-element');
+      const vinylSpinner = document.getElementById('vinyl-spinner');
       const platterLogo = document.getElementById('platter-logo');
+      const wrapper = document.getElementById('vinyl-flip-wrapper');
+
+      // STEP 1: NEEDLE SWINGS ENTIRELY BACK TO THE ARMREST
+      if (tonearm && tonearm.classList.contains('tonearm-playing')) {
+        tonearm.classList.remove('tonearm-playing');
+        await new Promise(r => setTimeout(r, 600)); // Arm lifting travel time
+        if (vinylSpinner) vinylSpinner.classList.remove('record-spinning');
+        // Platter logo beneath the record continues to spin dynamically during the flip if playing!
+        if (platterLogo && !isPlaying) platterLogo.classList.remove('record-spinning');
+        await new Promise(r => setTimeout(r, 600)); // Wait until fully parked
+      }
       
+      // STEP 2: MECHANICAL 3D FLIP SEPARATION
       if (wrapper) {
         const backLabel = document.getElementById('skin-cover-back');
         if (backLabel) backLabel.style.backgroundImage = `url('${newCover}')`;
@@ -2098,11 +2141,121 @@
         
         if (platterLogo) platterLogo.style.opacity = '0';
       }
+
+      // STEP 3: PLATTER RE-SPOOLS AND NEEDLE GLIDES BACK ONTO THE VINYL SURFACE
+      if (isPlaying) {
+        if (vinylSpinner) vinylSpinner.classList.add('record-spinning');
+        if (platterLogo) platterLogo.classList.add('record-spinning');
+        if (tonearm) tonearm.classList.add('tonearm-playing');
+        await new Promise(r => setTimeout(r, 1200)); // Needle drops travel duration
+      }
       
       isFlipping = false;
     }
 
+    function playTactileClick() {
+      if (typeof AudioContext === 'undefined' && typeof webkitAudioContext === 'undefined') return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(120, ctx.currentTime);
+        osc1.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 0.08);
+        
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(800, ctx.currentTime);
+        osc2.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.03);
+        
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+        
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc1.start();
+        osc2.start();
+        osc1.stop(ctx.currentTime + 0.08);
+        osc2.stop(ctx.currentTime + 0.08);
+      } catch (e) {
+        console.warn("Click synth failed:", e);
+      }
+    }
+
+    let speedTimeout = null;
+
+    function toggleVinylSpeed() {
+      if (isFlipping) return;
+      
+      if (speedTimeout) {
+        clearTimeout(speedTimeout);
+        speedTimeout = null;
+      }
+      
+      currentVinylSpeed = (currentVinylSpeed === '33') ? '45' : '33';
+      
+      playTactileClick();
+      
+      const selector = document.getElementById('speed-selector');
+      if (selector) {
+        selector.className = `speed-selector cursor-pointer speed-${currentVinylSpeed}`;
+      }
+      
+      const tonearm = document.getElementById('tonearm-element');
+      if (tonearm) {
+        const isPlayingNow = tonearm.classList.contains('tonearm-playing');
+        tonearm.style.setProperty('--arm-angle', isPlayingNow ? '22deg' : '-10deg');
+        
+        tonearm.classList.remove('wobbling');
+        tonearm.offsetHeight; // force reflow
+        tonearm.classList.add('wobbling');
+        setTimeout(() => tonearm.classList.remove('wobbling'), 600);
+      }
+      
+      const vinylSpinner = document.getElementById('vinyl-spinner');
+      const platterLogo = document.getElementById('platter-logo');
+      const duration = currentVinylSpeed === '45' ? '1.33s' : '2s';
+      
+      if (vinylSpinner) vinylSpinner.style.setProperty('--spin-duration', duration);
+      if (platterLogo) platterLogo.style.setProperty('--spin-duration', duration);
+      
+      if (isPlaying && audio && currentVinylSpeed === '45') {
+        audio.preservesPitch = false;
+        audio.mozPreservesPitch = false;
+        audio.webkitPreservesPitch = false;
+        
+        const peakShift = 0.18;
+        let start = null;
+        const durationMs = 800; // Snappy 800ms acceleration sweep
+        
+        function step(timestamp) {
+          if (!start) start = timestamp;
+          const progress = (timestamp - start) / durationMs;
+          if (progress < 1) {
+            audio.playbackRate = 1.0 + peakShift * Math.sin(progress * Math.PI);
+            requestAnimationFrame(step);
+          } else {
+            audio.playbackRate = 1.0;
+          }
+        }
+        requestAnimationFrame(step);
+      } else if (audio) {
+        // Going to 33: Instant, clean reset, absolutely no distortion!
+        audio.playbackRate = 1.0;
+      }
+
+      if (currentVinylSpeed === '45') {
+        speedTimeout = setTimeout(() => {
+          toggleVinylSpeed();
+        }, 800); // Snappy 800ms auto-reversion
+      }
+    }
+
     let currentEra = 'modern';
+    let currentVinylSpeed = '33';
     let libraryData = [];
 
     async function loadLibraryData() {
@@ -2330,24 +2483,24 @@
       } else if (currentEra === 'vinyl') {
         skinHTML = `
           <div class="turntable-chassis">
+            <div id="speed-selector" class="speed-selector cursor-pointer speed-${currentVinylSpeed}" onclick="toggleVinylSpeed()">
+              <div class="speed-label label-33">33</div>
+              <div class="speed-switch-track"><div class="speed-switch-knob"></div></div>
+              <div class="speed-label label-45">45</div>
+            </div>
             <div class="turntable-platter">
               <div class="platter-logo-container">
-                <div id="platter-logo" class="platter-logo ${isPlaying ? 'record-spinning' : ''}"></div>
+                <div id="platter-logo" class="platter-logo ${isPlaying ? 'record-spinning' : ''}" style="--spin-duration: ${currentVinylSpeed === '45' ? '1.33s' : '2s'};"></div>
               </div>
-              <div id="vinyl-flip-wrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d;">
-                <div id="vinyl-spinner" onclick="togglePlay()" class="record-spinner cursor-pointer group relative ${isPlaying ? 'record-spinning' : ''}" style="transform-style: preserve-3d;">
+              <div id="vinyl-flip-wrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; position: relative; z-index: 10;">
+                <div id="vinyl-spinner" onclick="togglePlay()" class="record-spinner cursor-pointer group relative ${isPlaying ? 'record-spinning' : ''}" style="--spin-duration: ${currentVinylSpeed === '45' ? '1.33s' : '2s'}; transform-style: preserve-3d;">
                   <div id="skin-cover" class="record-label" style="background-image: url('${cover}');"></div>
                   <div id="skin-cover-back" class="record-label record-label-back" style="background-image: url('${cover}');"></div>
                   <div class="record-center-hole"></div>
                   <div class="record-spindle"></div>
-                  <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
+                  <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full text-white text-[10px] font-black tracking-widest uppercase transition-opacity duration-300 z-20 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}" style="transform: translateZ(2px);">Tap to Play</div>
                 </div>
               </div>
-            </div>
-            <div class="speed-selector">
-              <div class="speed-label">33</div>
-              <div class="speed-switch-track"><div class="speed-switch-knob"></div></div>
-              <div class="speed-label">45</div>
             </div>
             <div id="tonearm-element" class="tonearm ${isPlaying && !isFlipping ? 'tonearm-playing' : ''}">
               <div class="tonearm-base"></div>
