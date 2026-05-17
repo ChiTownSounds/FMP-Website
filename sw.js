@@ -50,7 +50,6 @@ self.addEventListener('fetch', function(e) {
   e.respondWith(
     caches.match(e.request).then(function(cachedResponse) {
       const fetchPromise = fetch(e.request).then(function(networkResponse) {
-        // Only cache successful GET requests
         if (networkResponse && networkResponse.status === 200 && e.request.method === 'GET') {
           const cacheCopy = networkResponse.clone();
           caches.open(CACHE_NAME).then(function(cache) {
@@ -59,10 +58,10 @@ self.addEventListener('fetch', function(e) {
         }
         return networkResponse;
       }).catch(function() {
-        // Fallback handled below
+        return cachedResponse || handleOfflineFallback();
       });
 
-      return cachedResponse || fetchPromise || handleOfflineFallback();
+      return cachedResponse || fetchPromise;
     })
   );
 });
