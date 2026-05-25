@@ -435,7 +435,7 @@
     .platter-logo {
       width: 320px;
       height: 320px;
-      background-image: url('./assets/logo.png');
+      background-image: url('./assets/logo_512.png');
       background-size: 125%;
       background-position: center;
       background-repeat: no-repeat;
@@ -1929,7 +1929,7 @@
         show: 'Sunday Soul',
         time: 'Weekends',
         bio: 'Bringing you the deepest gospel cuts and community soul highlights straight from Tarpon Springs & Chicago.',
-        img: 'assets/hosts/kimberla.png'
+        img: 'assets/hosts/kimberla.jpg'
       },
       {
         name: 'Miss Liz',
@@ -1937,7 +1937,7 @@
         show: 'Community Spotlights',
         time: 'Weekends',
         bio: 'Highlighting Austin and Chicago local community leaders, grassroots creators, and block party organizers.',
-        img: 'assets/hosts/coming_soon_2.png'
+        img: 'assets/hosts/coming_soon_2.jpg'
       },
       {
         name: 'Rotation Slot 1',
@@ -1945,7 +1945,7 @@
         show: 'Special Rotation',
         time: 'TBD',
         bio: 'A professional guest slot ready for seasonal rotational takeovers, DJ battles, and block party syndications.',
-        img: 'assets/hosts/coming_soon_3.png'
+        img: 'assets/hosts/coming_soon_3.jpg'
       },
       {
         name: 'Rotation Slot 2',
@@ -1953,7 +1953,7 @@
         show: 'Special Rotation',
         time: 'TBD',
         bio: 'Reserved for upcoming syndications and regional Urban AC DJ partnerships. Stay tuned for rotational schedules!',
-        img: 'assets/hosts/coming_soon_3.png'
+        img: 'assets/hosts/coming_soon_3.jpg'
       }
     ];
 
@@ -2183,7 +2183,7 @@
                 <div class="absolute -inset-1 rounded-xl bg-gradient-to-tr from-yellow-500/10 to-amber-600/10 opacity-30 blur-md"></div>
                 
                 <div class="relative w-full h-48 rounded-xl overflow-hidden border border-white/5 shadow-inner">
-                  <img src="${host.img}" class="w-full h-full object-cover filter contrast-125 brightness-95" onerror="this.src='./assets/logo.svg'" alt="${host.name}">
+                  <img src="${host.img}" class="w-full h-full object-cover filter contrast-125 brightness-95" onerror="this.src='./assets/logo.svg'" alt="${host.name}" loading="lazy">
                 </div>
                 
                 <div class="mt-4 text-left">
