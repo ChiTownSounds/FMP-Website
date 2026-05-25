@@ -10,7 +10,7 @@
       "show": "Wake & Bake",
       "time": "6AM–10AM",
       "bio": "Start your mornings with high-energy tracks, local community news, and the smoothest morning R&B vibes.",
-      "img": "https://i.imgur.com/mTtRxbW.jpeg"
+      "img": "assets/hosts/danny_boy.jpg"
     },
     {
       "name": "ChiTown",
@@ -18,7 +18,7 @@
       "show": "The Bridge",
       "time": "10AM–12PM",
       "bio": "Bridging communities and markets with smooth Urban AC cuts, throwback reviews, and live call-ins.",
-      "img": "https://i.imgur.com/AFySV6g.jpeg"
+      "img": "assets/hosts/chitown.jpg"
     },
     {
       "name": "Kimberla",

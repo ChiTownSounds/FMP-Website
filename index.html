@@ -1595,7 +1595,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20 items-center">
           <div class="flex items-center gap-2">
-            <img src="./assets/logo.svg" alt="FMP Radio Logo"
+            <img src="./assets/logo.svg" alt="FMP Radio Logo" width="162" height="48"
               class="h-12 w-auto hover:scale-110 transition-transform cursor-pointer">
           </div>
           <div class="hidden md:flex items-center space-x-8">
@@ -1634,9 +1634,7 @@
 
     <section class="w-full pt-44 pb-28 hero-bg relative overflow-hidden">
       <!-- Muted Video Background with Static Fallback -->
-      <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" style="filter: brightness(0.75);" onerror="this.style.display='none'">
-        <source src="./assets/fmpstudio.mp4" type="video/mp4">
-        <source src="./assets/fmpstudio.webm" type="video/webm">
+      <video id="hero-bg-video" loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none" style="filter: brightness(0.75); display: none;" data-src="./assets/fmpstudio.mp4" onerror="this.style.display='none'">
       </video>
       <!-- Dark Cinematic Overlay to maintain contrast and legibility -->
       <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/90 z-0 pointer-events-none"></div>
@@ -1800,7 +1798,7 @@
         <div class="max-w-4xl mx-auto">
           <h4 class="text-xl font-extrabold text-yellow-500 mb-6 text-center tracking-wider">Join the Conversation</h4>
           <div class="rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-black/40 backdrop-blur-md" style="height: 600px;">
-            <iframe src="https://e.widgetbot.io/channels/1495227303838613505/1495227307605102745" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" title="FMP Radio Community Discord Chat"></iframe>
+            <iframe src="https://e.widgetbot.io/channels/1495227303838613505/1495227307605102745" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" title="FMP Radio Community Discord Chat" loading="lazy"></iframe>
           </div>
         </div>
       </div>
@@ -1809,7 +1807,7 @@
     <footer class="w-full py-8 bg-gray-950 border-t border-white/5 mt-auto">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div class="flex flex-col items-center sm:items-start">
-          <img src="./assets/logo.svg" alt="FMP Radio" class="h-16 w-auto mb-2">
+          <img src="./assets/logo.svg" alt="FMP Radio" width="216" height="64" class="h-16 w-auto mb-2">
           <p class="text-xs text-gray-500">© 2026 FMP Media Group</p>
         </div>
         <div class="flex gap-6">
@@ -1913,7 +1911,7 @@
         show: 'Wake & Bake',
         time: '6AM–10AM',
         bio: 'Start your mornings with high-energy tracks, local community news, and the smoothest morning R&B vibes.',
-        img: 'https://i.imgur.com/mTtRxbW.jpeg'
+        img: 'assets/hosts/danny_boy.jpg'
       },
       {
         name: 'ChiTown',
@@ -1921,7 +1919,7 @@
         show: 'The Bridge',
         time: '10AM–12PM',
         bio: 'Bridging communities and markets with smooth Urban AC cuts, throwback reviews, and live call-ins.',
-        img: 'https://i.imgur.com/AFySV6g.jpeg'
+        img: 'assets/hosts/chitown.jpg'
       },
       {
         name: 'Kimberla',
@@ -3285,6 +3283,20 @@
         document.getElementById('mobile-device-view').classList.add('active');
         setEra('auto');
       }
+
+      // Programmatically lazy-load the heavy background video (saves 1.8MB on initial paint)
+      setTimeout(() => {
+        const video = document.getElementById('hero-bg-video');
+        if (video && video.dataset.src) {
+          const source = document.createElement('source');
+          source.src = video.dataset.src;
+          source.type = 'video/mp4';
+          video.appendChild(source);
+          video.style.display = 'block';
+          video.load();
+          video.play().catch(err => console.log("[Video Engine] Autoplay blocked:", err));
+        }
+      }, 2500);
     });
 
     function initDepthTilting() {
