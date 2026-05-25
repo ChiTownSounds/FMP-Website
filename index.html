@@ -1809,7 +1809,7 @@
     <div class="text-white/60 text-sm">Please rotate your device to vertical<br>for the best experience.</div>
   </div>
 
-  <audio id="audio-stream" crossorigin="anonymous" src="https://hello.citrus3.com:2020/stream/fmpradio"></audio>
+  <audio id="audio-stream" crossorigin="anonymous" preload="none"></audio>
 
   <div id="mobile-device-view">
     <div class="dynamic-bg"></div>
@@ -1954,6 +1954,10 @@
 
       if (isPlaying) {
         audio.pause();
+        // Clear src to stop buffering in the background and release bandwidth
+        audio.removeAttribute('src'); 
+        audio.load();
+        
         isPlaying = false;
         if (eqAnimationId) cancelAnimationFrame(eqAnimationId);
 
@@ -1966,6 +1970,10 @@
         }
       }
       else {
+        // Re-bind source to the stream to flush any buffered cache and guarantee real-time playback
+        audio.src = "https://hello.citrus3.com:2020/stream/fmpradio";
+        audio.load();
+
         initAudioContext();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         

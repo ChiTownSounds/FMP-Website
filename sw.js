@@ -1,4 +1,4 @@
-var CACHE_NAME = 'fmpradio-v3'; // BREADCRUMB: Incremented for visual/engine updates
+var CACHE_NAME = 'fmpradio-v4'; // BREADCRUMB: Incremented for visual/engine updates
 var ASSETS = [
   './',
   'index.html',
