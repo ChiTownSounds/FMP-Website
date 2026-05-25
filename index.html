@@ -8,13 +8,16 @@
   <title>FMP RADIO</title>
 
   <meta name="application-name" content="FMPRADIO">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="FMPRADIO">
   <meta name="theme-color" content="#0a0e1a">
   <meta name="description" content="For My People Radio — The Voice of the People. Chicago's Austin Community.">
   <script src="https://cdn.jsdelivr.net/npm/@widgetbot/html-embed"></script>
-  <link class="apple-touch-icon" href="./assets/logo.svg">
+  <link rel="icon" type="image/svg+xml" href="./assets/logo.svg">
+  <link rel="icon" type="image/png" href="./assets/logo_192.png">
+  <link rel="apple-touch-icon" href="./assets/logo_512.png">
 
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -24,7 +27,7 @@
   <style>
     .hero-bg {
       background: linear-gradient(to bottom, rgba(5, 5, 7, 0.4) 0%, rgba(5, 5, 7, 0.9) 100%),
-        url('./assets/fmpstudio.png');
+        url('./assets/fmpstudio.jpg');
       background-size: cover;
       background-position: center 25%;
       background-repeat: no-repeat;
@@ -1610,7 +1613,7 @@
               <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
               <span class="text-[10px] font-black text-red-500 tracking-widest">LIVE</span>
             </div>
-            <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+            <button class="md:hidden text-white" onclick="toggleMobileMenu()" aria-label="Toggle Mobile Menu">
               <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m7 6H4"></path>
               </svg>
@@ -1797,7 +1800,7 @@
         <div class="max-w-4xl mx-auto">
           <h4 class="text-xl font-extrabold text-yellow-500 mb-6 text-center tracking-wider">Join the Conversation</h4>
           <div class="rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-black/40 backdrop-blur-md" style="height: 600px;">
-            <iframe src="https://e.widgetbot.io/channels/1495227303838613505/1495227307605102745" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+            <iframe src="https://e.widgetbot.io/channels/1495227303838613505/1495227307605102745" width="100%" height="100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" title="FMP Radio Community Discord Chat"></iframe>
           </div>
         </div>
       </div>
@@ -1855,7 +1858,7 @@
 
   <div id="mobile-device-view">
     <div class="dynamic-bg"></div>
-    <button onclick="toggleDeviceView()" class="absolute top-8 right-8 text-white/50 hover:text-white text-3xl z-[9999] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">✕</button>
+    <button onclick="toggleDeviceView()" class="absolute top-8 right-8 text-white/50 hover:text-white text-3xl z-[9999] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" aria-label="Close Visualizer View">✕</button>
 
     <div id="device-container" class="skin-modern">
       <div class="w-full text-center">
@@ -1864,7 +1867,7 @@
       </div>
 
       <div class="artwork-container">
-        <img id="device-cover" src="./assets/logo.svg" class="w-full h-full object-cover">
+        <img id="device-cover" src="./assets/logo.svg" class="w-full h-full object-cover" alt="Current Track Artwork">
       </div>
 
       <div class="player-controls">
@@ -2554,8 +2557,6 @@
       const LIVE_URL = 'https://raw.githubusercontent.com/ChiTownSounds/FMP-Radio/main/configs/fmp_data_7718.csv';
       const LOCAL_PATH = './fmp_data_7718.csv';
 
-      loadScheduleData();
-
       try {
         console.log("[Library Engine] Sourcing live data from FMP-Radio repo...");
         let resp = await fetch(LIVE_URL);
@@ -2575,41 +2576,7 @@
       }
     }
 
-    async function loadScheduleData() {
-      const SCHED_URL = 'https://raw.githubusercontent.com/ChiTownSounds/FMP-Radio/main/fmp_schedule.csv';
-      try {
-        const resp = await fetch(SCHED_URL);
-        if (!resp.ok) return;
-        const csv = await resp.text();
-        parseScheduleCSV(csv);
-      } catch (e) {
-        console.warn("[Schedule Engine] Using hardcoded fallback.");
-      }
-    }
 
-    function parseScheduleCSV(csv) {
-      const lines = csv.split('\n');
-      const newSched = {};
-      lines.slice(1).forEach(line => {
-        const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        if (parts.length >= 5) {
-          const day = parts[0].trim();
-          if (!newSched[day]) newSched[day] = [];
-          newSched[day].push({
-            time: parts[1].trim(),
-            show: parts[2].replace(/^"|"$/g, '').trim(),
-            host: parts[3].replace(/^"|"$/g, '').trim(),
-            genre: parts[4].replace(/^"|"$/g, '').trim()
-          });
-        }
-      });
-      if (Object.keys(newSched).length > 0) {
-        console.log("[Schedule Engine] Dynamic schedule loaded.");
-        Object.keys(newSched).forEach(day => { SCHEDULE[day] = newSched[day]; });
-        renderDayTabs();
-        renderSchedule();
-      }
-    }
 
     function parseLibraryCSV(csv) {
       const lines = csv.split('\n');
@@ -2848,7 +2815,7 @@
           <div class="artwork-container relative artwork-floating">
             <div class="absolute -inset-6 bg-yellow-500/10 blur-3xl rounded-full animate-pulse"></div>
               <div class="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 h-full">
-                <img id="device-cover" src="${cover}" class="w-full h-full object-cover">
+                <img id="device-cover" src="${cover}" class="w-full h-full object-cover" alt="Dynamic Album Artwork">
               </div>
           </div>
           <div class="player-controls mt-8 relative z-10 w-full">
@@ -2857,7 +2824,7 @@
               <div class="text-yellow-500 font-bold text-[11px] tracking-[0.2em] uppercase">The Voice of the People</div>
             </div>
             <div class="flex items-center justify-center">
-               <button onclick="togglePlay()" class="w-36 h-36 glass-btn text-white group relative">
+               <button onclick="togglePlay()" class="w-36 h-36 glass-btn text-white group relative" aria-label="Toggle Playback">
                  <div class="absolute inset-0 bg-yellow-500/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
                  <span id="device-play-icon" class="text-5xl relative z-10">${isPlaying ? '⏸' : '▶'}</span>
                </button>
@@ -2957,7 +2924,7 @@
             <div class="discman-dashboard">
               <div class="discman-btn-well">
                 <div class="discman-chassis-label">Open</div>
-                <button onclick="toggleEject()" class="discman-btn-round">⏏</button>
+                <button onclick="toggleEject()" class="discman-btn-round" aria-label="Eject CD Disc">⏏</button>
               </div>
               <div class="discman-lcd backlight-blue">
                 <div class="discman-lcd-label ${isEjected ? 'font-[900] animate-pulse' : ''}">FMP-D250 ESP PRO</div>
@@ -2968,7 +2935,7 @@
               </div>
               <div class="discman-btn-well">
                 <div class="discman-chassis-label">${isPlaying ? 'Pause' : 'Play'}</div>
-                <button onclick="togglePlay()" class="discman-btn-round">${isPlaying ? '⏸' : '▶'}</button>
+                 <button onclick="togglePlay()" class="discman-btn-round" aria-label="Toggle Playback">${isPlaying ? '⏸' : '▶'}</button>
               </div>
             </div>
           </div>
@@ -2976,7 +2943,7 @@
       } else if (currentEra === 'ipod') {
         skinHTML = `
           <div class="ipod-screen-refined cursor-pointer relative" onclick="togglePlay()">
-            <img id="skin-cover" src="${cover}" class="w-full h-full object-contain object-center bg-black">
+            <img id="skin-cover" src="${cover}" class="w-full h-full object-contain object-center bg-black" alt="iPod Screen Cover Art">
             <div id="tap-to-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-[10px] font-black tracking-widest uppercase z-30 transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}">Tap to Play</div>
             <div class="ipod-text-overlay">
               <div id="skin-title" class="text-white font-black text-sm leading-tight mb-1">${title}</div>
@@ -2985,7 +2952,7 @@
             <div class="text-slate-400/50 font-black text-[8px] tracking-[0.3em] uppercase mb-2">FMP MP3 Series</div>
           </div>
           <div class="click-wheel-refined">
-            <button onclick="togglePlay()" class="wheel-center text-slate-400 font-bold text-2xl">
+            <button onclick="togglePlay()" class="wheel-center text-slate-400 font-bold text-2xl" aria-label="Toggle Playback">
               <span style="font-family: sans-serif; filter: grayscale(100%);">⏭️</span>
             </button>
             <div class="absolute top-6 text-[12px] font-black text-slate-200">MENU</div>
