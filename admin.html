@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FMP RADIO — headCMS Admin Dashboard</title>
+  
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      background-color: #030205;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      background-image: radial-gradient(circle at 50% 30%, #0d0a17 0%, #020204 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.008) 100%);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .form-input {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-weight: 300;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: rgba(234, 179, 8, 0.4);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.1);
+    }
+  </style>
+</head>
+<body class="py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+      <div class="text-center sm:text-left">
+        <h1 class="text-3xl font-black tracking-tight text-white uppercase font-montserrat">FMP RADIO</h1>
+        <p class="text-xs text-yellow-500 font-bold tracking-widest uppercase mt-1">headCMS™ Admin Dashboard</p>
+      </div>
+      
+      <!-- Actions Bar -->
+      <div class="flex flex-wrap gap-2 justify-center">
+        <button onclick="saveLocalPreview()" class="px-5 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-xs tracking-wider uppercase rounded-full transition-all duration-200 active:scale-95 shadow-lg shadow-yellow-500/20">
+          💾 Save &amp; Preview
+        </button>
+        <button onclick="downloadJSON()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-extrabold text-xs tracking-wider uppercase rounded-full transition-all duration-200 active:scale-95">
+          📥 Download JSON
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert Bar -->
+    <div id="status-alert" class="hidden mb-6 p-4 rounded-xl text-xs font-bold tracking-wider text-center uppercase border"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Forms Column -->
+      <div class="lg:col-span-8 space-y-8">
+        <!-- Section 1: Hero & Copy -->
+        <div class="glass-card rounded-2xl p-6">
+          <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase mb-4 border-b border-white/5 pb-2">1. Hero Section &amp; Copy</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[10px] font-black text-white/50 tracking-wider uppercase mb-1">Live Broadcast Headline</label>
+              <input id="cms-heroLiveLocation" type="text" class="w-full form-input rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-white/50 tracking-wider uppercase mb-1">Hero Big Title</label>
+              <textarea id="cms-heroTitle" rows="2" class="w-full form-input rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-white/50 tracking-wider uppercase mb-1">Homepage Tagline (Widescreen Hero)</label>
+              <textarea id="cms-tagline" rows="3" class="w-full form-input rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-white/50 tracking-wider uppercase mb-1">Community Hub Title</label>
+              <input id="cms-communityHeadline" type="text" class="w-full form-input rounded-xl px-4 py-3 text-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Active Hosts & DJs -->
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
+            <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase">2. Active Hosts &amp; DJ Cards</h2>
+            <button onclick="addHostCard()" class="px-3 py-1 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[10px] tracking-wider uppercase rounded-lg transition-all active:scale-95">
+              ➕ Add Host
+            </button>
+          </div>
+          <div id="hosts-form-container" class="space-y-6">
+            <!-- Dynamic hosts forms injected here -->
+          </div>
+        </div>
+
+        <!-- Section 3: Community Spotlights -->
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
+            <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase">3. Community Spotlights</h2>
+            <button onclick="addSpotlight()" class="px-3 py-1 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[10px] tracking-wider uppercase rounded-lg transition-all active:scale-95">
+              ➕ Add Spotlight
+            </button>
+          </div>
+          <div id="spotlights-form-container" class="space-y-6">
+            <!-- Dynamic spotlights forms injected here -->
+          </div>
+        </div>
+
+        <!-- Section 4: Broadcast Schedule -->
+        <div class="glass-card rounded-2xl p-6">
+          <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase mb-4 border-b border-white/5 pb-2">4. Broadcast Schedule</h2>
+          <div id="schedule-form-container" class="space-y-6">
+            <!-- Dynamic schedule forms injected here -->
+          </div>
+        </div>
+      <!-- Right Column: Local Manual Workflow Guide -->
+      <div class="lg:col-span-4 space-y-8">
+        <div class="glass-card rounded-2xl p-6 border border-yellow-500/20">
+          <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase mb-3 border-b border-white/5 pb-2">💻 Local Workflow Guide</h2>
+          <div class="space-y-4 text-xs font-light leading-relaxed text-white/80">
+            <p>Welcome! This dashboard acts as a visual "fill-in-the-blank" editor for your site copy, schedules, and DJ cards.</p>
+            
+            <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
+              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 1: Save & Preview</strong>
+              <p class="text-white/60">Click <strong class="text-white">💾 Save & Preview</strong> to temporarily cache your drafts. Open <code class="bg-white/5 px-1 py-0.5 rounded text-yellow-500">index.html</code> in another browser tab to view your changes instantly!</p>
+            </div>
+            
+            <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
+              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 2: Export JSON</strong>
+              <p class="text-white/60">Once you are 100% satisfied with your changes, click <strong class="text-white">📥 Download JSON</strong>. This downloads your custom <code class="bg-white/5 px-1 py-0.5 rounded text-yellow-500">content.json</code> file.</p>
+            </div>
+
+            <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
+              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 3: Update Codebase</strong>
+              <p class="text-white/60">Place the downloaded <code class="bg-white/5 px-1 py-0.5 rounded text-white">content.json</code> file directly inside your local website directory (overwriting the existing one).</p>
+            </div>
+
+            <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
+              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 4: Push to Live Site</strong>
+              <p class="text-white/60">Push your updated code files to GitHub. Netlify will instantly detect the changes, build the site, and update it globally!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let activeContent = {};
+
+    // 100% Robust Local Fallback (Matches content.json structure perfectly)
+    const DEFAULT_CONTENT = {
+      "heroLiveLocation": "Broadcasting Live from Chicago",
+      "heroTitle": "THE VOICE OF THE PEOPLE.",
+      "tagline": "Broadcasting only the best Urban AC & R&B Throwback music straight from the heart of the Austin community!",
+      "communityHeadline": "The Voice of the People",
+      "hosts": [
+        {
+          "name": "Danny Boy",
+          "role": "Morning Host",
+          "show": "Wake & Bake",
+          "time": "6AM–10AM",
+          "bio": "Start your mornings with high-energy tracks, local community news, and the smoothest morning R&B vibes.",
+          "img": "https://i.imgur.com/mTtRxbW.jpeg"
+        },
+        {
+          "name": "ChiTown",
+          "role": "Midmorning Host",
+          "show": "The Bridge",
+          "time": "10AM–12PM",
+          "bio": "Bridging communities and markets with smooth Urban AC cuts, throwback reviews, and live call-ins.",
+          "img": "https://i.imgur.com/AFySV6g.jpeg"
+        },
+        {
+          "name": "Kimberla",
+          "role": "Weekend Host",
+          "show": "Sunday Soul",
+          "time": "Weekends",
+          "bio": "Bringing you the deepest gospel cuts and community soul highlights straight from Tarpon Springs & Chicago.",
+          "img": "assets/hosts/kimberla.png"
+        },
+        {
+          "name": "Miss Liz",
+          "role": "Co-Host / Presenter",
+          "show": "Community Spotlights",
+          "time": "Weekends",
+          "bio": "Highlighting Austin and Chicago local community leaders, grassroots creators, and block party organizers.",
+          "img": "assets/hosts/coming_soon_2.png"
+        },
+        {
+          "name": "Rotation Slot 1",
+          "role": "Guest / Rotation",
+          "show": "Special Rotation",
+          "time": "TBD",
+          "bio": "A professional guest slot ready for seasonal rotational takeovers, DJ battles, and block party syndications.",
+          "img": "assets/hosts/coming_soon_3.png"
+        },
+        {
+          "name": "Rotation Slot 2",
+          "role": "Guest / Rotation",
+          "show": "Special Rotation",
+          "time": "TBD",
+          "bio": "Reserved for upcoming syndications and regional Urban AC DJ partnerships. Stay tuned for rotational schedules!",
+          "img": "assets/hosts/coming_soon_3.png"
+        }
+      ],
+      "schedule": {
+        "Mon–Fri": [
+          { "time": "6AM–10AM", "show": "Wake & Bake", "host": "Danny Boy", "genre": "R&B / Soul" },
+          { "time": "10AM–12PM", "show": "The Bridge", "host": "ChiTown", "genre": "R&B" }
+        ],
+        "Saturday": [
+          { "time": "6AM–10AM", "show": "Saturday Soul", "host": "FMPRADIO", "genre": "Soul" }
+        ],
+        "Sunday": [
+          { "time": "6AM–12PM", "show": "Church on Block", "host": "Kimberla", "genre": "Gospel" }
+        ]
+      },
+      "spotlights": [
+        {
+          "title": "Austin Block Party Recap",
+          "desc": "Summer's biggest community event."
+        },
+        {
+          "title": "Soul Music Awards",
+          "desc": "Local artists making waves nationally."
+        }
+      ]
+    };
+
+    // Page Initializer
+    window.addEventListener('load', async () => {
+      await fetchInitialContent();
+    });
+
+    async function fetchInitialContent() {
+      try {
+        // First try local storage
+        const local = localStorage.getItem('fmp_cms_content');
+        let data = null;
+        let isLocalDraft = false;
+
+        if (local) {
+          try {
+            data = JSON.parse(local);
+            isLocalDraft = true;
+          } catch(e) {
+            console.warn("[CMS] Failed to parse local storage content:", e);
+          }
+        }
+
+        // Second, try fetching live content.json
+        if (!data) {
+          try {
+            const res = await fetch('./content.json');
+            if (res.ok) {
+              data = await res.json();
+            }
+          } catch (e) {
+            console.warn("[CMS] CORS/Offline restrictions blocked content.json fetch. Loading local template.");
+          }
+        }
+
+        // Third, fall back to embedded robust default content if both fail (perfect for local double-click file:///)
+        if (!data) {
+          data = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
+          activeContent = data;
+          populateForm(data);
+          showAlert('💡 CORS Note: Running locally under file:///. Form successfully populated from embedded template! Make edits and click "Save & Preview" or "Download JSON".', 'warning');
+        } else {
+          activeContent = data;
+          populateForm(data);
+          if (isLocalDraft) {
+            showAlert('📂 Loaded locally saved preview drafts. Click "Download JSON" once you are finished editing to save your changes.', 'info');
+          } else {
+            showAlert('✅ Successfully loaded copy configurations from content.json!', 'success');
+          }
+        }
+      } catch(e) {
+        console.error("[CMS] Error initializing content:", e);
+        showAlert('⚠️ Critical error loading content configurations. Populating backup template.', 'error');
+        activeContent = JSON.parse(JSON.stringify(DEFAULT_CONTENT));
+        populateForm(activeContent);
+      }
+    }
+
+    function populateForm(data) {
+      document.getElementById('cms-heroLiveLocation').value = data.heroLiveLocation || '';
+      document.getElementById('cms-heroTitle').value = data.heroTitle || '';
+      document.getElementById('cms-tagline').value = data.tagline || '';
+      document.getElementById('cms-communityHeadline').value = data.communityHeadline || '';
+
+      // Section 2: Populate Hosts
+      const hostsContainer = document.getElementById('hosts-form-container');
+      if (hostsContainer) {
+        hostsContainer.innerHTML = '';
+        if (data.hosts && Array.isArray(data.hosts)) {
+          data.hosts.forEach((host, idx) => {
+            const section = document.createElement('div');
+            section.className = 'p-5 bg-white/5 border border-white/5 rounded-xl space-y-4 relative';
+            section.innerHTML = `
+              <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
+                <span class="text-[10px] font-black text-yellow-500 tracking-widest uppercase">Host Card #${idx + 1}: ${host.name || 'New Host'}</span>
+                <button onclick="removeHostCard(${idx})" class="text-[9px] font-black text-red-400 hover:text-red-300 tracking-widest uppercase transition-all">
+                  ❌ Remove
+                </button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Display Name</label>
+                  <input type="text" value="${host.name || ''}" oninput="updateHostField(${idx}, 'name', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Role / Position</label>
+                  <input type="text" value="${host.role || ''}" oninput="updateHostField(${idx}, 'role', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Show Name</label>
+                  <input type="text" value="${host.show || ''}" oninput="updateHostField(${idx}, 'show', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Image Link (Portrait Path)</label>
+                  <input type="text" value="${host.img || ''}" oninput="updateHostField(${idx}, 'img', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Profile Show Bio</label>
+                  <textarea rows="2" oninput="updateHostField(${idx}, 'bio', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs resize-none">${host.bio || ''}</textarea>
+                </div>
+              </div>
+            `;
+            hostsContainer.appendChild(section);
+          });
+        }
+      }
+
+      // Section 3: Populate Spotlights
+      const spotlightsContainer = document.getElementById('spotlights-form-container');
+      if (spotlightsContainer) {
+        spotlightsContainer.innerHTML = '';
+        if (data.spotlights && Array.isArray(data.spotlights)) {
+          data.spotlights.forEach((spotlight, idx) => {
+            const section = document.createElement('div');
+            section.className = 'p-5 bg-white/5 border border-white/5 rounded-xl space-y-4';
+            section.innerHTML = `
+              <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
+                <span class="text-[10px] font-black text-yellow-500 tracking-widest uppercase">Spotlight Slot #${idx + 1}</span>
+                <button onclick="removeSpotlight(${idx})" class="text-[9px] font-black text-red-400 hover:text-red-300 tracking-widest uppercase transition-all">
+                  ❌ Remove
+                </button>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Spotlight Title</label>
+                  <input type="text" value="${spotlight.title || ''}" oninput="updateSpotlightField(${idx}, 'title', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                </div>
+                <div>
+                  <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Description / Summary</label>
+                  <textarea rows="2" oninput="updateSpotlightField(${idx}, 'desc', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs resize-none">${spotlight.desc || ''}</textarea>
+                </div>
+              </div>
+            `;
+            spotlightsContainer.appendChild(section);
+          });
+        }
+      }
+
+      // Section 4: Populate Broadcast Schedule
+      const scheduleContainer = document.getElementById('schedule-form-container');
+      if (scheduleContainer) {
+        scheduleContainer.innerHTML = '';
+        if (data.schedule) {
+          Object.keys(data.schedule).forEach((dayKey) => {
+            const daySection = document.createElement('div');
+            daySection.className = 'p-5 bg-white/5 border border-white/5 rounded-xl space-y-4';
+            
+            let html = `
+              <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
+                <span class="text-[10px] font-black text-yellow-500 tracking-widest uppercase">${dayKey} Shows</span>
+                <button onclick="addScheduleShow('${dayKey}')" class="px-2.5 py-1 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[9px] tracking-wider uppercase rounded-md transition-all active:scale-95">
+                  ➕ Add Show
+                </button>
+              </div>
+              <div class="space-y-4">
+            `;
+            
+            data.schedule[dayKey].forEach((show, showIdx) => {
+              html += `
+                <div class="p-3 bg-white/5 rounded-lg border border-white/5 space-y-3 relative">
+                  <div class="flex justify-between items-center">
+                    <div class="text-[8px] font-black text-white/30 tracking-wider uppercase">Show #${showIdx + 1}</div>
+                    <button onclick="removeScheduleShow('${dayKey}', ${showIdx})" class="text-[8px] font-black text-red-400 hover:text-red-300 tracking-wider uppercase transition-all">
+                      ❌ Remove
+                    </button>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Broadcast Time</label>
+                      <input type="text" value="${show.time || ''}" oninput="updateScheduleField('${dayKey}', ${showIdx}, 'time', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Show Name</label>
+                      <input type="text" value="${show.show || ''}" oninput="updateScheduleField('${dayKey}', ${showIdx}, 'show', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Host Name</label>
+                      <input type="text" value="${show.host || ''}" oninput="updateScheduleField('${dayKey}', ${showIdx}, 'host', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Genre</label>
+                      <input type="text" value="${show.genre || ''}" oninput="updateScheduleField('${dayKey}', ${showIdx}, 'genre', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            
+            html += `</div>`;
+            daySection.innerHTML = html;
+            scheduleContainer.appendChild(daySection);
+          });
+        }
+      }
+    }
+
+    function addHostCard() {
+      if (!activeContent.hosts) activeContent.hosts = [];
+      activeContent.hosts.push({
+        name: "New Host / DJ",
+        role: "Guest / Rotation",
+        show: "Special Show",
+        time: "TBD",
+        bio: "Bio details here...",
+        img: "assets/hosts/coming_soon_3.png"
+      });
+      populateForm(activeContent);
+      showAlert('New host card added! Customize their profile below.', 'info');
+    }
+
+    function removeHostCard(idx) {
+      if (confirm('Are you sure you want to remove this host card?')) {
+        activeContent.hosts.splice(idx, 1);
+        populateForm(activeContent);
+        showAlert('Host card successfully removed.', 'info');
+      }
+    }
+
+    function addSpotlight() {
+      if (!activeContent.spotlights) activeContent.spotlights = [];
+      activeContent.spotlights.push({
+        title: "New Spotlight Title",
+        desc: "New spotlight description details."
+      });
+      populateForm(activeContent);
+      showAlert('New spotlight added! Edit details below.', 'info');
+    }
+
+    function removeSpotlight(idx) {
+      if (confirm('Are you sure you want to remove this spotlight card?')) {
+        activeContent.spotlights.splice(idx, 1);
+        populateForm(activeContent);
+        showAlert('Spotlight card successfully removed.', 'info');
+      }
+    }
+
+    function addScheduleShow(dayKey) {
+      if (!activeContent.schedule) activeContent.schedule = {};
+      if (!activeContent.schedule[dayKey]) activeContent.schedule[dayKey] = [];
+      activeContent.schedule[dayKey].push({
+        time: "12PM–2PM",
+        show: "New Show Program",
+        host: "Host / DJ Name",
+        genre: "Urban AC"
+      });
+      populateForm(activeContent);
+      showAlert(`New show program added to ${dayKey}! Customize the details below.`, 'info');
+    }
+
+    function removeScheduleShow(dayKey, showIdx) {
+      if (confirm(`Are you sure you want to remove this show program from ${dayKey}?`)) {
+        activeContent.schedule[dayKey].splice(showIdx, 1);
+        populateForm(activeContent);
+        showAlert('Show program successfully removed from schedule.', 'info');
+      }
+    }
+
+    function updateHostField(idx, field, value) {
+      if (activeContent.hosts && activeContent.hosts[idx]) {
+        activeContent.hosts[idx][field] = value;
+      }
+    }
+
+    function updateSpotlightField(idx, field, value) {
+      if (activeContent.spotlights && activeContent.spotlights[idx]) {
+        activeContent.spotlights[idx][field] = value;
+      }
+    }
+
+    function updateScheduleField(dayKey, showIdx, field, value) {
+      if (activeContent.schedule && activeContent.schedule[dayKey] && activeContent.schedule[dayKey][showIdx]) {
+        activeContent.schedule[dayKey][showIdx][field] = value;
+      }
+    }
+
+    function serializeForm() {
+      activeContent.heroLiveLocation = document.getElementById('cms-heroLiveLocation').value;
+      activeContent.heroTitle = document.getElementById('cms-heroTitle').value;
+      activeContent.tagline = document.getElementById('cms-tagline').value;
+      activeContent.communityHeadline = document.getElementById('cms-communityHeadline').value;
+      return activeContent;
+    }
+
+    function saveLocalPreview() {
+      const data = serializeForm();
+      localStorage.setItem('fmp_cms_content', JSON.stringify(data, null, 2));
+      showAlert('Preview saved! Open index.html locally to view changes instantly.', 'success');
+    }
+
+    function downloadJSON() {
+      const data = serializeForm();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'content.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showAlert('JSON file downloaded successfully! Replace content.json in your directory with this file.', 'success');
+    }
+
+
+
+    function showAlert(msg, type) {
+      const el = document.getElementById('status-alert');
+      el.innerText = msg;
+      el.classList.remove('hidden', 'bg-yellow-500/10', 'border-yellow-500/30', 'text-yellow-500', 'bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400', 'bg-red-500/10', 'border-red-500/30', 'text-red-400', 'bg-blue-500/10', 'border-blue-500/30', 'text-blue-400');
+      
+      if (type === 'success') {
+        el.classList.add('bg-emerald-500/10', 'border-emerald-500/30', 'text-emerald-400');
+      } else if (type === 'error') {
+        el.classList.add('bg-red-500/10', 'border-red-500/30', 'text-red-400');
+      } else if (type === 'info') {
+        el.classList.add('bg-blue-500/10', 'border-blue-500/30', 'text-blue-400');
+      } else {
+        el.classList.add('bg-yellow-500/10', 'border-yellow-500/30', 'text-yellow-500');
+      }
+      el.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

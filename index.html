@@ -1525,6 +1525,43 @@
       animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
     }
 
+    /* 3D CARD FLIP UPGRADE */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .host-card-container {
+      min-height: 380px;
+      position: relative;
+    }
+    .host-card-inner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .host-card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .host-card-front, .host-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
     /* PC SCALING */
     @media (min-width: 1025px) {
       :root {
@@ -1670,7 +1707,7 @@
         <h2 class="text-xs font-black text-yellow-500 tracking-[0.3em] mb-2 uppercase">🔴 LIVE STREAM</h2>
         <h3 class="text-4xl font-black mb-8 text-white tracking-tight">Now Playing</h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div class="glass-card rounded-2xl p-6 flex gap-6 items-start">
+          <div class="glass-card rounded-2xl p-6 flex gap-6 items-start" data-depth-tilt>
             <div class="relative w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 group">
               <div class="absolute -inset-1.5 rounded-xl bg-gradient-to-tr from-yellow-500 to-amber-600 opacity-30 blur-md group-hover:opacity-50 transition-opacity"></div>
               <img id="main-cover-art" data-widget="mcp-cover-image" data-name="fmpradio" class="relative w-full h-full object-cover rounded-xl shadow-2xl border border-white/10 transition-transform duration-300 group-hover:scale-105" onerror="this.src='./assets/logo.svg'; this.onerror=null;" alt="Now Playing Cover Art" loading="lazy" />
@@ -1740,7 +1777,7 @@
             <div class="space-y-4" id="spotlights-grid"></div>
           </div>
           <div>
-            <div class="glass-card rounded-2xl p-6">
+            <div class="glass-card rounded-2xl p-6" data-depth-tilt>
               <h4 class="font-extrabold text-lg text-white mb-4">Send a Shout-Out</h4>
               <form id="shoutout-form" name="shoutout" data-netlify="true" netlify-honeypot="bot-field" onsubmit="submitShoutout(event)">
                 <input type="hidden" name="form-name" value="shoutout">
@@ -1767,9 +1804,14 @@
     </section>
 
     <footer class="w-full py-8 bg-gray-950 border-t border-white/5 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <img src="./assets/logo.svg" alt="FMP Radio" class="h-16 w-auto mb-2">
-        <p class="text-xs text-gray-500 mb-3">© 2026 FMP Media Group</p>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex flex-col items-center sm:items-start">
+          <img src="./assets/logo.svg" alt="FMP Radio" class="h-16 w-auto mb-2">
+          <p class="text-xs text-gray-500">© 2026 FMP Media Group</p>
+        </div>
+        <div class="flex gap-6">
+          <a href="./privacy.html" class="text-xs text-gray-500 hover:text-yellow-500 transition-colors uppercase tracking-widest font-bold">Privacy Policy</a>
+        </div>
       </div>
     </footer>
 
@@ -1862,9 +1904,54 @@
     const audio = document.getElementById('audio-stream');
 
     const HOSTS = [
-      { name: 'Danny Boy', role: 'Morning Host', show: 'Wake & Bake', time: '6AM–10AM', img: 'https://i.imgur.com/mTtRxbW.jpeg' },
-      { name: 'ChiTown', role: 'Midmorning', show: 'The Bridge', time: '10AM–12PM', img: 'https://i.imgur.com/AFySV6g.jpeg' },
-      { name: 'Kimberla', role: 'Weekend', show: 'Sunday Soul', time: 'Weekends', img: 'assets/hosts/kimberla.png' }
+      {
+        name: 'Danny Boy',
+        role: 'Morning Host',
+        show: 'Wake & Bake',
+        time: '6AM–10AM',
+        bio: 'Start your mornings with high-energy tracks, local community news, and the smoothest morning R&B vibes.',
+        img: 'https://i.imgur.com/mTtRxbW.jpeg'
+      },
+      {
+        name: 'ChiTown',
+        role: 'Midmorning Host',
+        show: 'The Bridge',
+        time: '10AM–12PM',
+        bio: 'Bridging communities and markets with smooth Urban AC cuts, throwback reviews, and live call-ins.',
+        img: 'https://i.imgur.com/AFySV6g.jpeg'
+      },
+      {
+        name: 'Kimberla',
+        role: 'Weekend Host',
+        show: 'Sunday Soul',
+        time: 'Weekends',
+        bio: 'Bringing you the deepest gospel cuts and community soul highlights straight from Tarpon Springs & Chicago.',
+        img: 'assets/hosts/kimberla.png'
+      },
+      {
+        name: 'Miss Liz',
+        role: 'Co-Host / Presenter',
+        show: 'Community Spotlights',
+        time: 'Weekends',
+        bio: 'Highlighting Austin and Chicago local community leaders, grassroots creators, and block party organizers.',
+        img: 'assets/hosts/coming_soon_2.png'
+      },
+      {
+        name: 'Rotation Slot 1',
+        role: 'Guest / Rotation',
+        show: 'Special Rotation',
+        time: 'TBD',
+        bio: 'A professional guest slot ready for seasonal rotational takeovers, DJ battles, and block party syndications.',
+        img: 'assets/hosts/coming_soon_3.png'
+      },
+      {
+        name: 'Rotation Slot 2',
+        role: 'Guest / Rotation',
+        show: 'Special Rotation',
+        time: 'TBD',
+        bio: 'Reserved for upcoming syndications and regional Urban AC DJ partnerships. Stay tuned for rotational schedules!',
+        img: 'assets/hosts/coming_soon_3.png'
+      }
     ];
 
     const DEFAULT_COVER = './assets/logo.svg';
@@ -2081,19 +2168,58 @@
       var grid = document.getElementById('hosts-grid');
       grid.innerHTML = '';
       HOSTS.forEach(function (host) {
-        var card = document.createElement('div');
-        card.className = 'glass-card rounded-2xl p-6 group';
-        card.innerHTML = `
-          <div class="relative w-16 h-16 mb-4 transition-transform duration-300 group-hover:scale-110">
-            <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-yellow-500 to-amber-600 opacity-60 blur-sm"></div>
-            <img src="${host.img}" class="relative w-full h-full rounded-full object-cover border-2 border-black" onerror="this.src='./assets/logo.svg'">
+        var container = document.createElement('div');
+        container.className = 'host-card-container perspective-1000 w-full min-h-[380px]';
+        container.setAttribute('data-depth-tilt', '');
+        container.innerHTML = `
+          <div class="host-card-tilt w-full h-full transform-style-3d">
+            <div class="host-card-inner relative w-full h-full transform-style-3d cursor-pointer" onclick="toggleCardFlip(this)">
+              
+              <!-- CARD FRONT: Portrait & basic role info -->
+              <div class="host-card-front absolute inset-0 glass-card rounded-2xl p-6 flex flex-col justify-between backface-hidden z-20">
+                <div class="absolute -inset-1 rounded-xl bg-gradient-to-tr from-yellow-500/10 to-amber-600/10 opacity-30 blur-md"></div>
+                
+                <div class="relative w-full h-48 rounded-xl overflow-hidden border border-white/5 shadow-inner">
+                  <img src="${host.img}" class="w-full h-full object-cover filter contrast-125 brightness-95" onerror="this.src='./assets/logo.svg'" alt="${host.name}">
+                </div>
+                
+                <div class="mt-4 text-left">
+                  <h3 class="font-extrabold text-xl text-white uppercase tracking-tight">${host.name}</h3>
+                  <p class="text-[10px] text-yellow-500 font-black uppercase tracking-widest mt-1">${host.role}</p>
+                  <span class="inline-block mt-3 text-[9px] font-black text-white/30 border border-white/10 rounded-full px-2.5 py-0.5 tracking-widest uppercase">Click to Flip</span>
+                </div>
+              </div>
+
+              <!-- CARD BACK: Detailed Bio & Show times -->
+              <div class="host-card-back absolute inset-0 glass-card rounded-2xl p-6 flex flex-col justify-between backface-hidden rotate-y-180 z-10 text-left">
+                <div>
+                  <h3 class="font-extrabold text-lg text-yellow-500 uppercase tracking-tight">${host.name}</h3>
+                  <p class="text-[9px] font-black text-white/40 uppercase tracking-widest mb-4 border-b border-white/5 pb-2">${host.role}</p>
+                  <h4 class="text-sm font-semibold text-white/95 leading-tight mb-2">${host.show} (${host.time || 'Live'})</h4>
+                  <p class="text-xs text-white/60 font-light leading-relaxed">${host.bio}</p>
+                </div>
+                
+                <div class="flex justify-between items-center pt-3 border-t border-white/5 mt-4">
+                  <span class="text-[9px] font-black text-white/30 tracking-widest uppercase">AUDIO INTRO</span>
+                  <button class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/30 hover:text-yellow-500 transition-all opacity-30 pointer-events-none" aria-label="Audio Preview (Coming Soon)">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
-          <h3 class="font-extrabold text-lg text-white">${host.name}</h3>
-          <p class="text-xs text-yellow-500 font-bold uppercase tracking-wider mt-1">${host.role}</p>
-          <p class="text-sm text-white/60 mt-3 font-light leading-relaxed">${host.show} (${host.time || 'Live'})</p>
         `;
-        grid.appendChild(card);
+        grid.appendChild(container);
       });
+      
+      if (typeof initDepthTilting === 'function') {
+        initDepthTilting();
+      }
+    }
+
+    function toggleCardFlip(element) {
+      element.classList.toggle('is-flipped');
     }
 
     function renderSpotlights() {
@@ -3107,18 +3233,137 @@
       });
     }
 
+    async function loadCmsContent() {
+      // 1. Check LocalStorage first for instant local preview/edit state
+      const localDataStr = localStorage.getItem('fmp_cms_content');
+      let data = null;
+      if (localDataStr) {
+        try {
+          data = JSON.parse(localDataStr);
+          console.log("[CMS Engine] Applying local preview copy from localStorage.");
+        } catch (e) {
+          console.warn("[CMS Engine] Failed to parse local copy:", e);
+        }
+      }
+
+      // 2. Fetch content.json if no local preview is active
+      if (!data) {
+        try {
+          const res = await fetch('./content.json');
+          if (res.ok) {
+            data = await res.json();
+            console.log("[CMS Engine] Sourced website content from content.json.");
+          }
+        } catch (e) {
+          console.warn("[CMS Engine] Failed to fetch content.json, fallback active:", e);
+        }
+      }
+
+      // 3. Bind copy and data arrays if we got data
+      if (data) {
+        try {
+          if (data.heroLiveLocation) {
+            const liveIndicator = document.querySelector('.hero-bg h2');
+            if (liveIndicator) {
+              liveIndicator.innerHTML = `<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> ` + data.heroLiveLocation;
+            }
+          }
+          if (data.heroTitle) {
+            const h1 = document.querySelector('.hero-bg h1');
+            if (h1) {
+              h1.innerHTML = data.heroTitle.replace('\n', '<br>');
+            }
+          }
+          if (data.tagline) {
+            const p = document.querySelector('.hero-bg p');
+            if (p) {
+              p.innerText = data.tagline;
+            }
+          }
+          if (data.communityHeadline) {
+            const headline = document.getElementById('community-headline');
+            if (headline) {
+              headline.innerText = data.communityHeadline;
+            }
+          }
+          if (data.hosts && Array.isArray(data.hosts)) {
+            HOSTS.length = 0;
+            data.hosts.forEach(h => HOSTS.push(h));
+            renderHosts();
+          }
+          if (data.schedule) {
+            Object.keys(data.schedule).forEach(day => {
+              SCHEDULE[day] = data.schedule[day];
+            });
+            renderSchedule();
+          }
+          if (data.spotlights && Array.isArray(data.spotlights)) {
+            SPOTLIGHTS.length = 0;
+            data.spotlights.forEach(s => SPOTLIGHTS.push(s));
+            renderSpotlights();
+          }
+        } catch (bindErr) {
+          console.error("[CMS Engine] Error binding copy:", bindErr);
+        }
+      }
+    }
+
     window.addEventListener('resize', updateScale);
     window.addEventListener('load', () => {
       updateScale();
       initWatchtower();
       loadLibraryData(); 
+      loadCmsContent();
       if (window.innerWidth <= 768) {
         document.getElementById('mobile-device-view').classList.add('active');
         setEra('auto');
       }
     });
 
-    renderDayTabs(); renderSchedule(); renderHosts(); renderSpotlights();
+    function initDepthTilting() {
+      const cards = document.querySelectorAll('[data-depth-tilt]');
+      
+      cards.forEach(card => {
+        if (card.getAttribute('data-tilt-initialized') === 'true') return;
+        card.setAttribute('data-tilt-initialized', 'true');
+        
+        const tiltTarget = card.querySelector('.host-card-tilt') || card;
+        
+        card.addEventListener('mousemove', e => {
+          if (window.innerWidth < 1025) return;
+          
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          
+          const deltaX = (x - centerX) / centerX;
+          const deltaY = (y - centerY) / centerY;
+          
+          const maxTilt = 8;
+          const tiltX = -deltaY * maxTilt;
+          const tiltY = deltaX * maxTilt;
+          
+          tiltTarget.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+          tiltTarget.style.boxShadow = `${-deltaX * 12}px ${-deltaY * 12}px 35px rgba(0, 0, 0, 0.65), 0 0 25px rgba(234, 179, 8, ${Math.abs(deltaX) * 0.12})`;
+        });
+        
+        card.addEventListener('mouseenter', () => {
+          if (window.innerWidth < 1025) return;
+          tiltTarget.style.transition = 'none';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          tiltTarget.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)';
+          tiltTarget.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+          tiltTarget.style.boxShadow = '';
+        });
+      });
+    }
+
+    renderDayTabs(); renderSchedule(); renderHosts(); renderSpotlights(); initDepthTilting();
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
     }, { threshold: 0.1 });

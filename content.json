@@ -1,0 +1,78 @@
+{
+  "heroLiveLocation": "Broadcasting Live from Chicago",
+  "heroTitle": "THE VOICE OF THE PEOPLE.",
+  "tagline": "Broadcasting only the best Urban AC & R&B Throwback music straight from the heart of the Austin community!",
+  "communityHeadline": "The Voice of the People",
+  "hosts": [
+    {
+      "name": "Danny Boy",
+      "role": "Morning Host",
+      "show": "Wake & Bake",
+      "time": "6AM–10AM",
+      "bio": "Start your mornings with high-energy tracks, local community news, and the smoothest morning R&B vibes.",
+      "img": "https://i.imgur.com/mTtRxbW.jpeg"
+    },
+    {
+      "name": "ChiTown",
+      "role": "Midmorning Host",
+      "show": "The Bridge",
+      "time": "10AM–12PM",
+      "bio": "Bridging communities and markets with smooth Urban AC cuts, throwback reviews, and live call-ins.",
+      "img": "https://i.imgur.com/AFySV6g.jpeg"
+    },
+    {
+      "name": "Kimberla",
+      "role": "Weekend Host",
+      "show": "Sunday Soul",
+      "time": "Weekends",
+      "bio": "Bringing you the deepest gospel cuts and community soul highlights straight from Tarpon Springs & Chicago.",
+      "img": "assets/hosts/kimberla.png"
+    },
+    {
+      "name": "Miss Liz",
+      "role": "Co-Host / Presenter",
+      "show": "Community Spotlights",
+      "time": "Weekends",
+      "bio": "Highlighting Austin and Chicago local community leaders, grassroots creators, and block party organizers.",
+      "img": "assets/hosts/coming_soon_2.png"
+    },
+    {
+      "name": "Rotation Slot 1",
+      "role": "Guest / Rotation",
+      "show": "Special Rotation",
+      "time": "TBD",
+      "bio": "A professional guest slot ready for seasonal rotational takeovers, DJ battles, and block party syndications.",
+      "img": "assets/hosts/coming_soon_3.png"
+    },
+    {
+      "name": "Rotation Slot 2",
+      "role": "Guest / Rotation",
+      "show": "Special Rotation",
+      "time": "TBD",
+      "bio": "Reserved for upcoming syndications and regional Urban AC DJ partnerships. Stay tuned for rotational schedules!",
+      "img": "assets/hosts/coming_soon_3.png"
+    }
+  ],
+  "schedule": {
+    "Mon–Fri": [
+      { "time": "6AM–10AM", "show": "Wake & Bake", "host": "Danny Boy", "genre": "R&B / Soul" },
+      { "time": "10AM–12PM", "show": "The Bridge", "host": "ChiTown", "genre": "R&B" }
+    ],
+    "Saturday": [
+      { "time": "6AM–10AM", "show": "Saturday Soul", "host": "FMPRADIO", "genre": "Soul" }
+    ],
+    "Sunday": [
+      { "time": "6AM–12PM", "show": "Church on Block", "host": "Kimberla", "genre": "Gospel" }
+    ]
+  },
+  "spotlights": [
+    {
+      "title": "Austin Block Party Recap",
+      "desc": "Summer's biggest community event."
+    },
+    {
+      "title": "Soul Music Awards",
+      "desc": "Local artists making waves nationally."
+    }
+  ]
+}
