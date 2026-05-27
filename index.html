@@ -1703,6 +1703,773 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         AD BOARD SECTION — Pinned Flyer Wall
+    ============================================================ -->
+    <section id="ad-board" class="w-full py-12 relative overflow-visible border-b border-white/5">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <h2 class="text-xs font-black text-yellow-500/70 tracking-[0.3em] uppercase m-0">📌 Upcoming Events</h2>
+        <div class="flex items-center gap-4 text-xs font-bold text-white/40 tracking-widest uppercase">
+          <span>Sponsored By</span>
+          <img src="https://i.imgur.com/qTVLhH3.jpeg" alt="Sponsor" class="h-16 md:h-20 rounded shadow-md border border-white/10 object-contain" />
+        </div>
+      </div>
+      <!-- Cork-board texture strip — flyers injected by renderAdBoard() -->
+      <div class="ad-corkboard" id="ad-corkboard"></div>
+    </section>
+
+    <!-- ============================================================
+         AD LIGHTBOX — Fullscreen paper view with pinch/drag
+    ============================================================ -->
+    <div id="ad-lightbox" role="dialog" aria-modal="true" aria-label="Event Flyer Fullscreen" onclick="handleLightboxBackdropClick(event)">
+      <div id="ad-lightbox-inner">
+        <div class="ad-paper-grain"></div>
+        <img id="ad-lightbox-img" src="" alt="Event flyer" draggable="false" />
+      </div>
+      <button class="ad-lightbox-close" onclick="closeAdLightbox()" aria-label="Close flyer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div class="ad-lightbox-hint" id="ad-lightbox-hint">Pinch to zoom &nbsp;·&nbsp; Drag to move &nbsp;·&nbsp; Double-tap to reset</div>
+    </div>
+
+    <style>
+      /* ── Cork board strip ──────────────────────────────────────── */
+      .ad-corkboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 40px 32px;
+        padding: 36px 24px 48px;
+        background:
+          repeating-linear-gradient(120deg, rgba(139,90,43,0.05) 0px, rgba(139,90,43,0.05) 1px, transparent 1px, transparent 12px),
+          linear-gradient(180deg, rgba(40,25,10,0.3) 0%, rgba(20,12,5,0.12) 100%);
+        border-top: 1px solid rgba(139,90,43,0.1);
+        border-bottom: 1px solid rgba(139,90,43,0.07);
+      }
+
+      /* ── Flyer wrapper (pin + angle) ───────────────────────────── */
+      .ad-flyer-wrap {
+        position: relative;
+        display: inline-block;
+        width: min(480px, 88vw);
+        cursor: pointer;
+        transform: rotate(-1.8deg);
+        transform-origin: top center;
+        transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), filter 0.4s ease;
+        animation: flyerSway 7s ease-in-out infinite;
+        filter: drop-shadow(0 16px 38px rgba(0,0,0,0.7));
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        outline: none;
+      }
+
+      .ad-flyer-wrap:hover,
+      .ad-flyer-wrap:focus-visible {
+        transform: rotate(0deg) scale(1.03);
+        filter: drop-shadow(0 28px 55px rgba(0,0,0,0.85));
+        animation-play-state: paused;
+      }
+
+      .ad-flyer-wrap:active { transform: rotate(0deg) scale(0.97); }
+
+      @keyframes flyerSway {
+        0%   { transform: rotate(-1.8deg); }
+        35%  { transform: rotate(-0.5deg); }
+        65%  { transform: rotate(-2.5deg); }
+        100% { transform: rotate(-1.8deg); }
+      }
+
+      /* ── Pushpin ───────────────────────────────────────────────── */
+      .ad-pushpin {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+        pointer-events: none;
+      }
+
+      /* ── Flyer image ───────────────────────────────────────────── */
+      .ad-flyer-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        border: 2px solid rgba(255,255,255,0.07);
+        box-shadow: 6px 12px 32px rgba(0,0,0,0.6), 2px 4px 10px rgba(0,0,0,0.4);
+      }
+
+      /* ── Expand hint overlay ───────────────────────────────────── */
+      .ad-expand-hint {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        background: rgba(0,0,0,0);
+        border-radius: 4px;
+        opacity: 0;
+        transition: background 0.3s ease, opacity 0.3s ease;
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      .ad-flyer-wrap:hover .ad-expand-hint { background: rgba(0,0,0,0.5); opacity: 1; }
+
+      /* ── Lightbox backdrop ─────────────────────────────────────── */
+      #ad-lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99998;
+        background: rgba(0,0,0,0.93);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      #ad-lightbox.ad-open { display: flex; animation: lbFadeIn 0.3s ease; }
+
+      @keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+      /* ── Lightbox paper container ──────────────────────────────── */
+      #ad-lightbox-inner {
+        position: relative;
+        cursor: grab;
+        will-change: transform;
+        touch-action: none;
+        animation: lbUnfold 0.45s cubic-bezier(0.22,1,0.36,1);
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.07);
+      }
+
+      #ad-lightbox-inner:active { cursor: grabbing; }
+
+      @keyframes lbUnfold {
+        from { transform: scale(0.55) rotate(7deg); opacity: 0; }
+        to   { transform: scale(1)    rotate(0deg); opacity: 1; }
+      }
+
+      .ad-paper-grain {
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        opacity: 0.045;
+        pointer-events: none;
+        z-index: 10;
+        mix-blend-mode: overlay;
+      }
+
+      #ad-lightbox-img {
+        display: block;
+        max-width: 92vw;
+        max-height: 88vh;
+        width: auto;
+        height: auto;
+        border-radius: 3px;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
+      /* ── Close button ──────────────────────────────────────────── */
+      .ad-lightbox-close {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        z-index: 99999;
+        width: 44px;
+        height: 44px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 50%;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.25s;
+      }
+
+      .ad-lightbox-close:hover { background: rgba(255,255,255,0.2); transform: scale(1.1) rotate(90deg); }
+
+      /* ── Hint text ─────────────────────────────────────────────── */
+      .ad-lightbox-hint {
+        position: fixed;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        color: rgba(255,255,255,0.38);
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        text-transform: uppercase;
+        pointer-events: none;
+        white-space: nowrap;
+        transition: opacity 0.6s ease;
+      }
+
+      .ad-lightbox-hint.hint-hidden { opacity: 0; }
+
+      /* ── CTA button below each flyer ─────────────────────────── */
+      .ad-cta-wrap {
+        position: relative;
+        z-index: 20;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .ad-cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        border: none;
+        outline: none;
+        white-space: nowrap;
+      }
+
+      .ad-cta-email {
+        background: linear-gradient(135deg, #eab308, #d97706);
+        color: #000;
+        box-shadow: 0 4px 18px rgba(234,179,8,0.35);
+      }
+
+      .ad-cta-email:hover {
+        transform: translateY(-2px) scale(1.04);
+        box-shadow: 0 8px 28px rgba(234,179,8,0.5);
+      }
+
+      .ad-cta-link {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: #fff;
+        box-shadow: 0 4px 18px rgba(59,130,246,0.35);
+      }
+
+      .ad-cta-link:hover {
+        transform: translateY(-2px) scale(1.04);
+        box-shadow: 0 8px 28px rgba(59,130,246,0.5);
+      }
+
+      /* ── Email compose modal ─────────────────────────────────── */
+      #ad-email-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      #ad-email-modal.open { display: flex; animation: lbFadeIn 0.25s ease; }
+
+      .ad-email-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 28px 24px 24px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      }
+
+      .ad-email-card h3 {
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #eab308;
+        margin-bottom: 4px;
+      }
+
+      .ad-email-card p {
+        font-size: 11px;
+        color: rgba(255,255,255,0.4);
+        margin-bottom: 18px;
+        letter-spacing: 0.04em;
+      }
+
+      .ad-email-to {
+        font-size: 10px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.35);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 8px;
+      }
+
+      #ad-email-message {
+        width: 100%;
+        min-height: 110px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+        font-size: 14px;
+        font-weight: 300;
+        padding: 12px 14px;
+        resize: vertical;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+        box-sizing: border-box;
+      }
+
+      #ad-email-message:focus {
+        border-color: rgba(234,179,8,0.4);
+        background: rgba(255,255,255,0.07);
+      }
+
+      .ad-email-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .ad-email-send {
+        flex: 1;
+        padding: 12px;
+        background: linear-gradient(135deg, #eab308, #d97706);
+        color: #000;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(234,179,8,0.3);
+      }
+
+      .ad-email-send:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(234,179,8,0.45); }
+
+      .ad-email-cancel {
+        padding: 12px 18px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: rgba(255,255,255,0.6);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .ad-email-cancel:hover { background: rgba(255,255,255,0.1); }
+
+      .ad-email-input {
+        flex: 1;
+        min-width: 0;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+        font-size: 12px;
+        font-weight: 300;
+        padding: 10px 12px;
+        outline: none;
+        transition: border-color 0.2s, background 0.2s;
+        box-sizing: border-box;
+      }
+      .ad-email-input:focus {
+        border-color: rgba(234,179,8,0.4);
+        background: rgba(255,255,255,0.07);
+      }
+    </style>
+
+    <!-- Email Compose Modal -->
+    <div id="ad-email-modal" role="dialog" aria-modal="true" aria-label="Send ticket request email" onclick="if(event.target===this)closeEmailModal()">
+      <form class="ad-email-card" id="ad-email-form-card" name="ticket-requests" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="submitTicketForm(event)">
+        <input type="hidden" name="form-name" value="ticket-requests" />
+        <input type="hidden" name="bot-field" />
+        <input type="hidden" id="ad-email-recipient" name="recipient" value="" />
+        <input type="hidden" id="ad-email-subject-hidden" name="subject" value="" />
+
+        <h3>📧 Request Tickets</h3>
+        <p>Fill out the form below and we will get back to you shortly.</p>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <input type="email" id="ad-email-sender" name="email" class="ad-email-input" placeholder="Your Email Address" required />
+          <input type="tel" id="ad-email-phone" name="phone" class="ad-email-input" placeholder="Your Phone Number" />
+        </div>
+        <textarea id="ad-email-message" name="message" placeholder="Write your message here..." required></textarea>
+        <div class="ad-email-actions">
+          <button type="submit" class="ad-email-send">Send Message</button>
+          <button type="button" class="ad-email-cancel" onclick="closeEmailModal()">Cancel</button>
+        </div>
+      </form>
+      
+      <!-- Success Card -->
+      <div class="ad-email-card" id="ad-email-success-card" style="display: none; text-align: center;">
+        <h3 style="font-size: 18px; margin-bottom: 12px;">✅ Message Prepared</h3>
+        <p style="font-size: 13px; color: #fff; line-height: 1.6; margin-bottom: 24px;">
+          Tickets also available at:<br>
+          <strong style="color: #eab308; font-size: 15px;">Artist Room Cafe</strong><br>
+          5125 W Madison St<br>
+          Chicago, IL 60644
+        </p>
+        <div class="ad-email-actions" style="justify-content: center;">
+          <button class="ad-email-send" style="flex: 0 1 200px;" onclick="closeEmailModal()">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var _adEmailAddress = '';
+      var _adEmailSubject = '';
+
+      window.openEmailModal = function(btn) {
+        _adEmailAddress = btn.dataset.email || '';
+        _adEmailSubject = btn.dataset.subject || 'I need my tickets!';
+        
+        var recipientHidden = document.getElementById('ad-email-recipient');
+        if (recipientHidden) recipientHidden.value = _adEmailAddress;
+
+        var subjectHidden = document.getElementById('ad-email-subject-hidden');
+        if (subjectHidden) subjectHidden.value = _adEmailSubject;
+
+        var senderEl = document.getElementById('ad-email-sender');
+        var phoneEl = document.getElementById('ad-email-phone');
+        if (senderEl) senderEl.value = '';
+        if (phoneEl) phoneEl.value = '';
+
+        var msg = document.getElementById('ad-email-message');
+        if (msg) { msg.value = _adEmailSubject; msg.focus(); msg.select(); }
+        
+        var formCard = document.getElementById('ad-email-form-card');
+        var successCard = document.getElementById('ad-email-success-card');
+        if (formCard) formCard.style.display = 'block';
+        if (successCard) successCard.style.display = 'none';
+
+        var modal = document.getElementById('ad-email-modal');
+        if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      };
+
+      window.closeEmailModal = function() {
+        var modal = document.getElementById('ad-email-modal');
+        if (modal) { modal.classList.remove('open'); document.body.style.overflow = ''; }
+      };
+
+      window.submitTicketForm = function(e) {
+        e.preventDefault();
+        var form = document.getElementById('ad-email-form-card');
+        var formData = new FormData(form);
+        
+        var sendBtn = form.querySelector('.ad-email-send');
+        var oldText = sendBtn.textContent;
+        sendBtn.textContent = 'Sending...';
+        sendBtn.disabled = true;
+
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData).toString()
+        })
+        .then(function() {
+          var formCard = document.getElementById('ad-email-form-card');
+          var successCard = document.getElementById('ad-email-success-card');
+          if (formCard) formCard.style.display = 'none';
+          if (successCard) successCard.style.display = 'block';
+        })
+        .catch(function(error) {
+          // If it fails locally (e.g. Node server instead of Netlify), still show the success UI for testing.
+          var formCard = document.getElementById('ad-email-form-card');
+          var successCard = document.getElementById('ad-email-success-card');
+          if (formCard) formCard.style.display = 'none';
+          if (successCard) successCard.style.display = 'block';
+        })
+        .finally(function() {
+          sendBtn.textContent = oldText;
+          sendBtn.disabled = false;
+        });
+      };
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeEmailModal();
+      });
+    </script>
+
+    <script>
+    (function() {
+      /* ── Default flyer data (overwritten by CMS if content.json has adEvents) ── */
+      window.AD_EVENTS = [
+        {
+          name: 'Rhythm & Roses — Danny Boy',
+          imageUrl: 'https://i.imgur.com/xYndorh.jpeg',
+          linkUrl: '',
+          visible: true,
+          cta: {
+            type: 'email',
+            label: '📧 Get Tickets',
+            email: 'hiredannyboy@gmail.com',
+            subject: 'I need my tickets!'
+          }
+        },
+        {
+          name: 'Exclusive Juneteenth Celebration',
+          imageUrl: 'https://i.imgur.com/VbW9mNI.jpeg',
+          linkUrl: '',
+          visible: true,
+          cta: {
+            type: 'link',
+            label: '🎟️ Buy Tickets',
+            url: 'https://www.ticketmaster.com/rb-music-experience-a-juneteenth-celebration-chicago-illinois-06-20-2026/event/07006495031282A4?_gl=1*s0ao6x*_ga*MTM1NTMwNzg1NS4xNzc5ODMxMDM0*_ga_C1T806G4DF*czE3Nzk4MzYxMjUkbzIkZzAkdDE3Nzk4MzYxNzUkajEwJGwwJGgw'
+          }
+        }
+      ];
+
+      /* Pin colours cycling through red, blue, green, gold */
+      var PIN_COLORS = [
+        { fill: '#cc2200', stroke: '#8b0000' },
+        { fill: '#1a56cc', stroke: '#0d3699' },
+        { fill: '#16a34a', stroke: '#14532d' },
+        { fill: '#ca8a04', stroke: '#7c5400' }
+      ];
+
+      /* Sway angles alternating per flyer */
+      var SWAY_ANGLES = [[-1.8, -0.5, -2.5], [1.6, 0.4, 2.2], [-2.2, -0.8, -2.8], [1.2, 0.2, 1.8]];
+
+      /* ── Render the corkboard ──────────────────────────────────── */
+      window.renderAdBoard = function() {
+        var board = document.getElementById('ad-corkboard');
+        if (!board) return;
+        board.innerHTML = '';
+
+        var flyers = (window.AD_EVENTS || []).filter(function(f) { return f.visible !== false; });
+        if (!flyers.length) return;
+
+        flyers.forEach(function(flyer, i) {
+          var pin = PIN_COLORS[i % PIN_COLORS.length];
+          var angles = SWAY_ANGLES[i % SWAY_ANGLES.length];
+          var swayId = 'flyerSway_' + i;
+
+          var wrap = document.createElement('div');
+          wrap.className = 'ad-flyer-wrap';
+          wrap.setAttribute('role', 'button');
+          wrap.setAttribute('tabindex', '0');
+          wrap.setAttribute('aria-label', 'Open flyer: ' + flyer.name);
+          wrap.style.cssText = 'animation-name:' + swayId + ';';
+          wrap.dataset.idx = i;
+
+          /* Inject per-flyer keyframe */
+          var styleEl = document.createElement('style');
+          styleEl.textContent = '@keyframes ' + swayId + ' {' +
+            '0%{transform:rotate(' + angles[0] + 'deg)}' +
+            '35%{transform:rotate(' + angles[1] + 'deg)}' +
+            '65%{transform:rotate(' + angles[2] + 'deg)}' +
+            '100%{transform:rotate(' + angles[0] + 'deg)}' +
+          '}';
+          document.head.appendChild(styleEl);
+
+          wrap.innerHTML =
+            '<div class="ad-pushpin" aria-hidden="true">' +
+              '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+                '<circle cx="12" cy="8" r="6" fill="' + pin.fill + '" stroke="' + pin.stroke + '" stroke-width="1.5"/>' +
+                '<circle cx="10.5" cy="6.5" r="1.5" fill="rgba(255,255,255,0.35)"/>' +
+                '<rect x="11.2" y="13" width="1.6" height="9" rx="0.8" fill="#888"/>' +
+              '</svg>' +
+            '</div>' +
+            '<img src="' + flyer.imageUrl + '" alt="' + flyer.name + '" class="ad-flyer-img" draggable="false" loading="lazy"/>' +
+            '<div class="ad-expand-hint" aria-hidden="true">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5-5-5m5 5v-4m0 4h-4"/></svg>' +
+              '<span>View Full Flyer</span>' +
+            '</div>';
+
+          var container = document.createElement('div');
+          container.className = 'ad-item-container';
+          container.style.display = 'flex';
+          container.style.flexDirection = 'column';
+          container.style.alignItems = 'center';
+          container.style.gap = '16px';
+          container.appendChild(wrap);
+
+          /* ── CTA button below flyer ── */
+          if (flyer.cta) {
+            var cta = flyer.cta;
+            var ctaBtn = document.createElement('div');
+            ctaBtn.className = 'ad-cta-wrap';
+            ctaBtn.style.marginTop = '0';
+
+            if (cta.type === 'email') {
+              ctaBtn.innerHTML =
+                '<button class="ad-cta-btn ad-cta-email" data-email="' + cta.email + '" data-subject="' + cta.subject + '" onclick="event.stopPropagation(); openEmailModal(this)">' +
+                  cta.label +
+                '</button>';
+            } else if (cta.type === 'link') {
+              ctaBtn.innerHTML =
+                '<a class="ad-cta-btn ad-cta-link" href="' + cta.url + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' +
+                  cta.label +
+                '</a>';
+            }
+            container.appendChild(ctaBtn);
+          }
+
+          board.appendChild(container);
+        });
+
+        /* Delegated click + keyboard on board — skip CTA buttons */
+        board.onclick = function(e) {
+          if (e.target.closest('.ad-cta-wrap')) return;
+          var wrap = e.target.closest('.ad-flyer-wrap');
+          if (wrap) openAdLightboxFor(parseInt(wrap.dataset.idx, 10));
+        };
+        board.onkeydown = function(e) {
+          if (e.target.closest('.ad-cta-wrap')) return;
+          var wrap = e.target.closest('.ad-flyer-wrap');
+          if (wrap && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            openAdLightboxFor(parseInt(wrap.dataset.idx, 10));
+          }
+        };
+      };
+
+      /* ── Lightbox open (with specific flyer) ─────────────────── */
+      window.openAdLightboxFor = function(idx) {
+        var flyer = (window.AD_EVENTS || [])[idx];
+        if (!flyer) return;
+        var lbImg = document.getElementById('ad-lightbox-img');
+        if (lbImg) { lbImg.src = flyer.imageUrl; lbImg.alt = flyer.name; }
+        var lb = document.getElementById('ad-lightbox');
+        if (!lb) return;
+        lb.classList.add('ad-open');
+        document.body.style.overflow = 'hidden';
+        resetAdTransform();
+        var hint = document.getElementById('ad-lightbox-hint');
+        if (hint) hint.classList.remove('hint-hidden');
+        setTimeout(function() { if (hint) hint.classList.add('hint-hidden'); }, 3500);
+      };
+
+      /* Keep old name as alias for admin compatibility */
+      window.openAdLightbox = function() { openAdLightboxFor(0); };
+
+      window.closeAdLightbox = function() {
+        var lb = document.getElementById('ad-lightbox');
+        if (!lb) return;
+        lb.classList.remove('ad-open');
+        document.body.style.overflow = '';
+        resetAdTransform();
+      };
+
+      window.handleLightboxBackdropClick = function(e) {
+        if (e.target === document.getElementById('ad-lightbox')) closeAdLightbox();
+      };
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeAdLightbox();
+      });
+
+      /* ── Transform state ─────────────────────────────────────── */
+      var adScale = 1, adTx = 0, adTy = 0;
+      var adMinScale = 0.5, adMaxScale = 4.5;
+
+      function resetAdTransform() { adScale = 1; adTx = 0; adTy = 0; applyAdTransform(); }
+
+      function applyAdTransform() {
+        var el = document.getElementById('ad-lightbox-inner');
+        if (!el) return;
+        el.style.transform = 'translate(' + adTx + 'px, ' + adTy + 'px) scale(' + adScale + ')';
+      }
+
+      /* ── Mouse drag ──────────────────────────────────────────── */
+      var adDragging = false, adDragX = 0, adDragY = 0, adDragTx = 0, adDragTy = 0;
+      var inner = document.getElementById('ad-lightbox-inner');
+      if (inner) {
+        inner.addEventListener('mousedown', function(e) {
+          adDragging = true; adDragX = e.clientX; adDragY = e.clientY; adDragTx = adTx; adDragTy = adTy;
+        });
+      }
+      document.addEventListener('mousemove', function(e) {
+        if (!adDragging) return;
+        adTx = adDragTx + (e.clientX - adDragX); adTy = adDragTy + (e.clientY - adDragY);
+        applyAdTransform();
+      });
+      document.addEventListener('mouseup', function() { adDragging = false; });
+
+      /* ── Scroll-wheel zoom ───────────────────────────────────── */
+      var lb2 = document.getElementById('ad-lightbox');
+      if (lb2) {
+        lb2.addEventListener('wheel', function(e) {
+          e.preventDefault();
+          adScale = Math.max(adMinScale, Math.min(adMaxScale, adScale + (e.deltaY < 0 ? 0.13 : -0.13)));
+          applyAdTransform();
+        }, { passive: false });
+      }
+
+      /* ── Touch: drag + pinch ─────────────────────────────────── */
+      var adLastDist = null, adTouchStartTx = 0, adTouchStartTy = 0;
+      var adTouchStartX = 0, adTouchStartY = 0, adLastTap = 0;
+      if (inner) {
+        inner.addEventListener('touchstart', function(e) {
+          if (e.touches.length === 1) {
+            adTouchStartX = e.touches[0].clientX; adTouchStartY = e.touches[0].clientY;
+            adTouchStartTx = adTx; adTouchStartTy = adTy; adLastDist = null;
+          } else if (e.touches.length === 2) { adLastDist = getTouchDist(e.touches); }
+        }, { passive: true });
+
+        inner.addEventListener('touchmove', function(e) {
+          e.preventDefault();
+          if (e.touches.length === 1 && adLastDist === null) {
+            adTx = adTouchStartTx + (e.touches[0].clientX - adTouchStartX);
+            adTy = adTouchStartTy + (e.touches[0].clientY - adTouchStartY);
+            applyAdTransform();
+          } else if (e.touches.length === 2) {
+            var dist = getTouchDist(e.touches);
+            if (adLastDist !== null) adScale = Math.max(adMinScale, Math.min(adMaxScale, adScale * (dist / adLastDist)));
+            adLastDist = dist; applyAdTransform();
+          }
+        }, { passive: false });
+
+        inner.addEventListener('touchend', function(e) {
+          if (e.touches.length < 2) adLastDist = null;
+          var now = Date.now();
+          if (now - adLastTap < 300) resetAdTransform();
+          adLastTap = now;
+        }, { passive: true });
+      }
+
+      function getTouchDist(touches) {
+        var dx = touches[0].clientX - touches[1].clientX;
+        var dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      /* ── Initial render ──────────────────────────────────────── */
+      document.addEventListener('DOMContentLoaded', function() { renderAdBoard(); });
+    })();
+    </script>
+
     <section id="now-playing" class="w-full py-16 bg-gradient-to-b from-black/20 to-black/60 border-b border-white/5 relative">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 reveal">
         <h2 class="text-xs font-black text-yellow-500 tracking-[0.3em] mb-2 uppercase">🔴 LIVE STREAM</h2>
@@ -3266,6 +4033,29 @@
             SPOTLIGHTS.length = 0;
             data.spotlights.forEach(s => SPOTLIGHTS.push(s));
             renderSpotlights();
+          }
+          // adEvent — Upcoming Events board
+          if (data.adEvent) {
+            var ad = data.adEvent;
+            var adSection = document.getElementById('ad-board');
+            // Visibility toggle
+            if (adSection) {
+              adSection.style.display = ad.visible === false ? 'none' : '';
+            }
+            // Swap flyer image
+            if (ad.imageUrl) {
+              var flyerImg = document.querySelector('.ad-flyer-img');
+              var lbImg = document.getElementById('ad-lightbox-img');
+              if (flyerImg) { flyerImg.src = ad.imageUrl; flyerImg.alt = ad.name || 'Event flyer'; }
+              if (lbImg)    { lbImg.src    = ad.imageUrl; lbImg.alt    = ad.name || 'Event flyer'; }
+            }
+            // Wire destination URL if provided
+            if (ad.linkUrl) {
+              var flyerWrap = document.getElementById('ad-flyer-wrap');
+              if (flyerWrap) {
+                flyerWrap.setAttribute('data-ad-link', ad.linkUrl);
+              }
+            }
           }
         } catch (bindErr) {
           console.error("[CMS Engine] Error binding copy:", bindErr);

@@ -1,6 +1,6 @@
 # Local Netlify folder
-.netlify
 .netlify/
+.netlify/plugins/
 netlify/.netlify/
 
 # Dependency directories

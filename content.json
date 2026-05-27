@@ -74,5 +74,11 @@
       "title": "Soul Music Awards",
       "desc": "Local artists making waves nationally."
     }
-  ]
+  ],
+  "adEvent": {
+    "visible": true,
+    "name": "Rhythm & Roses — Danny Boy",
+    "imageUrl": "https://i.imgur.com/xYndorh.jpeg",
+    "linkUrl": ""
+  }
 }

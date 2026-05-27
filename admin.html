@@ -56,7 +56,38 @@
   </style>
 </head>
 <body class="py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-5xl mx-auto">
+  <!-- Passcode Overlay Protection -->
+  <div id="passcode-overlay" class="fixed inset-0 z-[99999] flex items-center justify-center bg-[#030205]/95 backdrop-blur-2xl transition-all duration-500">
+    <div class="glass-card rounded-3xl p-8 max-w-sm w-full text-center border border-white/10 shadow-2xl relative overflow-hidden">
+      <!-- Accent Ring Glow -->
+      <div class="absolute -top-10 -left-10 w-32 h-32 bg-yellow-500/10 rounded-full blur-2xl"></div>
+      <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-red-500/10 rounded-full blur-2xl"></div>
+      
+      <div class="flex flex-col items-center mb-6">
+        <div class="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 mb-3 shadow-[0_0_20px_rgba(234,179,8,0.1)]">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <h2 class="text-2xl font-black text-white tracking-tight uppercase font-montserrat">STATION SECURE</h2>
+        <p class="text-[10px] text-yellow-500 font-bold tracking-[0.2em] uppercase mt-1">Authorized Personnel Only</p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="relative">
+          <input id="admin-passcode" type="password" placeholder="ENTER ACCESS CODE" class="w-full form-input rounded-xl px-4 py-3.5 text-center text-sm font-black tracking-[0.3em] uppercase text-white" maxlength="12" autofocus>
+        </div>
+        
+        <button onclick="checkPasscode()" class="w-full py-3.5 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black font-extrabold text-xs tracking-wider uppercase rounded-xl transition-all duration-200 active:scale-95 shadow-lg shadow-yellow-500/10">
+          UNLOCK CONSOLE
+        </button>
+        
+        <div id="passcode-error" class="hidden text-red-500 text-[10px] font-black tracking-widest uppercase mt-2">INVALID ACCESS CODE</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-main-content" class="max-w-5xl mx-auto" style="display: none;">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
       <div class="text-center sm:text-left">
@@ -137,6 +168,51 @@
             <!-- Dynamic schedule forms injected here -->
           </div>
         </div>
+
+        <!-- Section 5: Upcoming Events / Ad Board -->
+        <div class="glass-card rounded-2xl p-6">
+          <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
+            <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase">5. Upcoming Events Board</h2>
+            <span class="text-[9px] text-white/30 font-bold tracking-widest uppercase">📌 Pinned Flyer</span>
+          </div>
+          <div class="space-y-4">
+            <div class="p-4 bg-white/5 border border-white/5 rounded-xl space-y-4">
+              <!-- Live preview thumbnail -->
+              <div class="flex items-start gap-4">
+                <img id="ad-preview-thumb" src="" alt="Flyer preview" class="w-20 h-20 object-cover rounded-lg border border-white/10 bg-white/5 flex-shrink-0" onerror="this.style.display='none'" style="display:none;" />
+                <div class="flex-1 min-w-0">
+                  <div class="text-[9px] font-black text-white/40 tracking-widest uppercase mb-1">Live Preview</div>
+                  <div id="ad-preview-name" class="text-xs font-bold text-white truncate">—</div>
+                  <div id="ad-preview-link" class="text-[9px] text-yellow-500/60 truncate mt-0.5"></div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Event / Flyer Name</label>
+                <input id="cms-adName" type="text" placeholder="e.g. Rhythm &amp; Roses — Danny Boy" class="w-full form-input rounded-xl px-4 py-3 text-sm" oninput="updateAdPreview()">
+              </div>
+              <div>
+                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Flyer Image URL</label>
+                <input id="cms-adImageUrl" type="url" placeholder="https://i.imgur.com/xYndorh.jpeg" class="w-full form-input rounded-xl px-4 py-3 text-sm font-mono" oninput="updateAdPreview()">
+                <p class="text-[9px] text-white/30 mt-1.5">Paste any direct image URL (Imgur, your server, etc.)</p>
+              </div>
+              <div>
+                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Click Destination URL <span class="text-white/20">(optional)</span></label>
+                <input id="cms-adLinkUrl" type="url" placeholder="https://tickets.example.com" class="w-full form-input rounded-xl px-4 py-3 text-sm font-mono" oninput="updateAdPreview()">
+                <p class="text-[9px] text-white/30 mt-1.5">Leave blank if the flyer is display-only</p>
+              </div>
+              <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                <div>
+                  <div class="text-[10px] font-black text-white/60 tracking-wider uppercase">Show Events Section</div>
+                  <div class="text-[9px] text-white/30 mt-0.5">Toggle the entire Upcoming Events board on/off</div>
+                </div>
+                <button id="cms-adVisible-btn" onclick="toggleAdVisible()" class="relative w-12 h-6 rounded-full transition-all duration-300 bg-yellow-500 focus:outline-none flex-shrink-0">
+                  <span id="cms-adVisible-knob" class="absolute top-0.5 left-6 w-5 h-5 bg-white rounded-full shadow transition-all duration-300"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       <!-- Right Column: Local Manual Workflow Guide -->
       <div class="lg:col-span-4 space-y-8">
         <div class="glass-card rounded-2xl p-6 border border-yellow-500/20">
@@ -249,7 +325,13 @@
           "title": "Soul Music Awards",
           "desc": "Local artists making waves nationally."
         }
-      ]
+      ],
+      "adEvent": {
+        "visible": true,
+        "name": "Rhythm & Roses — Danny Boy",
+        "imageUrl": "https://i.imgur.com/xYndorh.jpeg",
+        "linkUrl": ""
+      }
     };
 
     // Page Initializer
@@ -313,6 +395,21 @@
       document.getElementById('cms-heroTitle').value = data.heroTitle || '';
       document.getElementById('cms-tagline').value = data.tagline || '';
       document.getElementById('cms-communityHeadline').value = data.communityHeadline || '';
+
+      // Section 5: Upcoming Events / Ad Board
+      var ad = data.adEvent || {};
+      document.getElementById('cms-adName').value = ad.name || '';
+      document.getElementById('cms-adImageUrl').value = ad.imageUrl || '';
+      document.getElementById('cms-adLinkUrl').value = ad.linkUrl || '';
+      var visible = ad.visible !== false; // default true
+      var btn = document.getElementById('cms-adVisible-btn');
+      var knob = document.getElementById('cms-adVisible-knob');
+      if (btn && knob) {
+        btn.classList.toggle('bg-yellow-500', visible);
+        btn.classList.toggle('bg-white/20', !visible);
+        knob.style.left = visible ? '1.5rem' : '0.125rem';
+      }
+      updateAdPreview();
 
       // Section 2: Populate Hosts
       const hostsContainer = document.getElementById('hosts-form-container');
@@ -530,7 +627,46 @@
       activeContent.heroTitle = document.getElementById('cms-heroTitle').value;
       activeContent.tagline = document.getElementById('cms-tagline').value;
       activeContent.communityHeadline = document.getElementById('cms-communityHeadline').value;
+      // Section 5: Ad Event
+      if (!activeContent.adEvent) activeContent.adEvent = {};
+      activeContent.adEvent.name = document.getElementById('cms-adName').value;
+      activeContent.adEvent.imageUrl = document.getElementById('cms-adImageUrl').value;
+      activeContent.adEvent.linkUrl = document.getElementById('cms-adLinkUrl').value;
+      // visible state is managed by toggleAdVisible directly on activeContent
       return activeContent;
+    }
+
+    function updateAdPreview() {
+      var name = document.getElementById('cms-adName').value;
+      var url  = document.getElementById('cms-adImageUrl').value;
+      var link = document.getElementById('cms-adLinkUrl').value;
+      var thumb = document.getElementById('ad-preview-thumb');
+      var nameEl = document.getElementById('ad-preview-name');
+      var linkEl = document.getElementById('ad-preview-link');
+      if (nameEl) nameEl.textContent = name || '—';
+      if (linkEl) linkEl.textContent = link ? '🔗 ' + link : 'Display only';
+      if (thumb) {
+        if (url) {
+          thumb.src = url;
+          thumb.style.display = 'block';
+        } else {
+          thumb.style.display = 'none';
+        }
+      }
+    }
+
+    var _adVisible = true;
+    function toggleAdVisible() {
+      _adVisible = !_adVisible;
+      if (!activeContent.adEvent) activeContent.adEvent = {};
+      activeContent.adEvent.visible = _adVisible;
+      var btn  = document.getElementById('cms-adVisible-btn');
+      var knob = document.getElementById('cms-adVisible-knob');
+      if (btn && knob) {
+        btn.classList.toggle('bg-yellow-500', _adVisible);
+        btn.classList.toggle('bg-white/20', !_adVisible);
+        knob.style.left = _adVisible ? '1.5rem' : '0.125rem';
+      }
     }
 
     function saveLocalPreview() {
@@ -572,6 +708,55 @@
       el.classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // ── PASSCODE SYSTEM PROTECTION (OPTION 2) ──────────────────────
+    const ACCESS_KEY = '773FMP';
+
+    function checkPasscode() {
+      const input = document.getElementById('admin-passcode').value.trim().toUpperCase();
+      const errorEl = document.getElementById('passcode-error');
+      
+      if (input === ACCESS_KEY) {
+        // Fade out overlay
+        const overlay = document.getElementById('passcode-overlay');
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 500);
+        
+        // Show main console content
+        document.getElementById('admin-main-content').style.display = 'block';
+        
+        // Persist authorization during active tab session
+        sessionStorage.setItem('fmp_console_authorized', 'true');
+      } else {
+        errorEl.classList.remove('hidden');
+        document.getElementById('admin-passcode').value = '';
+        document.getElementById('admin-passcode').focus();
+      }
+    }
+
+    // Bind Enter key listener and handle session reload bypass
+    window.addEventListener('DOMContentLoaded', () => {
+      const pinField = document.getElementById('admin-passcode');
+      if (pinField) {
+        pinField.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            checkPasscode();
+          }
+        });
+      }
+
+      // Check if session is already unlocked
+      if (sessionStorage.getItem('fmp_console_authorized') === 'true') {
+        const overlay = document.getElementById('passcode-overlay');
+        if (overlay) overlay.style.display = 'none';
+        const mainEl = document.getElementById('admin-main-content');
+        if (mainEl) mainEl.style.display = 'block';
+      }
+    });
   </script>
+  </div>
 </body>
 </html>
