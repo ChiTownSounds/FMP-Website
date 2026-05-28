@@ -3380,7 +3380,7 @@
 
         if (!name) return null;
 
-        let cleanName = name.replace(/\.[^/.]+$/, "").replace(/^cbr_/, "");
+        let cleanName = name.replace(/\.[a-z0-9]{3,4}$/i, "").replace(/^cbr_/, "");
 
         // Synthesize 'category' to maintain 100% backwards-compatibility with detectEra()
         let category = "Unsorted_Review";
@@ -3416,7 +3416,82 @@
       if (!title || title.toLowerCase().includes('loading')) return 'modern';
       const lower = title.toLowerCase().trim();
 
-      const match = libraryData.find(item => lower.includes(item.name) || item.name.includes(lower));
+      // Clean brackets from names for fast path as well
+      const cleanStreamLower = lower.replace(/\[.*?\]/g, '').trim();
+
+      let match = libraryData.find(item => {
+        const cleanItemName = item.name.replace(/\[.*?\]/g, '').trim();
+        return cleanStreamLower.includes(cleanItemName) || cleanItemName.includes(cleanStreamLower);
+      });
+
+      if (!match) {
+        // Clean tokenization helper for fuzzy matcher
+        const tokenize = (str) => {
+          if (!str) return [];
+          return str.toLowerCase()
+            .replace(/\[.*?\]/g, '') // remove bracketed content (albums)
+            .replace(/[\[\]\(\)\-\._,\/\\&\+\:\?]/g, ' ') // replace punctuation/brackets/dashes with spaces
+            .split(/\s+/)
+            .map(w => w.trim())
+            .filter(w => w.length > 0 && !['feat', 'ft', 'pres', 'presents', 'with', 'and', 'vs', 'prod', 'remix', 'mix', 'edit', 'radio', 'single', 'version', 'album', 'live'].includes(w));
+        };
+
+        const streamParts = title.split('-');
+        const hasStreamDash = streamParts.length > 1;
+        const streamArtistTokens = hasStreamDash ? tokenize(streamParts[0]) : [];
+        const streamTrackTokens = hasStreamDash ? tokenize(streamParts.slice(1).join('-')) : [];
+        const streamAllTokens = tokenize(title);
+
+        if (streamAllTokens.length > 0) {
+          let bestMatch = null;
+          let highestScore = 0;
+
+          for (const item of libraryData) {
+            const libParts = item.name.split('-');
+            const hasLibDash = libParts.length > 1;
+            
+            let artistMatch = false;
+            let trackMatch = false;
+            let overallScore = 0;
+            
+            if (hasStreamDash && hasLibDash) {
+              const libArtistTokens = tokenize(libParts[0]);
+              const libTrackTokens = tokenize(libParts.slice(1).join('-'));
+              
+              const artistIntersect = streamArtistTokens.filter(t => libArtistTokens.includes(t));
+              const trackIntersect = streamTrackTokens.filter(t => libTrackTokens.includes(t));
+              
+              artistMatch = (libArtistTokens.length === 0 || streamArtistTokens.length === 0 || artistIntersect.length > 0);
+              trackMatch = (libTrackTokens.length === 0 || streamTrackTokens.length === 0 || trackIntersect.length > 0);
+              
+              if (artistMatch && trackMatch) {
+                const artistScore = libArtistTokens.length === 0 || streamArtistTokens.length === 0 ? 1.0 : artistIntersect.length / Math.min(streamArtistTokens.length, libArtistTokens.length);
+                const trackScore = libTrackTokens.length === 0 || streamTrackTokens.length === 0 ? 1.0 : trackIntersect.length / Math.min(streamTrackTokens.length, libTrackTokens.length);
+                overallScore = (artistScore + trackScore) / 2;
+              }
+            } else {
+              const libAllTokens = tokenize(item.name);
+              const intersectAll = streamAllTokens.filter(t => libAllTokens.includes(t));
+              const minOverlap = Math.min(2, streamAllTokens.length, libAllTokens.length);
+              
+              if (intersectAll.length >= minOverlap) {
+                overallScore = intersectAll.length / Math.min(streamAllTokens.length, libAllTokens.length);
+              }
+            }
+
+            if (overallScore > highestScore && overallScore >= 0.6) {
+              highestScore = overallScore;
+              bestMatch = item;
+            }
+          }
+
+          if (bestMatch) {
+            console.log(`[Library Engine] Fuzzy match resolved: "${title}" -> "${bestMatch.name}" (score: ${highestScore.toFixed(2)})`);
+            match = bestMatch;
+          }
+        }
+      }
+
       if (match) {
         // If a year is explicitly found, map natively to clear structural categories:
         // Pre-1980 = Vinyl Era; 1980–1994 = Cassette Era; 1995–2004 = Discman Era; 2005–2012 = iPod Era; 2013+ = Modern Era.
