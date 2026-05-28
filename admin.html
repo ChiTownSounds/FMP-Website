@@ -169,47 +169,16 @@
           </div>
         </div>
 
-        <!-- Section 5: Upcoming Events / Ad Board -->
+        <!-- Section 5: Upcoming Events Board -->
         <div class="glass-card rounded-2xl p-6">
           <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
             <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase">5. Upcoming Events Board</h2>
-            <span class="text-[9px] text-white/30 font-bold tracking-widest uppercase">📌 Pinned Flyer</span>
+            <button onclick="addFlyerCard()" class="px-3 py-1 bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-[10px] tracking-wider uppercase rounded-lg transition-all active:scale-95">
+              ➕ Add Flyer
+            </button>
           </div>
-          <div class="space-y-4">
-            <div class="p-4 bg-white/5 border border-white/5 rounded-xl space-y-4">
-              <!-- Live preview thumbnail -->
-              <div class="flex items-start gap-4">
-                <img id="ad-preview-thumb" src="" alt="Flyer preview" class="w-20 h-20 object-cover rounded-lg border border-white/10 bg-white/5 flex-shrink-0" onerror="this.style.display='none'" style="display:none;" />
-                <div class="flex-1 min-w-0">
-                  <div class="text-[9px] font-black text-white/40 tracking-widest uppercase mb-1">Live Preview</div>
-                  <div id="ad-preview-name" class="text-xs font-bold text-white truncate">—</div>
-                  <div id="ad-preview-link" class="text-[9px] text-yellow-500/60 truncate mt-0.5"></div>
-                </div>
-              </div>
-              <div>
-                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Event / Flyer Name</label>
-                <input id="cms-adName" type="text" placeholder="e.g. Rhythm &amp; Roses — Danny Boy" class="w-full form-input rounded-xl px-4 py-3 text-sm" oninput="updateAdPreview()">
-              </div>
-              <div>
-                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Flyer Image URL</label>
-                <input id="cms-adImageUrl" type="url" placeholder="https://i.imgur.com/xYndorh.jpeg" class="w-full form-input rounded-xl px-4 py-3 text-sm font-mono" oninput="updateAdPreview()">
-                <p class="text-[9px] text-white/30 mt-1.5">Paste any direct image URL (Imgur, your server, etc.)</p>
-              </div>
-              <div>
-                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Click Destination URL <span class="text-white/20">(optional)</span></label>
-                <input id="cms-adLinkUrl" type="url" placeholder="https://tickets.example.com" class="w-full form-input rounded-xl px-4 py-3 text-sm font-mono" oninput="updateAdPreview()">
-                <p class="text-[9px] text-white/30 mt-1.5">Leave blank if the flyer is display-only</p>
-              </div>
-              <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                <div>
-                  <div class="text-[10px] font-black text-white/60 tracking-wider uppercase">Show Events Section</div>
-                  <div class="text-[9px] text-white/30 mt-0.5">Toggle the entire Upcoming Events board on/off</div>
-                </div>
-                <button id="cms-adVisible-btn" onclick="toggleAdVisible()" class="relative w-12 h-6 rounded-full transition-all duration-300 bg-yellow-500 focus:outline-none flex-shrink-0">
-                  <span id="cms-adVisible-knob" class="absolute top-0.5 left-6 w-5 h-5 bg-white rounded-full shadow transition-all duration-300"></span>
-                </button>
-              </div>
-            </div>
+          <div id="flyers-form-container" class="space-y-6">
+            <!-- Dynamic flyer forms injected here -->
           </div>
         </div>
 
@@ -326,12 +295,31 @@
           "desc": "Local artists making waves nationally."
         }
       ],
-      "adEvent": {
-        "visible": true,
-        "name": "Rhythm & Roses — Danny Boy",
-        "imageUrl": "https://i.imgur.com/xYndorh.jpeg",
-        "linkUrl": ""
-      }
+      "adEvents": [
+        {
+          "name": "Rhythm & Roses — Danny Boy",
+          "imageUrl": "./assets/xyndorh.jpg",
+          "linkUrl": "",
+          "visible": true,
+          "cta": {
+            "type": "email",
+            "label": "📧 Get Tickets",
+            "email": "hiredannyboy@gmail.com",
+            "subject": "I need my tickets!"
+          }
+        },
+        {
+          "name": "Exclusive Juneteenth Celebration",
+          "imageUrl": "./assets/vbw9mni.jpg",
+          "linkUrl": "",
+          "visible": true,
+          "cta": {
+            "type": "link",
+            "label": "🎟️ Buy Tickets",
+            "url": "https://www.ticketmaster.com/rb-music-experience-a-juneteenth-celebration-chicago-illinois-06-20-2026/event/07006495031282A4?_gl=1*s0ao6x*_ga*MTM1NTMwNzg1NS4xNzc5ODMxMDM0*_ga_C1T806G4DF*czE3Nzk4MzYxMjUkbzIkZzAkdDE3Nzk4MzYxNzUkajEwJGwwJGgw"
+          }
+        }
+      ]
     };
 
     // Page Initializer
@@ -396,20 +384,110 @@
       document.getElementById('cms-tagline').value = data.tagline || '';
       document.getElementById('cms-communityHeadline').value = data.communityHeadline || '';
 
-      // Section 5: Upcoming Events / Ad Board
-      var ad = data.adEvent || {};
-      document.getElementById('cms-adName').value = ad.name || '';
-      document.getElementById('cms-adImageUrl').value = ad.imageUrl || '';
-      document.getElementById('cms-adLinkUrl').value = ad.linkUrl || '';
-      var visible = ad.visible !== false; // default true
-      var btn = document.getElementById('cms-adVisible-btn');
-      var knob = document.getElementById('cms-adVisible-knob');
-      if (btn && knob) {
-        btn.classList.toggle('bg-yellow-500', visible);
-        btn.classList.toggle('bg-white/20', !visible);
-        knob.style.left = visible ? '1.5rem' : '0.125rem';
+      // Migrate old adEvent to adEvents if necessary
+      if (!data.adEvents && data.adEvent) {
+        data.adEvents = [
+          {
+            name: data.adEvent.name,
+            imageUrl: data.adEvent.imageUrl,
+            linkUrl: data.adEvent.linkUrl,
+            visible: data.adEvent.visible !== false,
+            cta: data.adEvent.cta || null
+          }
+        ];
       }
-      updateAdPreview();
+
+      // Section 5: Populate Flyers
+      const flyersContainer = document.getElementById('flyers-form-container');
+      if (flyersContainer) {
+        flyersContainer.innerHTML = '';
+        if (data.adEvents && Array.isArray(data.adEvents)) {
+          data.adEvents.forEach((flyer, idx) => {
+            const isVisible = flyer.visible !== false;
+            const cta = flyer.cta || { type: 'none' };
+            const ctaType = cta.type || 'none';
+            
+            const card = document.createElement('div');
+            card.className = 'p-5 bg-white/5 border border-white/5 rounded-xl space-y-4 relative';
+            
+            let ctaFieldsHtml = '';
+            if (ctaType === 'link') {
+              ctaFieldsHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Button Label</label>
+                    <input type="text" value="${cta.label || ''}" oninput="updateFlyerCtaField(${idx}, 'label', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs" placeholder="🎟️ Buy Tickets">
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Destination URL</label>
+                    <input type="url" value="${cta.url || ''}" oninput="updateFlyerCtaField(${idx}, 'url', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono" placeholder="https://...">
+                  </div>
+                </div>
+              `;
+            } else if (ctaType === 'email') {
+              ctaFieldsHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Button Label</label>
+                    <input type="text" value="${cta.label || ''}" oninput="updateFlyerCtaField(${idx}, 'label', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs" placeholder="📧 Contact Event">
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Recipient Email</label>
+                    <input type="email" value="${cta.email || ''}" oninput="updateFlyerCtaField(${idx}, 'email', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono" placeholder="hiredannyboy@gmail.com">
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Subject Title</label>
+                    <input type="text" value="${cta.subject || ''}" oninput="updateFlyerCtaField(${idx}, 'subject', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs" placeholder="Event Inquiry">
+                  </div>
+                </div>
+              `;
+            }
+
+            card.innerHTML = `
+              <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
+                <span class="text-[10px] font-black text-yellow-500 tracking-widest uppercase">Flyer Card #${idx + 1}: ${flyer.name || 'New Flyer'}</span>
+                <button onclick="removeFlyerCard(${idx})" class="text-[9px] font-black text-red-400 hover:text-red-300 tracking-widest uppercase transition-all">
+                  ❌ Remove
+                </button>
+              </div>
+              <div class="flex items-start gap-4">
+                <img src="${flyer.imageUrl || ''}" alt="Flyer image" class="w-20 h-20 object-cover rounded-lg border border-white/10 bg-white/5 flex-shrink-0" onerror="this.src='assets/hosts/coming_soon_3.jpg'" />
+                <div class="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Flyer Name</label>
+                    <input type="text" value="${flyer.name || ''}" oninput="updateFlyerField(${idx}, 'name', this.value); this.closest('.p-5').querySelector('.text-yellow-500').textContent = 'Flyer Card #' + (${idx} + 1) + ': ' + this.value;" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Flyer Image URL</label>
+                    <input type="url" value="${flyer.imageUrl || ''}" oninput="updateFlyerField(${idx}, 'imageUrl', this.value); this.closest('.p-5').querySelector('img').src = this.value;" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Click Destination URL (Optional)</label>
+                    <input type="url" value="${flyer.linkUrl || ''}" oninput="updateFlyerField(${idx}, 'linkUrl', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono">
+                  </div>
+                  <div class="flex items-center justify-between p-2 bg-white/5 rounded-xl border border-white/5" style="margin-top: 18px;">
+                    <span class="text-[9px] font-bold text-white/60 tracking-wider uppercase">Show Flyer</span>
+                    <button onclick="toggleFlyerVisible(${idx})" class="relative w-10 h-5 rounded-full transition-all duration-300 ${isVisible ? 'bg-yellow-500' : 'bg-white/20'} focus:outline-none flex-shrink-0">
+                      <span class="absolute top-0.5 ${isVisible ? 'left-5' : 'left-0.5'} w-4 h-4 bg-white rounded-full shadow transition-all duration-300"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="border-t border-white/5 pt-4 mt-2">
+                <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Call To Action (CTA)</label>
+                <select onchange="updateFlyerCtaType(${idx}, this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs">
+                  <option value="none" ${ctaType === 'none' ? 'selected' : ''}>None (No Button)</option>
+                  <option value="link" ${ctaType === 'link' ? 'selected' : ''}>Link Button (Open external website)</option>
+                  <option value="email" ${ctaType === 'email' ? 'selected' : ''}>Email Button (Opens contact popup form)</option>
+                </select>
+                ${ctaFieldsHtml}
+              </div>
+            `;
+            
+            flyersContainer.appendChild(card);
+          });
+        }
+      }
 
       // Section 2: Populate Hosts
       const hostsContainer = document.getElementById('hosts-form-container');
@@ -627,45 +705,69 @@
       activeContent.heroTitle = document.getElementById('cms-heroTitle').value;
       activeContent.tagline = document.getElementById('cms-tagline').value;
       activeContent.communityHeadline = document.getElementById('cms-communityHeadline').value;
-      // Section 5: Ad Event
-      if (!activeContent.adEvent) activeContent.adEvent = {};
-      activeContent.adEvent.name = document.getElementById('cms-adName').value;
-      activeContent.adEvent.imageUrl = document.getElementById('cms-adImageUrl').value;
-      activeContent.adEvent.linkUrl = document.getElementById('cms-adLinkUrl').value;
-      // visible state is managed by toggleAdVisible directly on activeContent
+      // adEvents array is updated directly in activeContent via updateFlyerField/updateFlyerCtaField
       return activeContent;
     }
 
-    function updateAdPreview() {
-      var name = document.getElementById('cms-adName').value;
-      var url  = document.getElementById('cms-adImageUrl').value;
-      var link = document.getElementById('cms-adLinkUrl').value;
-      var thumb = document.getElementById('ad-preview-thumb');
-      var nameEl = document.getElementById('ad-preview-name');
-      var linkEl = document.getElementById('ad-preview-link');
-      if (nameEl) nameEl.textContent = name || '—';
-      if (linkEl) linkEl.textContent = link ? '🔗 ' + link : 'Display only';
-      if (thumb) {
-        if (url) {
-          thumb.src = url;
-          thumb.style.display = 'block';
-        } else {
-          thumb.style.display = 'none';
-        }
+    function addFlyerCard() {
+      if (!activeContent.adEvents) activeContent.adEvents = [];
+      activeContent.adEvents.push({
+        name: "New Event / Flyer",
+        imageUrl: "https://i.imgur.com/xYndorh.jpeg",
+        linkUrl: "",
+        visible: true,
+        cta: null
+      });
+      populateForm(activeContent);
+      showAlert('New flyer added! Customize its details below.', 'info');
+    }
+
+    function removeFlyerCard(idx) {
+      if (confirm('Are you sure you want to remove this flyer?')) {
+        activeContent.adEvents.splice(idx, 1);
+        populateForm(activeContent);
+        showAlert('Flyer successfully removed.', 'info');
       }
     }
 
-    var _adVisible = true;
-    function toggleAdVisible() {
-      _adVisible = !_adVisible;
-      if (!activeContent.adEvent) activeContent.adEvent = {};
-      activeContent.adEvent.visible = _adVisible;
-      var btn  = document.getElementById('cms-adVisible-btn');
-      var knob = document.getElementById('cms-adVisible-knob');
-      if (btn && knob) {
-        btn.classList.toggle('bg-yellow-500', _adVisible);
-        btn.classList.toggle('bg-white/20', !_adVisible);
-        knob.style.left = _adVisible ? '1.5rem' : '0.125rem';
+    function updateFlyerField(idx, field, value) {
+      if (activeContent.adEvents && activeContent.adEvents[idx]) {
+        activeContent.adEvents[idx][field] = value;
+      }
+    }
+
+    function toggleFlyerVisible(idx) {
+      if (activeContent.adEvents && activeContent.adEvents[idx]) {
+        activeContent.adEvents[idx].visible = activeContent.adEvents[idx].visible !== false ? false : true;
+        populateForm(activeContent);
+      }
+    }
+
+    function updateFlyerCtaType(idx, type) {
+      if (activeContent.adEvents && activeContent.adEvents[idx]) {
+        if (type === 'none') {
+          activeContent.adEvents[idx].cta = null;
+        } else if (type === 'link') {
+          activeContent.adEvents[idx].cta = {
+            type: 'link',
+            label: '🎟️ Buy Tickets',
+            url: ''
+          };
+        } else if (type === 'email') {
+          activeContent.adEvents[idx].cta = {
+            type: 'email',
+            label: '📧 Contact Event',
+            email: 'hiredannyboy@gmail.com',
+            subject: 'Inquiry regarding Event'
+          };
+        }
+        populateForm(activeContent);
+      }
+    }
+
+    function updateFlyerCtaField(idx, field, value) {
+      if (activeContent.adEvents && activeContent.adEvents[idx] && activeContent.adEvents[idx].cta) {
+        activeContent.adEvents[idx].cta[field] = value;
       }
     }
 
