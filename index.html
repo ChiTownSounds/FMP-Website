@@ -1801,6 +1801,39 @@
         box-shadow: 6px 12px 32px rgba(0,0,0,0.6), 2px 4px 10px rgba(0,0,0,0.4);
       }
 
+      /* ── Concluded overlay ─────────────────────────────────────── */
+      .ad-concluded-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        z-index: 8;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .ad-concluded-stamp {
+        border: 4px solid #ef4444;
+        color: #ef4444;
+        font-family: 'Permanent Marker', 'Outfit', sans-serif;
+        font-size: clamp(20px, 4.5vw, 34px);
+        font-weight: 900;
+        text-transform: uppercase;
+        padding: 8px 20px;
+        border-radius: 10px;
+        transform: rotate(-45deg);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        letter-spacing: 0.12em;
+        background: rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+        text-align: center;
+      }
+
       /* ── Expand hint overlay ───────────────────────────────────── */
       .ad-expand-hint {
         position: absolute;
@@ -2274,13 +2307,57 @@
       var SWAY_ANGLES = [[-1.8, -0.5, -2.5], [1.6, 0.4, 2.2], [-2.2, -0.8, -2.8], [1.2, 0.2, 1.8]];
 
       /* ── Render the corkboard ──────────────────────────────────── */
+      /* Helper to parse event dates as local time */
+      function getEventDate(dateStr) {
+        if (!dateStr) return null;
+        if (dateStr.length === 10) { // YYYY-MM-DD
+          return new Date(dateStr + 'T23:59:59');
+        }
+        return new Date(dateStr);
+      }
+
+      /* ── Render the corkboard ──────────────────────────────────── */
       window.renderAdBoard = function() {
         var board = document.getElementById('ad-corkboard');
         if (!board) return;
         board.innerHTML = '';
 
-        var flyers = (window.AD_EVENTS || []).filter(function(f) { return f.visible !== false; });
-        if (!flyers.length) return;
+        var now = new Date();
+        var flyers = (window.AD_EVENTS || []).filter(function(f) {
+          if (f.visible === false) return false;
+          if (f.eventDate) {
+            var eventDate = getEventDate(f.eventDate);
+            if (eventDate) {
+              var hoursPassed = (now - eventDate) / (1000 * 60 * 60);
+              if (hoursPassed > 48) {
+                return false; // Auto-disabled after 48 hours
+              }
+            }
+          }
+          return true;
+        });
+
+        // Hide/disable the events section if no flyers are active/visible
+        var adSection = document.getElementById('ad-board');
+        if (!flyers.length) {
+          if (adSection) adSection.style.display = 'none';
+          return;
+        }
+        if (adSection) adSection.style.display = '';
+
+        // Dynamic base width depending on visible flyers count (support up to 6)
+        var baseWidth = 480;
+        if (flyers.length === 1) {
+          baseWidth = 500;
+        } else if (flyers.length === 2) {
+          baseWidth = 420;
+        } else if (flyers.length === 3) {
+          baseWidth = 360;
+        } else if (flyers.length === 4) {
+          baseWidth = 310;
+        } else if (flyers.length >= 5) {
+          baseWidth = 270;
+        }
 
         flyers.forEach(function(flyer, i) {
           var pin = PIN_COLORS[i % PIN_COLORS.length];
@@ -2292,7 +2369,7 @@
           wrap.setAttribute('role', 'button');
           wrap.setAttribute('tabindex', '0');
           wrap.setAttribute('aria-label', 'Open flyer: ' + flyer.name);
-          wrap.style.cssText = 'animation-name:' + swayId + ';';
+          wrap.style.cssText = 'animation-name:' + swayId + '; width: min(' + baseWidth + 'px, 88vw);';
           wrap.dataset.idx = i;
 
           /* Inject per-flyer keyframe */
@@ -2305,6 +2382,23 @@
           '}';
           document.head.appendChild(styleEl);
 
+          // Calculate "Concluded" status
+          var isConcluded = false;
+          if (flyer.eventDate) {
+            var eventDate = getEventDate(flyer.eventDate);
+            if (eventDate) {
+              var hoursPassed = (now - eventDate) / (1000 * 60 * 60);
+              if (hoursPassed > 0 && hoursPassed <= 48) {
+                isConcluded = true;
+              }
+            }
+          }
+
+          var overlayHtml = '';
+          if (isConcluded) {
+            overlayHtml = '<div class="ad-concluded-overlay"><span class="ad-concluded-stamp">Concluded</span></div>';
+          }
+
           wrap.innerHTML =
             '<div class="ad-pushpin" aria-hidden="true">' +
               '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">' +
@@ -2314,6 +2408,7 @@
               '</svg>' +
             '</div>' +
             '<img src="' + flyer.imageUrl + '" alt="' + flyer.name + '" class="ad-flyer-img" draggable="false" loading="lazy"/>' +
+            overlayHtml +
             '<div class="ad-expand-hint" aria-hidden="true">' +
               '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5-5-5m5 5v-4m0 4h-4"/></svg>' +
               '<span>View Full Flyer</span>' +
@@ -2328,7 +2423,7 @@
           container.appendChild(wrap);
 
           /* ── CTA button below flyer ── */
-          if (flyer.cta) {
+          if (flyer.cta && !isConcluded) {
             var cta = flyer.cta;
             var ctaBtn = document.createElement('div');
             ctaBtn.className = 'ad-cta-wrap';
@@ -2355,14 +2450,24 @@
         board.onclick = function(e) {
           if (e.target.closest('.ad-cta-wrap')) return;
           var wrap = e.target.closest('.ad-flyer-wrap');
-          if (wrap) openAdLightboxFor(parseInt(wrap.dataset.idx, 10));
+          if (wrap) {
+            var clickedFlyer = flyers[parseInt(wrap.dataset.idx, 10)];
+            var originalIdx = window.AD_EVENTS.indexOf(clickedFlyer);
+            if (originalIdx !== -1) {
+              openAdLightboxFor(originalIdx);
+            }
+          }
         };
         board.onkeydown = function(e) {
           if (e.target.closest('.ad-cta-wrap')) return;
           var wrap = e.target.closest('.ad-flyer-wrap');
           if (wrap && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
-            openAdLightboxFor(parseInt(wrap.dataset.idx, 10));
+            var clickedFlyer = flyers[parseInt(wrap.dataset.idx, 10)];
+            var originalIdx = window.AD_EVENTS.indexOf(clickedFlyer);
+            if (originalIdx !== -1) {
+              openAdLightboxFor(originalIdx);
+            }
           }
         };
       };
@@ -4125,12 +4230,6 @@
           if (data.adEvents && Array.isArray(data.adEvents)) {
             window.AD_EVENTS = data.adEvents;
             renderAdBoard();
-            
-            const adSection = document.getElementById('ad-board');
-            if (adSection) {
-              const hasVisibleFlyers = (window.AD_EVENTS || []).some(f => f.visible !== false);
-              adSection.style.display = hasVisibleFlyers ? '' : 'none';
-            }
           } else if (data.adEvent) {
             window.AD_EVENTS = [ {
               name: data.adEvent.name,
@@ -4140,12 +4239,6 @@
               cta: data.adEvent.cta || null
             } ];
             renderAdBoard();
-            
-            const adSection = document.getElementById('ad-board');
-            if (adSection) {
-              const hasVisibleFlyers = (window.AD_EVENTS || []).some(f => f.visible !== false);
-              adSection.style.display = hasVisibleFlyers ? '' : 'none';
-            }
           }
         } catch (bindErr) {
           console.error("[CMS Engine] Error binding copy:", bindErr);

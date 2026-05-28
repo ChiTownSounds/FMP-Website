@@ -80,6 +80,7 @@
       "name": "Rhythm & Roses — Danny Boy",
       "imageUrl": "./assets/xyndorh.jpg",
       "linkUrl": "",
+      "eventDate": "",
       "visible": true,
       "cta": {
         "type": "email",
@@ -92,6 +93,7 @@
       "name": "Exclusive Juneteenth Celebration",
       "imageUrl": "./assets/vbw9mni.jpg",
       "linkUrl": "",
+      "eventDate": "",
       "visible": true,
       "cta": {
         "type": "link",
@@ -101,8 +103,9 @@
     },
     {
       "name": "Special Concert Event",
-      "imageUrl": "./assets/zkv9i1l.jpg",
+      "imageUrl": "./assets/x201r1f.jpg",
       "linkUrl": "",
+      "eventDate": "",
       "visible": true,
       "cta": {
         "type": "email",
