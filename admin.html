@@ -300,6 +300,7 @@
           "name": "Rhythm & Roses — Danny Boy",
           "imageUrl": "./assets/xyndorh.jpg",
           "linkUrl": "",
+          "eventDate": "",
           "visible": true,
           "cta": {
             "type": "email",
@@ -312,6 +313,7 @@
           "name": "Exclusive Juneteenth Celebration",
           "imageUrl": "./assets/vbw9mni.jpg",
           "linkUrl": "",
+          "eventDate": "",
           "visible": true,
           "cta": {
             "type": "link",
@@ -446,9 +448,18 @@
             card.innerHTML = `
               <div class="flex justify-between items-center mb-2 border-b border-white/5 pb-2">
                 <span class="text-[10px] font-black text-yellow-500 tracking-widest uppercase">Flyer Card #${idx + 1}: ${flyer.name || 'New Flyer'}</span>
-                <button onclick="removeFlyerCard(${idx})" class="text-[9px] font-black text-red-400 hover:text-red-300 tracking-widest uppercase transition-all">
-                  ❌ Remove
-                </button>
+                <div class="flex items-center gap-3">
+                  <button onclick="moveFlyer(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="text-[9px] font-black text-yellow-500 hover:text-yellow-400 tracking-widest uppercase transition-all disabled:opacity-30 disabled:pointer-events-none">
+                    ▲ Up
+                  </button>
+                  <button onclick="moveFlyer(${idx}, 1)" ${idx === data.adEvents.length - 1 ? 'disabled' : ''} class="text-[9px] font-black text-yellow-500 hover:text-yellow-400 tracking-widest uppercase transition-all disabled:opacity-30 disabled:pointer-events-none">
+                    ▼ Down
+                  </button>
+                  <span class="text-white/20">|</span>
+                  <button onclick="removeFlyerCard(${idx})" class="text-[9px] font-black text-red-400 hover:text-red-300 tracking-widest uppercase transition-all">
+                    ❌ Remove
+                  </button>
+                </div>
               </div>
               <div class="flex items-start gap-4">
                 <img src="${flyer.imageUrl || ''}" alt="Flyer image" class="w-20 h-20 object-cover rounded-lg border border-white/10 bg-white/5 flex-shrink-0" onerror="this.src='assets/hosts/coming_soon_3.jpg'" />
@@ -465,7 +476,11 @@
                     <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Click Destination URL (Optional)</label>
                     <input type="url" value="${flyer.linkUrl || ''}" oninput="updateFlyerField(${idx}, 'linkUrl', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono">
                   </div>
-                  <div class="flex items-center justify-between p-2 bg-white/5 rounded-xl border border-white/5" style="margin-top: 18px;">
+                  <div>
+                    <label class="block text-[8px] font-black text-white/40 tracking-wider uppercase mb-1">Event Date & Time (Optional)</label>
+                    <input type="datetime-local" value="${flyer.eventDate || ''}" oninput="updateFlyerField(${idx}, 'eventDate', this.value)" class="w-full form-input rounded-lg px-3 py-2 text-xs font-mono">
+                  </div>
+                  <div class="flex items-center justify-between p-2 bg-white/5 rounded-xl border border-white/5 col-span-1 sm:col-span-2">
                     <span class="text-[9px] font-bold text-white/60 tracking-wider uppercase">Show Flyer</span>
                     <button onclick="toggleFlyerVisible(${idx})" class="relative w-10 h-5 rounded-full transition-all duration-300 ${isVisible ? 'bg-yellow-500' : 'bg-white/20'} focus:outline-none flex-shrink-0">
                       <span class="absolute top-0.5 ${isVisible ? 'left-5' : 'left-0.5'} w-4 h-4 bg-white rounded-full shadow transition-all duration-300"></span>
@@ -715,6 +730,7 @@
         name: "New Event / Flyer",
         imageUrl: "https://i.imgur.com/xYndorh.jpeg",
         linkUrl: "",
+        eventDate: "",
         visible: true,
         cta: null
       });
@@ -741,6 +757,19 @@
         activeContent.adEvents[idx].visible = activeContent.adEvents[idx].visible !== false ? false : true;
         populateForm(activeContent);
       }
+    }
+
+    function moveFlyer(idx, direction) {
+      if (!activeContent.adEvents) return;
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= activeContent.adEvents.length) return;
+      
+      const temp = activeContent.adEvents[idx];
+      activeContent.adEvents[idx] = activeContent.adEvents[targetIdx];
+      activeContent.adEvents[targetIdx] = temp;
+      
+      populateForm(activeContent);
+      showAlert('Flyers reordered successfully.', 'info');
     }
 
     function updateFlyerCtaType(idx, type) {
