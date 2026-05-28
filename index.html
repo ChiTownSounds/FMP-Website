@@ -1711,7 +1711,7 @@
         <h2 class="text-xs font-black text-yellow-500/70 tracking-[0.3em] uppercase m-0">📌 Upcoming Events</h2>
         <div class="flex items-center gap-4 text-xs font-bold text-white/40 tracking-widest uppercase">
           <span>Sponsored By</span>
-          <img src="https://i.imgur.com/qTVLhH3.jpeg" alt="Sponsor" class="h-16 md:h-20 rounded shadow-md border border-white/10 object-contain" />
+          <img src="./assets/sponsor_logo.png" alt="Sponsor" class="h-16 md:h-20 rounded shadow-md border border-white/10 object-contain" />
         </div>
       </div>
       <!-- Cork-board texture strip — flyers injected by renderAdBoard() -->
@@ -2120,9 +2120,12 @@
 
         <h3>📧 Request Tickets</h3>
         <p>Fill out the form below and we will get back to you shortly.</p>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-          <input type="email" id="ad-email-sender" name="email" class="ad-email-input" placeholder="Your Email Address" required />
-          <input type="tel" id="ad-email-phone" name="phone" class="ad-email-input" placeholder="Your Phone Number" />
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; width: 100%;">
+          <input type="text" id="ad-email-name" name="name" class="ad-email-input" placeholder="Your Name" required style="width: 100%;" />
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+            <input type="email" id="ad-email-sender" name="email" class="ad-email-input" placeholder="Your Email Address" required />
+            <input type="tel" id="ad-email-phone" name="phone" class="ad-email-input" placeholder="Your Phone Number (Optional)" />
+          </div>
         </div>
         <textarea id="ad-email-message" name="message" placeholder="Write your message here..." required></textarea>
         <div class="ad-email-actions">
@@ -2160,10 +2163,19 @@
         var subjectHidden = document.getElementById('ad-email-subject-hidden');
         if (subjectHidden) subjectHidden.value = _adEmailSubject;
 
+        // Reset input fields
+        var nameEl = document.getElementById('ad-email-name');
         var senderEl = document.getElementById('ad-email-sender');
         var phoneEl = document.getElementById('ad-email-phone');
+        if (nameEl) nameEl.value = '';
         if (senderEl) senderEl.value = '';
         if (phoneEl) phoneEl.value = '';
+
+        // Dynamically update the header title based on button text
+        var titleEl = document.querySelector('#ad-email-form-card h3');
+        if (titleEl) {
+          titleEl.innerHTML = '📧 ' + (btn.innerText || 'Contact Event').replace(/📧/g, '').trim();
+        }
 
         var msg = document.getElementById('ad-email-message');
         if (msg) { msg.value = _adEmailSubject; msg.focus(); msg.select(); }
@@ -2227,7 +2239,7 @@
       window.AD_EVENTS = [
         {
           name: 'Rhythm & Roses — Danny Boy',
-          imageUrl: 'https://i.imgur.com/xYndorh.jpeg',
+          imageUrl: './assets/xyndorh.jpg',
           linkUrl: '',
           visible: true,
           cta: {
@@ -2239,7 +2251,7 @@
         },
         {
           name: 'Exclusive Juneteenth Celebration',
-          imageUrl: 'https://i.imgur.com/VbW9mNI.jpeg',
+          imageUrl: './assets/vbw9mni.jpg',
           linkUrl: '',
           visible: true,
           cta: {
@@ -4056,7 +4068,7 @@
       // 2. Fetch content.json if no local preview is active
       if (!data) {
         try {
-          const res = await fetch('./content.json');
+          const res = await fetch('./content.json?t=' + Date.now(), { cache: 'no-store' });
           if (res.ok) {
             data = await res.json();
             console.log("[CMS Engine] Sourced website content from content.json.");
@@ -4109,27 +4121,30 @@
             data.spotlights.forEach(s => SPOTLIGHTS.push(s));
             renderSpotlights();
           }
-          // adEvent — Upcoming Events board
-          if (data.adEvent) {
-            var ad = data.adEvent;
-            var adSection = document.getElementById('ad-board');
-            // Visibility toggle
+          // adEvents — Upcoming Events board
+          if (data.adEvents && Array.isArray(data.adEvents)) {
+            window.AD_EVENTS = data.adEvents;
+            renderAdBoard();
+            
+            const adSection = document.getElementById('ad-board');
             if (adSection) {
-              adSection.style.display = ad.visible === false ? 'none' : '';
+              const hasVisibleFlyers = (window.AD_EVENTS || []).some(f => f.visible !== false);
+              adSection.style.display = hasVisibleFlyers ? '' : 'none';
             }
-            // Swap flyer image
-            if (ad.imageUrl) {
-              var flyerImg = document.querySelector('.ad-flyer-img');
-              var lbImg = document.getElementById('ad-lightbox-img');
-              if (flyerImg) { flyerImg.src = ad.imageUrl; flyerImg.alt = ad.name || 'Event flyer'; }
-              if (lbImg)    { lbImg.src    = ad.imageUrl; lbImg.alt    = ad.name || 'Event flyer'; }
-            }
-            // Wire destination URL if provided
-            if (ad.linkUrl) {
-              var flyerWrap = document.getElementById('ad-flyer-wrap');
-              if (flyerWrap) {
-                flyerWrap.setAttribute('data-ad-link', ad.linkUrl);
-              }
+          } else if (data.adEvent) {
+            window.AD_EVENTS = [ {
+              name: data.adEvent.name,
+              imageUrl: data.adEvent.imageUrl,
+              linkUrl: data.adEvent.linkUrl,
+              visible: data.adEvent.visible !== false,
+              cta: data.adEvent.cta || null
+            } ];
+            renderAdBoard();
+            
+            const adSection = document.getElementById('ad-board');
+            if (adSection) {
+              const hasVisibleFlyers = (window.AD_EVENTS || []).some(f => f.visible !== false);
+              adSection.style.display = hasVisibleFlyers ? '' : 'none';
             }
           }
         } catch (bindErr) {
