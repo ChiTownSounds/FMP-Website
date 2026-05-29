@@ -14,12 +14,48 @@ export const handler = async (event) => {
   }
 
   try {
-    const { name, message } = JSON.parse(event.body);
-
-    if (!name || !message) {
+    let data;
+    try {
+      data = JSON.parse(event.body);
+    } catch (parseErr) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Name and message are required." }),
+        body: JSON.stringify({ error: "Invalid JSON format in request body." }),
+      };
+    }
+
+    const { name, message } = data;
+
+    // Type checking validation
+    if (typeof name !== 'string' || typeof message !== 'string') {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Name and message must be strings." }),
+      };
+    }
+
+    const trimmedName = name.trim();
+    const trimmedMessage = message.trim();
+
+    if (!trimmedName || !trimmedMessage) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Name and message cannot be empty or whitespace only." }),
+      };
+    }
+
+    // Input length limits to prevent DoS attacks and log flooding
+    if (trimmedName.length > 50) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Name must not exceed 50 characters." }),
+      };
+    }
+
+    if (trimmedMessage.length > 1000) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Message must not exceed 1000 characters." }),
       };
     }
 
@@ -40,8 +76,8 @@ export const handler = async (event) => {
         color: 0xEAB308,
         title: '📢 New Shout-Out!',
         fields: [
-          { name: 'From', value: name, inline: true },
-          { name: 'Message', value: message, inline: false }
+          { name: 'From', value: trimmedName, inline: true },
+          { name: 'Message', value: trimmedMessage, inline: false }
         ],
         footer: { text: 'Securely proxied via Netlify Functions' },
         timestamp: new Date().toISOString()
@@ -61,7 +97,7 @@ export const handler = async (event) => {
       sheetsPromise = fetch(SHEETS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, message })
+        body: JSON.stringify({ name: trimmedName, message: trimmedMessage })
       });
     }
 
