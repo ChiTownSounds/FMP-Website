@@ -23,3 +23,7 @@ build/
 
 # Station Data (Managed by Automation Engine)
 fmp_data_7718.csv
+
+# Temporary scratch folder
+scratch/
+
