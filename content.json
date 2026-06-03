@@ -78,7 +78,7 @@
   "adEvents": [
     {
       "name": "Rhythm & Roses — Danny Boy",
-      "imageUrl": "./assets/xyndorh.jpg",
+      "imageUrl": "https://i.imgur.com/tkoq6F6.png",
       "linkUrl": "",
       "eventDate": "",
       "visible": true,
@@ -103,7 +103,7 @@
     },
     {
       "name": "Special Concert Event",
-      "imageUrl": "./assets/x201r1f.jpg",
+      "imageUrl": "https://i.imgur.com/G8QUsXb.jpeg",
       "linkUrl": "",
       "eventDate": "",
       "visible": true,
