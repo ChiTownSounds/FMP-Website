@@ -3842,6 +3842,8 @@
 
     setInterval(animateVUMeters, 150);
 
+    let lastFetchedTitle = "";
+
     async function fetchCitrusData() {
       try {
         const response = await fetch('https://hello.citrus3.com:2020/json/stream/fmpradio');
@@ -3852,21 +3854,30 @@
           const listeners = data.connections || 0;
 
           const titleEl = document.getElementById('now-playing-title');
-          if (titleEl && titleEl.innerText !== title) {
+          if (titleEl) {
             titleEl.innerText = title;
-            document.getElementById('sticky-title').innerText = title;
-
-            const mainCover = document.getElementById('main-cover-art');
-            if (mainCover) mainCover.src = cover;
-            document.getElementById('cover-art').src = cover;
-
-            updateDeviceUI();
           }
+          
+          const stickyTitle = document.getElementById('sticky-title');
+          if (stickyTitle) {
+            stickyTitle.innerText = title;
+          }
+
+          const mainCover = document.getElementById('main-cover-art');
+          if (mainCover) mainCover.src = cover;
+          
+          const coverArt = document.getElementById('cover-art');
+          if (coverArt) coverArt.src = cover;
 
           const listenerEl = document.querySelector('[data-format="%connections%"]');
           if (listenerEl) listenerEl.innerText = listeners;
           const deviceListeners = document.getElementById('device-listeners');
           if (deviceListeners) deviceListeners.innerText = listeners + ' Listeners';
+
+          if (title !== lastFetchedTitle) {
+            lastFetchedTitle = title;
+            updateDeviceUI();
+          }
         }
       } catch (e) {
         console.error("Citrus Sync Error:", e);
