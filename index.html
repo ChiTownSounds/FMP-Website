@@ -1711,7 +1711,7 @@
         <h2 class="text-xs font-black text-yellow-500/70 tracking-[0.3em] uppercase m-0">📌 Upcoming Events</h2>
         <div class="flex items-center gap-4 text-xs font-bold text-white/40 tracking-widest uppercase">
           <span>Sponsored By</span>
-          <img src="https://i.imgur.com/qTVLhH3.jpeg" alt="Sponsor" class="h-16 md:h-20 rounded shadow-md border border-white/10 object-contain" />
+          <img src="./assets/sponsor_logo.jpg" alt="Sponsor" class="h-16 md:h-20 rounded shadow-md border border-white/10 object-contain" />
         </div>
       </div>
       <!-- Cork-board texture strip — flyers injected by renderAdBoard() -->
@@ -1799,6 +1799,39 @@
         border-radius: 4px;
         border: 2px solid rgba(255,255,255,0.07);
         box-shadow: 6px 12px 32px rgba(0,0,0,0.6), 2px 4px 10px rgba(0,0,0,0.4);
+      }
+
+      /* ── Concluded overlay ─────────────────────────────────────── */
+      .ad-concluded-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        z-index: 8;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .ad-concluded-stamp {
+        border: 4px solid #ef4444;
+        color: #ef4444;
+        font-family: 'Permanent Marker', 'Outfit', sans-serif;
+        font-size: clamp(20px, 4.5vw, 34px);
+        font-weight: 900;
+        text-transform: uppercase;
+        padding: 8px 20px;
+        border-radius: 10px;
+        transform: rotate(-45deg);
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        letter-spacing: 0.12em;
+        background: rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+        text-align: center;
       }
 
       /* ── Expand hint overlay ───────────────────────────────────── */
@@ -2120,11 +2153,14 @@
 
         <h3>📧 Request Tickets</h3>
         <p>Fill out the form below and we will get back to you shortly.</p>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-          <input type="email" id="ad-email-sender" name="email" class="ad-email-input" placeholder="Your Email Address" required />
-          <input type="tel" id="ad-email-phone" name="phone" class="ad-email-input" placeholder="Your Phone Number" />
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; width: 100%;">
+          <input type="text" id="ad-email-name" name="name" class="ad-email-input" placeholder="Your Name" required maxlength="100" style="width: 100%;" />
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+            <input type="email" id="ad-email-sender" name="email" class="ad-email-input" placeholder="Your Email Address" required maxlength="100" />
+            <input type="tel" id="ad-email-phone" name="phone" class="ad-email-input" placeholder="Your Phone Number (Optional)" maxlength="20" />
+          </div>
         </div>
-        <textarea id="ad-email-message" name="message" placeholder="Write your message here..." required></textarea>
+        <textarea id="ad-email-message" name="message" placeholder="Write your message here..." required maxlength="3000"></textarea>
         <div class="ad-email-actions">
           <button type="submit" class="ad-email-send">Send Message</button>
           <button type="button" class="ad-email-cancel" onclick="closeEmailModal()">Cancel</button>
@@ -2160,10 +2196,19 @@
         var subjectHidden = document.getElementById('ad-email-subject-hidden');
         if (subjectHidden) subjectHidden.value = _adEmailSubject;
 
+        // Reset input fields
+        var nameEl = document.getElementById('ad-email-name');
         var senderEl = document.getElementById('ad-email-sender');
         var phoneEl = document.getElementById('ad-email-phone');
+        if (nameEl) nameEl.value = '';
         if (senderEl) senderEl.value = '';
         if (phoneEl) phoneEl.value = '';
+
+        // Dynamically update the header title based on button text
+        var titleEl = document.querySelector('#ad-email-form-card h3');
+        if (titleEl) {
+          titleEl.innerHTML = '📧 ' + (btn.innerText || 'Contact Event').replace(/📧/g, '').trim();
+        }
 
         var msg = document.getElementById('ad-email-message');
         if (msg) { msg.value = _adEmailSubject; msg.focus(); msg.select(); }
@@ -2227,7 +2272,7 @@
       window.AD_EVENTS = [
         {
           name: 'Rhythm & Roses — Danny Boy',
-          imageUrl: 'https://i.imgur.com/xYndorh.jpeg',
+          imageUrl: 'https://i.imgur.com/tkoq6F6.png',
           linkUrl: '',
           visible: true,
           cta: {
@@ -2239,7 +2284,7 @@
         },
         {
           name: 'Exclusive Juneteenth Celebration',
-          imageUrl: 'https://i.imgur.com/VbW9mNI.jpeg',
+          imageUrl: './assets/vbw9mni.jpg',
           linkUrl: '',
           visible: true,
           cta: {
@@ -2262,13 +2307,57 @@
       var SWAY_ANGLES = [[-1.8, -0.5, -2.5], [1.6, 0.4, 2.2], [-2.2, -0.8, -2.8], [1.2, 0.2, 1.8]];
 
       /* ── Render the corkboard ──────────────────────────────────── */
+      /* Helper to parse event dates as local time */
+      function getEventDate(dateStr) {
+        if (!dateStr) return null;
+        if (dateStr.length === 10) { // YYYY-MM-DD
+          return new Date(dateStr + 'T23:59:59');
+        }
+        return new Date(dateStr);
+      }
+
+      /* ── Render the corkboard ──────────────────────────────────── */
       window.renderAdBoard = function() {
         var board = document.getElementById('ad-corkboard');
         if (!board) return;
         board.innerHTML = '';
 
-        var flyers = (window.AD_EVENTS || []).filter(function(f) { return f.visible !== false; });
-        if (!flyers.length) return;
+        var now = new Date();
+        var flyers = (window.AD_EVENTS || []).filter(function(f) {
+          if (f.visible === false) return false;
+          if (f.eventDate) {
+            var eventDate = getEventDate(f.eventDate);
+            if (eventDate) {
+              var hoursPassed = (now - eventDate) / (1000 * 60 * 60);
+              if (hoursPassed > 48) {
+                return false; // Auto-disabled after 48 hours
+              }
+            }
+          }
+          return true;
+        });
+
+        // Hide/disable the events section if no flyers are active/visible
+        var adSection = document.getElementById('ad-board');
+        if (!flyers.length) {
+          if (adSection) adSection.style.display = 'none';
+          return;
+        }
+        if (adSection) adSection.style.display = '';
+
+        // Dynamic base width depending on visible flyers count (support up to 6)
+        var baseWidth = 480;
+        if (flyers.length === 1) {
+          baseWidth = 500;
+        } else if (flyers.length === 2) {
+          baseWidth = 420;
+        } else if (flyers.length === 3) {
+          baseWidth = 360;
+        } else if (flyers.length === 4) {
+          baseWidth = 310;
+        } else if (flyers.length >= 5) {
+          baseWidth = 270;
+        }
 
         flyers.forEach(function(flyer, i) {
           var pin = PIN_COLORS[i % PIN_COLORS.length];
@@ -2280,7 +2369,7 @@
           wrap.setAttribute('role', 'button');
           wrap.setAttribute('tabindex', '0');
           wrap.setAttribute('aria-label', 'Open flyer: ' + flyer.name);
-          wrap.style.cssText = 'animation-name:' + swayId + ';';
+          wrap.style.cssText = 'animation-name:' + swayId + '; width: min(' + baseWidth + 'px, 88vw);';
           wrap.dataset.idx = i;
 
           /* Inject per-flyer keyframe */
@@ -2293,6 +2382,23 @@
           '}';
           document.head.appendChild(styleEl);
 
+          // Calculate "Concluded" status
+          var isConcluded = false;
+          if (flyer.eventDate) {
+            var eventDate = getEventDate(flyer.eventDate);
+            if (eventDate) {
+              var hoursPassed = (now - eventDate) / (1000 * 60 * 60);
+              if (hoursPassed > 0 && hoursPassed <= 48) {
+                isConcluded = true;
+              }
+            }
+          }
+
+          var overlayHtml = '';
+          if (isConcluded) {
+            overlayHtml = '<div class="ad-concluded-overlay"><span class="ad-concluded-stamp">Concluded</span></div>';
+          }
+
           wrap.innerHTML =
             '<div class="ad-pushpin" aria-hidden="true">' +
               '<svg viewBox="0 0 24 24" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">' +
@@ -2302,6 +2408,7 @@
               '</svg>' +
             '</div>' +
             '<img src="' + flyer.imageUrl + '" alt="' + flyer.name + '" class="ad-flyer-img" draggable="false" loading="lazy"/>' +
+            overlayHtml +
             '<div class="ad-expand-hint" aria-hidden="true">' +
               '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5-5-5m5 5v-4m0 4h-4"/></svg>' +
               '<span>View Full Flyer</span>' +
@@ -2316,7 +2423,7 @@
           container.appendChild(wrap);
 
           /* ── CTA button below flyer ── */
-          if (flyer.cta) {
+          if (flyer.cta && !isConcluded) {
             var cta = flyer.cta;
             var ctaBtn = document.createElement('div');
             ctaBtn.className = 'ad-cta-wrap';
@@ -2343,14 +2450,24 @@
         board.onclick = function(e) {
           if (e.target.closest('.ad-cta-wrap')) return;
           var wrap = e.target.closest('.ad-flyer-wrap');
-          if (wrap) openAdLightboxFor(parseInt(wrap.dataset.idx, 10));
+          if (wrap) {
+            var clickedFlyer = flyers[parseInt(wrap.dataset.idx, 10)];
+            var originalIdx = window.AD_EVENTS.indexOf(clickedFlyer);
+            if (originalIdx !== -1) {
+              openAdLightboxFor(originalIdx);
+            }
+          }
         };
         board.onkeydown = function(e) {
           if (e.target.closest('.ad-cta-wrap')) return;
           var wrap = e.target.closest('.ad-flyer-wrap');
           if (wrap && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
-            openAdLightboxFor(parseInt(wrap.dataset.idx, 10));
+            var clickedFlyer = flyers[parseInt(wrap.dataset.idx, 10)];
+            var originalIdx = window.AD_EVENTS.indexOf(clickedFlyer);
+            if (originalIdx !== -1) {
+              openAdLightboxFor(originalIdx);
+            }
           }
         };
       };
@@ -2552,8 +2669,8 @@
                 <p class="hidden">
                   <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
                 </p>
-                <input id="shoutout-name" name="name" type="text" placeholder="Your Name" required class="w-full mb-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all">
-                <textarea id="shoutout-msg" name="message" placeholder="Your message..." rows="3" required class="w-full mb-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm resize-none focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all"></textarea>
+                <input id="shoutout-name" name="name" type="text" placeholder="Your Name" required maxlength="50" class="w-full mb-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all">
+                <textarea id="shoutout-msg" name="message" placeholder="Your message..." rows="3" required maxlength="300" class="w-full mb-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 text-sm resize-none focus:outline-none focus:border-yellow-500/50 focus:ring-1 focus:ring-yellow-500/50 transition-all"></textarea>
                 <button type="submit" id="shoutout-submit-btn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-800 to-red-600 hover:from-red-700 hover:to-red-500 text-white font-black text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-red-950/40">Send It In</button>
               </form>
               <div id="shoutout-success" class="hidden mt-4 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 text-xs text-yellow-500 text-center font-bold tracking-wider">
@@ -2575,7 +2692,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div class="flex flex-col items-center sm:items-start">
           <img src="./assets/logo.svg" alt="FMP Radio" width="216" height="64" class="h-16 w-auto mb-2">
-          <p class="text-xs text-gray-500">© 2026 FMP Media Group</p>
+          <p class="text-xs text-gray-500">© 2026 FMP Media Group, LLC</p>
         </div>
         <div class="flex gap-6">
           <a href="./privacy.html" class="text-xs text-gray-500 hover:text-yellow-500 transition-colors uppercase tracking-widest font-bold">Privacy Policy</a>
@@ -3380,7 +3497,7 @@
 
         if (!name) return null;
 
-        let cleanName = name.replace(/\.[^/.]+$/, "").replace(/^cbr_/, "");
+        let cleanName = name.replace(/\.[a-z0-9]{3,4}$/i, "").replace(/^cbr_/, "");
 
         // Synthesize 'category' to maintain 100% backwards-compatibility with detectEra()
         let category = "Unsorted_Review";
@@ -3416,7 +3533,82 @@
       if (!title || title.toLowerCase().includes('loading')) return 'modern';
       const lower = title.toLowerCase().trim();
 
-      const match = libraryData.find(item => lower.includes(item.name) || item.name.includes(lower));
+      // Clean brackets from names for fast path as well
+      const cleanStreamLower = lower.replace(/\[.*?\]/g, '').trim();
+
+      let match = libraryData.find(item => {
+        const cleanItemName = item.name.replace(/\[.*?\]/g, '').trim();
+        return cleanStreamLower.includes(cleanItemName) || cleanItemName.includes(cleanStreamLower);
+      });
+
+      if (!match) {
+        // Clean tokenization helper for fuzzy matcher
+        const tokenize = (str) => {
+          if (!str) return [];
+          return str.toLowerCase()
+            .replace(/\[.*?\]/g, '') // remove bracketed content (albums)
+            .replace(/[\[\]\(\)\-\._,\/\\&\+\:\?]/g, ' ') // replace punctuation/brackets/dashes with spaces
+            .split(/\s+/)
+            .map(w => w.trim())
+            .filter(w => w.length > 0 && !['feat', 'ft', 'pres', 'presents', 'with', 'and', 'vs', 'prod', 'remix', 'mix', 'edit', 'radio', 'single', 'version', 'album', 'live'].includes(w));
+        };
+
+        const streamParts = title.split('-');
+        const hasStreamDash = streamParts.length > 1;
+        const streamArtistTokens = hasStreamDash ? tokenize(streamParts[0]) : [];
+        const streamTrackTokens = hasStreamDash ? tokenize(streamParts.slice(1).join('-')) : [];
+        const streamAllTokens = tokenize(title);
+
+        if (streamAllTokens.length > 0) {
+          let bestMatch = null;
+          let highestScore = 0;
+
+          for (const item of libraryData) {
+            const libParts = item.name.split('-');
+            const hasLibDash = libParts.length > 1;
+            
+            let artistMatch = false;
+            let trackMatch = false;
+            let overallScore = 0;
+            
+            if (hasStreamDash && hasLibDash) {
+              const libArtistTokens = tokenize(libParts[0]);
+              const libTrackTokens = tokenize(libParts.slice(1).join('-'));
+              
+              const artistIntersect = streamArtistTokens.filter(t => libArtistTokens.includes(t));
+              const trackIntersect = streamTrackTokens.filter(t => libTrackTokens.includes(t));
+              
+              artistMatch = (libArtistTokens.length === 0 || streamArtistTokens.length === 0 || artistIntersect.length > 0);
+              trackMatch = (libTrackTokens.length === 0 || streamTrackTokens.length === 0 || trackIntersect.length > 0);
+              
+              if (artistMatch && trackMatch) {
+                const artistScore = libArtistTokens.length === 0 || streamArtistTokens.length === 0 ? 1.0 : artistIntersect.length / Math.min(streamArtistTokens.length, libArtistTokens.length);
+                const trackScore = libTrackTokens.length === 0 || streamTrackTokens.length === 0 ? 1.0 : trackIntersect.length / Math.min(streamTrackTokens.length, libTrackTokens.length);
+                overallScore = (artistScore + trackScore) / 2;
+              }
+            } else {
+              const libAllTokens = tokenize(item.name);
+              const intersectAll = streamAllTokens.filter(t => libAllTokens.includes(t));
+              const minOverlap = Math.min(2, streamAllTokens.length, libAllTokens.length);
+              
+              if (intersectAll.length >= minOverlap) {
+                overallScore = intersectAll.length / Math.min(streamAllTokens.length, libAllTokens.length);
+              }
+            }
+
+            if (overallScore > highestScore && overallScore >= 0.6) {
+              highestScore = overallScore;
+              bestMatch = item;
+            }
+          }
+
+          if (bestMatch) {
+            console.log(`[Library Engine] Fuzzy match resolved: "${title}" -> "${bestMatch.name}" (score: ${highestScore.toFixed(2)})`);
+            match = bestMatch;
+          }
+        }
+      }
+
       if (match) {
         // If a year is explicitly found, map natively to clear structural categories:
         // Pre-1980 = Vinyl Era; 1980–1994 = Cassette Era; 1995–2004 = Discman Era; 2005–2012 = iPod Era; 2013+ = Modern Era.
@@ -3992,7 +4184,7 @@
       // 2. Fetch content.json if no local preview is active
       if (!data) {
         try {
-          const res = await fetch('./content.json');
+          const res = await fetch('./content.json?t=' + Date.now(), { cache: 'no-store' });
           if (res.ok) {
             data = await res.json();
             console.log("[CMS Engine] Sourced website content from content.json.");
@@ -4045,28 +4237,19 @@
             data.spotlights.forEach(s => SPOTLIGHTS.push(s));
             renderSpotlights();
           }
-          // adEvent — Upcoming Events board
-          if (data.adEvent) {
-            var ad = data.adEvent;
-            var adSection = document.getElementById('ad-board');
-            // Visibility toggle
-            if (adSection) {
-              adSection.style.display = ad.visible === false ? 'none' : '';
-            }
-            // Swap flyer image
-            if (ad.imageUrl) {
-              var flyerImg = document.querySelector('.ad-flyer-img');
-              var lbImg = document.getElementById('ad-lightbox-img');
-              if (flyerImg) { flyerImg.src = ad.imageUrl; flyerImg.alt = ad.name || 'Event flyer'; }
-              if (lbImg)    { lbImg.src    = ad.imageUrl; lbImg.alt    = ad.name || 'Event flyer'; }
-            }
-            // Wire destination URL if provided
-            if (ad.linkUrl) {
-              var flyerWrap = document.getElementById('ad-flyer-wrap');
-              if (flyerWrap) {
-                flyerWrap.setAttribute('data-ad-link', ad.linkUrl);
-              }
-            }
+          // adEvents — Upcoming Events board
+          if (data.adEvents && Array.isArray(data.adEvents)) {
+            window.AD_EVENTS = data.adEvents;
+            renderAdBoard();
+          } else if (data.adEvent) {
+            window.AD_EVENTS = [ {
+              name: data.adEvent.name,
+              imageUrl: data.adEvent.imageUrl,
+              linkUrl: data.adEvent.linkUrl,
+              visible: data.adEvent.visible !== false,
+              cta: data.adEvent.cta || null
+            } ];
+            renderAdBoard();
           }
         } catch (bindErr) {
           console.error("[CMS Engine] Error binding copy:", bindErr);
