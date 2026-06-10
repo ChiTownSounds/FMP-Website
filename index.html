@@ -4109,7 +4109,7 @@
 
     async function fetchCitrusData() {
       try {
-        const response = await fetch('https://hello.citrus3.com:8256/status-json.xsl');
+        const response = await fetch('https://hello.citrus3.com:8256/status-json.xsl?t=' + Date.now());
         const data = await response.json();
         if (data && data.icestats && data.icestats.source) {
           setLiveStatus(true);
