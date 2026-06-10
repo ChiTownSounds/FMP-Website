@@ -4209,7 +4209,7 @@
             if (isLiveShow) {
               const mainCover = document.getElementById('main-cover-art');
               const coverArt = document.getElementById('cover-art');
-              const liveShowArt = './assets/live_show.jpg';
+              const liveShowArt = './assets/live_show.jpg?t=' + Date.now();
               if (mainCover) mainCover.src = liveShowArt;
               if (coverArt) coverArt.src = liveShowArt;
               updateDeviceUI();
