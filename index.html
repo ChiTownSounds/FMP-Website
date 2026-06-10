@@ -2603,9 +2603,9 @@
                 <span id="now-playing-title" data-widget="mcp-custom-text" data-name="fmpradio" data-format="%nowplaying%">Loading...</span>
               </div>
               <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-400 tracking-wider">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span data-widget="mcp-stream-status" data-name="fmpradio" data-online-text="ONLINE" data-offline-text="OFFLINE">ONLINE</span>
+                <div id="stream-status-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-400 tracking-wider">
+                  <span id="stream-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span id="stream-status-text" data-widget="mcp-stream-status" data-name="fmpradio" data-online-text="ONLINE" data-offline-text="OFFLINE">ONLINE</span>
                 </div>
                 <div class="text-xs text-white/50 font-medium">
                   Listeners: <span class="text-white font-bold" data-widget="mcp-custom-text" data-name="fmpradio" data-format="%connections%">0</span>
@@ -4070,11 +4070,45 @@
       updateDeviceUI();
     }
 
+    function setLiveStatus(isOnline) {
+      const liveIndicator = document.getElementById('live-indicator');
+      const statusText = document.getElementById('stream-status-text');
+      const statusBadge = document.getElementById('stream-status-badge');
+      const statusDot = document.getElementById('stream-status-dot');
+      
+      if (isOnline) {
+        if (liveIndicator) {
+          liveIndicator.classList.remove('hidden');
+          liveIndicator.classList.add('flex');
+        }
+        if (statusText) statusText.innerText = "ONLINE";
+        if (statusBadge) {
+          statusBadge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-400 tracking-wider";
+        }
+        if (statusDot) {
+          statusDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+        }
+      } else {
+        if (liveIndicator) {
+          liveIndicator.classList.add('hidden');
+          liveIndicator.classList.remove('flex');
+        }
+        if (statusText) statusText.innerText = "OFFLINE";
+        if (statusBadge) {
+          statusBadge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-500/10 border border-zinc-500/20 text-[10px] font-black text-zinc-400 tracking-wider";
+        }
+        if (statusDot) {
+          statusDot.className = "w-1.5 h-1.5 rounded-full bg-zinc-500";
+        }
+      }
+    }
+
     async function fetchCitrusData() {
       try {
         const response = await fetch('https://hello.citrus3.com:8256/status-json.xsl');
         const data = await response.json();
         if (data && data.icestats && data.icestats.source) {
+          setLiveStatus(true);
           const source = data.icestats.source;
           let stream_title = "";
           let listeners = 0;
@@ -4181,9 +4215,34 @@
               updateAlbumArt(artist, title);
             }
           }
+        } else {
+          setLiveStatus(false);
+          handleOfflinePlayout();
         }
       } catch (e) {
         console.error("Citrus Sync Error:", e);
+        setLiveStatus(false);
+        handleOfflinePlayout();
+      }
+    }
+
+    function handleOfflinePlayout() {
+      const cleanDisplay = "Stream Offline";
+      const titleEl = document.getElementById('now-playing-title');
+      if (titleEl) titleEl.innerText = cleanDisplay;
+      
+      const stickyTitle = document.getElementById('sticky-title');
+      if (stickyTitle) stickyTitle.innerText = cleanDisplay;
+
+      const mainCover = document.getElementById('main-cover-art');
+      const coverArt = document.getElementById('cover-art');
+      const defaultArt = './assets/logo.svg';
+      if (mainCover && !mainCover.src.includes('logo.svg')) mainCover.src = defaultArt;
+      if (coverArt && !coverArt.src.includes('logo.svg')) coverArt.src = defaultArt;
+      
+      if (cleanDisplay !== lastFetchedTitle) {
+        lastFetchedTitle = cleanDisplay;
+        updateDeviceUI();
       }
     }
 
