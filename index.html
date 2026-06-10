@@ -4120,17 +4120,30 @@
           if (Array.isArray(source)) {
             for (let src of source) {
               if (src.listenurl && src.listenurl.includes("/stream")) {
-                stream_title = src.title || src.yp_currently_playing || "";
+                if (src.artist && src.title && src.artist.trim() && src.title.trim()) {
+                  stream_title = src.artist.trim() + " - " + src.title.trim();
+                } else {
+                  stream_title = src.title || src.yp_currently_playing || "";
+                }
                 listeners = src.listeners || 0;
                 break;
               }
             }
             if (!stream_title && source.length > 0) {
-              stream_title = source[0].title || source[0].yp_currently_playing || "";
-              listeners = source[0].listeners || 0;
+              const src0 = source[0];
+              if (src0.artist && src0.title && src0.artist.trim() && src0.title.trim()) {
+                stream_title = src0.artist.trim() + " - " + src0.title.trim();
+              } else {
+                stream_title = src0.title || src0.yp_currently_playing || "";
+              }
+              listeners = src0.listeners || 0;
             }
           } else {
-            stream_title = source.title || source.yp_currently_playing || "";
+            if (source.artist && source.title && source.artist.trim() && source.title.trim()) {
+              stream_title = source.artist.trim() + " - " + source.title.trim();
+            } else {
+              stream_title = source.title || source.yp_currently_playing || "";
+            }
             listeners = source.listeners || 0;
           }
           
