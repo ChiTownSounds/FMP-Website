@@ -4202,9 +4202,18 @@
           const deviceListeners = document.getElementById('device-listeners');
           if (deviceListeners) deviceListeners.innerText = listeners + ' Listeners';
 
+          let isLiveShow = stream_title.includes("[Live Show]") || stream_title.includes("Remote Live DJ") || stream_title.includes("Live Performance") || cleanDisplay.includes("Remote Live DJ") || cleanDisplay.includes("Live Show");
+
           if (cleanDisplay !== lastFetchedTitle) {
             lastFetchedTitle = cleanDisplay;
-            if (isNonMusic) {
+            if (isLiveShow) {
+              const mainCover = document.getElementById('main-cover-art');
+              const coverArt = document.getElementById('cover-art');
+              const liveShowArt = './assets/live_show.jpg';
+              if (mainCover) mainCover.src = liveShowArt;
+              if (coverArt) coverArt.src = liveShowArt;
+              updateDeviceUI();
+            } else if (isNonMusic) {
               const mainCover = document.getElementById('main-cover-art');
               const coverArt = document.getElementById('cover-art');
               const defaultArt = './assets/logo.svg';
