@@ -4139,7 +4139,7 @@
           }
           
           // Clean stream metadata
-          let rawTitle = stream_title;
+          let rawTitle = stream_title.replace(/\uFFFD/g, '');
           let artist = "Unknown Artist";
           let title = rawTitle;
           let showContext = "AutoDJ";
