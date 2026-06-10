@@ -4125,10 +4125,16 @@
           let cleanDisplay = rawTitle;
           let isNonMusic = false;
           
+          let isLive365Comm = stream_title.toLowerCase().includes("365 commercial") || stream_title.toLowerCase().includes("live365");
           let isCommercial = showContext.toLowerCase().includes("commercial") || showContext.toLowerCase().includes("ad") || title.toLowerCase().includes("commercial") || title.toLowerCase().includes("adbreak");
           let isStationID = showContext.toLowerCase().includes("station") || showContext.toLowerCase().includes("id") || title.toLowerCase().includes("station id") || title.toLowerCase().includes("jingle");
           
-          if (isCommercial) {
+          if (isLive365Comm) {
+            artist = "FMP Radio";
+            title = rawTitle;
+            cleanDisplay = `FMP Radio - ${rawTitle}`;
+            isNonMusic = true;
+          } else if (isCommercial) {
             artist = "Sponsor Segment";
             title = "Station Advertisement";
             cleanDisplay = "Sponsor Segment - Station Advertisement";
