@@ -4041,7 +4041,7 @@
       const mainCover = document.getElementById('main-cover-art');
       const coverArt = document.getElementById('cover-art');
       
-      if (title === "FMP Radio Master Playout" || title === "Unknown Title" || !title || title === "Stream Offline") {
+      if (title === "FMP Radio Master Playout" || title === "Unknown Title" || !artist || artist === "Unknown Artist" || title === "Stream Offline") {
         if (mainCover) mainCover.src = defaultArt;
         if (coverArt) coverArt.src = defaultArt;
         updateDeviceUI();
@@ -4049,33 +4049,18 @@
       }
       
       // Clean brackets and strip encoding replacement characters (\ufffd)
-      const cleanArtist = (artist && artist !== "Unknown Artist") ? artist.replace(/\[.*?\]/g, '').replace(/\uFFFD/g, '').trim() : '';
+      const cleanArtist = artist.replace(/\[.*?\]/g, '').replace(/\uFFFD/g, '').trim();
       const cleanTitle = title.replace(/\[.*?\]/g, '').replace(/\uFFFD/g, '').trim();
       
       try {
-        const searchTerm = cleanArtist ? (cleanArtist + ' ' + cleanTitle) : cleanTitle;
-        const searchUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(searchTerm)}&entity=song&limit=1`;
+        const searchUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(cleanArtist + ' ' + cleanTitle)}&entity=song&limit=1`;
         const res = await fetch(searchUrl);
         if (res.ok) {
           const searchData = await res.json();
-          if (searchData.results && searchData.results.length > 0) {
-            const track = searchData.results[0];
-            if (track.artworkUrl100) {
-              const artUrl = track.artworkUrl100.replace('100x100bb', '300x300bb');
-              if (mainCover) mainCover.src = artUrl;
-              if (coverArt) coverArt.src = artUrl;
-            }
-            
-            // If the artist was unknown, dynamically enrich the display name with the correct artist
-            if (!cleanArtist) {
-              const resolvedDisplay = `${track.artistName} - ${track.trackName}`;
-              lastFetchedTitle = resolvedDisplay;
-              const titleEl = document.getElementById('now-playing-title');
-              if (titleEl) titleEl.innerText = resolvedDisplay;
-              const stickyTitle = document.getElementById('sticky-title');
-              if (stickyTitle) stickyTitle.innerText = resolvedDisplay;
-            }
-            
+          if (searchData.results && searchData.results.length > 0 && searchData.results[0].artworkUrl100) {
+            const artUrl = searchData.results[0].artworkUrl100.replace('100x100bb', '300x300bb');
+            if (mainCover) mainCover.src = artUrl;
+            if (coverArt) coverArt.src = artUrl;
             updateDeviceUI();
             return;
           }
@@ -4179,29 +4164,13 @@
               rawTitle = contextMatch[2].trim();
             }
             
-            // Segment filter to strip duration/timestamp codes and system markers (like FIXED CLOCK ASSET)
-            let segments = rawTitle.split(" - ").map(s => s.trim());
-            segments = segments.filter(s => {
-              if (!s) return false;
-              // Remove duration/timestamp patterns (e.g. "17:22", "6:23", "01:23:45")
-              if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(s)) return false;
-              // Remove clock asset markers and locks
-              if (/clock\s*asset/i.test(s) || /fixed\s*clock/i.test(s)) return false;
-              if (s === '🔒' || s === '🔒 FIXED CLOCK ASSET') return false;
-              return true;
-            });
-            
-            if (segments.length >= 2) {
-              artist = segments[0];
-              title = segments.slice(1).join(" - ");
-            } else if (segments.length === 1) {
-              artist = "Unknown Artist";
-              title = segments[0];
+            const parts = rawTitle.split(" - ");
+            if (parts.length >= 2) {
+              artist = parts[0].trim();
+              title = parts.slice(1).join(" - ").trim();
             } else {
-              title = rawTitle;
+              title = rawTitle.trim();
             }
-            
-            rawTitle = artist !== "Unknown Artist" ? `${artist} - ${title}` : title;
           }
           
           let cleanDisplay = rawTitle;
@@ -4232,7 +4201,7 @@
             cleanDisplay = "Stream Offline";
             isNonMusic = true;
           } else {
-            cleanDisplay = artist !== "Unknown Artist" ? `${artist} - ${title}` : title;
+            cleanDisplay = `${artist} - ${title}`;
           }
 
           const titleEl = document.getElementById('now-playing-title');

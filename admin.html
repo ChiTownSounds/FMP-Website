@@ -103,6 +103,9 @@
         <button onclick="downloadJSON()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-extrabold text-xs tracking-wider uppercase rounded-full transition-all duration-200 active:scale-95">
           📥 Download JSON
         </button>
+        <button onclick="publishToLiveSite()" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs tracking-wider uppercase rounded-full transition-all duration-200 active:scale-95 shadow-lg shadow-red-600/20">
+          🚀 Publish to Live Site
+        </button>
       </div>
     </div>
 
@@ -182,31 +185,26 @@
           </div>
         </div>
 
-      <!-- Right Column: Local Manual Workflow Guide -->
+      <!-- Right Column: Publishing & Workflow Guide -->
       <div class="lg:col-span-4 space-y-8">
         <div class="glass-card rounded-2xl p-6 border border-yellow-500/20">
-          <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase mb-3 border-b border-white/5 pb-2">💻 Local Workflow Guide</h2>
+          <h2 class="text-sm font-black text-yellow-500 tracking-widest uppercase mb-3 border-b border-white/5 pb-2">⚡ Publishing Guide</h2>
           <div class="space-y-4 text-xs font-light leading-relaxed text-white/80">
-            <p>Welcome! This dashboard acts as a visual "fill-in-the-blank" editor for your site copy, schedules, and DJ cards.</p>
+            <p>Welcome! This dashboard acts as a visual "fill-in-the-blank" editor for your site copy, schedules, and flyers.</p>
             
-            <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
-              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 1: Save & Preview</strong>
-              <p class="text-white/60">Click <strong class="text-white">💾 Save & Preview</strong> to temporarily cache your drafts. Open <code class="bg-white/5 px-1 py-0.5 rounded text-yellow-500">index.html</code> in another browser tab to view your changes instantly!</p>
-            </div>
-            
-            <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
-              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 2: Export JSON</strong>
-              <p class="text-white/60">Once you are 100% satisfied with your changes, click <strong class="text-white">📥 Download JSON</strong>. This downloads your custom <code class="bg-white/5 px-1 py-0.5 rounded text-yellow-500">content.json</code> file.</p>
+            <div class="p-3 bg-red-600/10 rounded-xl border border-red-500/20 space-y-2">
+              <strong class="text-red-400 block uppercase tracking-wider text-[10px]">Option A: Publish to Live Site (Recommended)</strong>
+              <p class="text-white/70">Click <strong class="text-white">🚀 Publish to Live Site</strong>, enter the broadcaster passcode (<code class="bg-white/5 px-1 py-0.5 rounded text-red-400">773312</code>), and your updates will immediately go live on the site!</p>
             </div>
 
             <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
-              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 3: Update Codebase</strong>
-              <p class="text-white/60">Place the downloaded <code class="bg-white/5 px-1 py-0.5 rounded text-white">content.json</code> file directly inside your local website directory (overwriting the existing one).</p>
+              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Option B: Save Draft / Local Preview</strong>
+              <p class="text-white/60">Click <strong class="text-white">💾 Save &amp; Preview</strong> to temporarily cache draft edits. Open your local <code class="bg-white/5 px-1 py-0.5 rounded text-yellow-500">index.html</code> in another browser tab to view them locally.</p>
             </div>
-
+            
             <div class="p-3 bg-white/5 rounded-xl border border-white/5 space-y-2">
-              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Step 4: Push to Live Site</strong>
-              <p class="text-white/60">Push your updated code files to GitHub. Netlify will instantly detect the changes, build the site, and update it globally!</p>
+              <strong class="text-yellow-500 block uppercase tracking-wider text-[10px]">Option C: Manual JSON Export</strong>
+              <p class="text-white/60">If needed, click <strong class="text-white">📥 Download JSON</strong> to export <code class="bg-white/5 px-1 py-0.5 rounded text-yellow-500">content.json</code> manually. You can place it in your local folder, commit, and push manually.</p>
             </div>
           </div>
         </div>
@@ -818,6 +816,48 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       showAlert('JSON file downloaded successfully! Replace content.json in your directory with this file.', 'success');
+    }
+
+    async function publishToLiveSite() {
+      const passcode = prompt("Please enter the Broadcaster Passcode (PD_CONSOLE_PASSCODE) to publish live:");
+      if (passcode === null) return; // User cancelled
+      if (!passcode.trim()) {
+        showAlert('Passcode cannot be empty.', 'error');
+        return;
+      }
+
+      const data = serializeForm();
+      showAlert('Publishing website changes to live site...', 'info');
+
+      try {
+        const response = await fetch('https://djportal.fmpmediagroup.com/api/cms/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            passcode: passcode.trim(),
+            content: data
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          showAlert('🚀 ' + (result.message || 'Website published to live site successfully!'), 'success');
+        } else {
+          let errMsg = 'Failed to publish to live site.';
+          try {
+            const errJson = await response.json();
+            if (errJson.detail) {
+              errMsg += ' Error: ' + errJson.detail;
+            }
+          } catch (e) {}
+          showAlert('❌ ' + errMsg + ' (Status: ' + response.status + ')', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showAlert('❌ Network error: Could not connect to the broadcaster backend. Please verify your connection.', 'error');
+      }
     }
 
 
