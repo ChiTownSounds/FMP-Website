@@ -3,7 +3,7 @@
   "name": "For My People Radio",
   "short_name": "FMPRADIO",
   "description": "The Voice of the People — Chicago's Austin Community",
-  "start_url": "./",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0e1a",
   "theme_color": "#0a0e1a",

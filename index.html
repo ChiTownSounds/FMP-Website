@@ -2688,10 +2688,13 @@
       </div>
     </section>
 
-    <footer class="w-full py-8 bg-gray-950 border-t border-white/5 mt-auto">
+    <footer class="w-full py-8 bg-gray-950 border-t border-white/5 mt-auto relative z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
         <div class="flex flex-col items-center sm:items-start">
-          <img src="./assets/logo.svg" alt="FMP Radio" width="216" height="64" class="h-16 w-auto mb-2">
+          <a href="/metaverse" class="relative group cursor-pointer block mb-2" title="Easter Egg!">
+            <div class="absolute inset-0 bg-yellow-500/20 blur-xl group-hover:bg-yellow-500/50 transition-colors duration-500 rounded-full pointer-events-none"></div>
+            <img src="./assets/logo.svg" alt="FMP Radio" width="216" height="64" class="h-16 w-auto relative z-10 drop-shadow-[0_0_15px_rgba(234,179,8,0.4)] group-hover:drop-shadow-[0_0_25px_rgba(234,179,8,0.8)] transition-all duration-500">
+          </a>
           <p class="text-xs text-gray-500">© 2026 FMP Media Group, LLC</p>
         </div>
         <div class="flex gap-6">
@@ -4325,12 +4328,25 @@
     }
 
     let deferredPrompt;
+    const isBannerDismissed = () => localStorage.getItem('fmp_pwa_dismissed') === 'true';
+
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       document.getElementById('install-btn').classList.remove('hidden');
       const mobBtn = document.getElementById('mobile-install-btn');
       if (mobBtn) mobBtn.classList.remove('hidden');
+      
+      // Show mobile floating banner if not running standalone and not dismissed
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      if (!isStandalone && !isBannerDismissed()) {
+        const pwaBanner = document.getElementById('pwa-install-banner');
+        if (pwaBanner) {
+          pwaBanner.classList.remove('hidden');
+          pwaBanner.classList.add('flex');
+          document.getElementById('banner-install-btn').classList.remove('hidden');
+        }
+      }
     });
 
     async function installPWA() {
@@ -4341,20 +4357,44 @@
         document.getElementById('install-btn').classList.add('hidden');
         const mobBtn = document.getElementById('mobile-install-btn');
         if (mobBtn) mobBtn.classList.add('hidden');
+        dismissPWABanner();
       }
       deferredPrompt = null;
     }
 
     function showIOSInstructions() {
-      alert("To install FMP Radio on your iPhone:\n\n1. Tap the 'Share' icon (the square with an arrow) at the bottom of Safari.\n2. Scroll down and tap 'Add to Home Screen'.\n3. Tap 'Add' in the top right corner.");
+      alert("To install FMP Radio on your iPhone/iPad:\n\n1. Tap the 'Share' icon (the square with an arrow) in your browser.\n2. Scroll down and tap 'Add to Home Screen'.\n3. Tap 'Add' in the top right corner.");
     }
 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    function dismissPWABanner() {
+      const pwaBanner = document.getElementById('pwa-install-banner');
+      if (pwaBanner) {
+        pwaBanner.classList.add('hidden');
+        pwaBanner.classList.remove('flex');
+      }
+      localStorage.setItem('fmp_pwa_dismissed', 'true');
+    }
+
+    // iOS and iPadOS user agent detection
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if (isIOS) {
       window.addEventListener('load', () => {
         document.getElementById('ios-install-btn').classList.remove('hidden');
         const mobIosBtn = document.getElementById('mobile-ios-install-btn');
         if (mobIosBtn) mobIosBtn.classList.remove('hidden');
+        
+        // Show iOS banner if not standalone and not dismissed
+        const isStandaloneIOS = window.navigator.standalone === true;
+        if (!isStandaloneIOS && !isBannerDismissed()) {
+          const pwaBanner = document.getElementById('pwa-install-banner');
+          if (pwaBanner) {
+            pwaBanner.classList.remove('hidden');
+            pwaBanner.classList.add('flex');
+            document.getElementById('banner-ios-btn').classList.remove('hidden');
+            document.getElementById('banner-install-btn').classList.add('hidden');
+          }
+        }
       });
     }
 
@@ -4528,6 +4568,22 @@
     }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   </script>
+  <!-- Floating Mobile PWA Install Banner -->
+  <div id="pwa-install-banner" class="hidden md:hidden fixed bottom-4 left-4 right-4 z-[9999] bg-[#050507]/95 border border-yellow-500/20 rounded-2xl p-4 items-center justify-between shadow-2xl backdrop-blur-lg flex-row gap-2">
+      <div class="flex items-center gap-3">
+          <img src="./assets/logo_192.png" alt="App Logo" class="w-10 h-10 rounded-xl border border-white/10">
+          <div>
+              <h4 class="text-[11px] font-black text-yellow-500 tracking-wider">FOR MY PEOPLE RADIO</h4>
+              <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Chicago's Austin Community</p>
+          </div>
+      </div>
+      <div class="flex gap-2 items-center">
+          <button onclick="dismissPWABanner()" class="px-2 py-1 text-[9px] font-black text-gray-400 hover:text-white uppercase tracking-wider">Dismiss</button>
+          <button id="banner-install-btn" onclick="installPWA()" class="px-3.5 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-black text-[9px] font-black uppercase tracking-wider rounded transition-all active:scale-95">Install</button>
+          <button id="banner-ios-btn" onclick="showIOSInstructions()" class="hidden px-3.5 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-black text-[9px] font-black uppercase tracking-wider rounded transition-all active:scale-95">Save</button>
+      </div>
+  </div>
+
   <script type="text/javascript" src="https://hello.citrus3.com:2020/dist/widgets.js" defer></script>
 </body>
 </html>
