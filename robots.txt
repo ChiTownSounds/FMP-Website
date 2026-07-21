@@ -1,3 +1,11 @@
 User-agent: *
-Disallow: /fmp_data_7718.csv
-Disallow: /*.csv
+Disallow: /dashboard
+Disallow: /library-auditor
+Disallow: /dj-portal
+Disallow: /library-eraser
+Disallow: /pd-login
+Disallow: /edit_intro/
+Disallow: /api/
+Allow: /
+
+Sitemap: https://formypeopleradio.com/sitemap.xml

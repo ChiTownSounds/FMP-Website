@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FMP RADIO</title>
+  <meta name="google-site-verification" content="JDQKfojxEHvsraoR6QuAkrJx2TIvkUvgfwSKCGlgoso" />
 
   <meta name="application-name" content="FMPRADIO">
   <meta name="mobile-web-app-capable" content="yes">
@@ -4111,6 +4112,36 @@
 
     async function fetchCitrusData() {
       try {
+        let fmpData = null;
+        try {
+          const fmpRes = await fetch('/api/now_playing/json');
+          if (fmpRes.ok) {
+            fmpData = await fmpRes.json();
+          }
+        } catch(e) {}
+
+        if (fmpData && fmpData.title) {
+          setLiveStatus(true);
+          const cleanDisplay = fmpData.artist ? `${fmpData.artist} - ${fmpData.title}` : fmpData.title;
+          const titleEl = document.getElementById('now-playing-title');
+          if (titleEl) titleEl.innerText = cleanDisplay;
+          const stickyTitle = document.getElementById('sticky-title');
+          if (stickyTitle) stickyTitle.innerText = cleanDisplay;
+
+          const isLiveShow = fmpData.source === 'remote_dj';
+          if (cleanDisplay !== lastFetchedTitle) {
+            lastFetchedTitle = cleanDisplay;
+            if (fmpData.album_art) {
+              const mainCover = document.getElementById('main-cover-art');
+              const coverArt = document.getElementById('cover-art');
+              if (mainCover) mainCover.src = fmpData.album_art;
+              if (coverArt) coverArt.src = fmpData.album_art;
+            }
+            updateDeviceUI();
+          }
+          return;
+        }
+
         const response = await fetch('https://hello.citrus3.com:8256/status-json.xsl?t=' + Date.now());
         const data = await response.json();
         if (data && data.icestats && data.icestats.source) {
@@ -4583,6 +4614,34 @@
       </div>
   </div>
 
+  <script>
+    (function() {
+      let sessionId = sessionStorage.getItem('fmp_session_id');
+      if (!sessionId) {
+        sessionId = 'sess_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        sessionStorage.setItem('fmp_session_id', sessionId);
+      }
+      async function sendPing() {
+        const skin = window.currentEra || 'modern';
+        try {
+          await fetch('/api/listener/ping', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              session_id: sessionId,
+              skin: skin
+            })
+          });
+        } catch (e) {
+          console.warn("[Analytics] Ping failed:", e);
+        }
+      }
+      sendPing();
+      setInterval(sendPing, 30000);
+    })();
+  </script>
   <script type="text/javascript" src="https://hello.citrus3.com:2020/dist/widgets.js" defer></script>
 </body>
 </html>
