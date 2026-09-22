@@ -50,7 +50,7 @@ Traffic to the VM is routed via Nginx based on subdomain mappings:
 ## 5. Telemetry & Media Stream APIs
 
 * **Now Playing Telemetry JSON:** `https://djportal.fmpmediagroup.com/api/telemetry/stats`
-  * CORS is enabled globally for all origins (`allow_origin_regex=r"https?://.*"`).
+  * CORS is limited to the station's own https sites (any subdomain of fmpmediagroup.com / fmpradio.com / formypeopleradio.com) plus localhost for dev (since 2026-09-22). Pages on this site should call the API on their own origin (`/api/...`).
   * Returns JSON containing: `stream_title`, `remote_dj_active`, `remote_dj_metadata`, `active_listeners`, etc.
 * **Low-Latency Monitor Audio Stream:** `https://djportal.fmpmediagroup.com/api/stream/monitor`
   * Proxies the clean monitor output from Liquidsoap harbor (port `8005/monitor`).
