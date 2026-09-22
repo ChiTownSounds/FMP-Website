@@ -1599,14 +1599,20 @@
             <img src="./assets/logo.svg" alt="FMP Radio Logo" width="162" height="48"
               class="h-12 w-auto hover:scale-110 transition-transform cursor-pointer">
           </div>
-          <div class="hidden md:flex items-center space-x-8">
+          <div class="hidden md:flex items-center space-x-6">
             <a href="#" class="text-[10px] font-black tracking-[0.2em] text-yellow-500">HOME</a>
             <a href="#now-playing" class="text-[10px] font-black tracking-[0.2em] text-white hover:text-yellow-500 transition-colors">NOW PLAYING</a>
             <a href="#schedule" class="text-[10px] font-black tracking-[0.2em] text-white hover:text-yellow-500 transition-colors">SCHEDULE</a>
             <a href="#hosts" class="text-[10px] font-black tracking-[0.2em] text-white hover:text-yellow-500 transition-colors">HOSTS</a>
             <a href="#community" class="text-[10px] font-black tracking-[0.2em] text-white hover:text-yellow-500 transition-colors">COMMUNITY</a>
-            <button id="install-btn" onclick="installPWA()" class="hidden px-5 py-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-[10px] font-black tracking-[0.2em] text-yellow-500 rounded transition-all active:scale-95 shadow-lg shadow-yellow-900/10">INSTALL APP</button>
-            <button id="ios-install-btn" onclick="showIOSInstructions()" class="hidden px-5 py-2.5 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-[10px] font-black tracking-[0.2em] text-yellow-500 rounded transition-all active:scale-95 shadow-lg shadow-yellow-900/10">SAVE TO IPHONE</button>
+            <a href="https://apps.apple.com/us/app/fmp-radio/id6786327806" target="_blank" rel="noopener noreferrer" class="text-[10px] font-black tracking-[0.15em] text-white hover:text-yellow-500 transition-colors uppercase flex items-center gap-1" title="Download on Apple App Store">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 66.2 32.1 114.9c22.7 34 50 71.3 84.7 69.8 32.2-1.4 44.7-20.9 83.3-20.9 38.6 0 50 20.9 83.8 20.2 35.5-.7 60-33.3 82.2-66.7 15.6-23.4 22.8-46.7 23.3-48-1-1.3-44.7-17.1-44.7-74.1zM249.9 89.8c16.4-20 27.6-47.8 24.6-75.8-23.8 1-52.6 15.9-69.6 35.9-15 17.6-28.3 46.1-24.8 73.4 26.6 2 53.4-13.5 69.8-33.5z"/></svg> iOS APP
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.app.radiofmp&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" class="text-[10px] font-black tracking-[0.15em] text-white hover:text-yellow-500 transition-colors uppercase flex items-center gap-1" title="Get it on Google Play">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> ANDROID APP
+            </a>
+            <button id="install-btn" onclick="installPWA()" class="hidden px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-[10px] font-black tracking-[0.15em] text-yellow-500 rounded transition-all active:scale-95 shadow-lg shadow-yellow-900/10">WEB APP</button>
+            <button id="ios-install-btn" onclick="showIOSInstructions()" class="hidden px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 text-[10px] font-black tracking-[0.15em] text-yellow-500 rounded transition-all active:scale-95 shadow-lg shadow-yellow-900/10">SAVE WEB APP</button>
             <button onclick="document.getElementById('schedule').scrollIntoView({behavior:'smooth'})" class="px-5 py-2.5 bg-red-700 hover:bg-red-600 text-[10px] font-black tracking-[0.2em] text-white rounded transition-all active:scale-95 shadow-lg shadow-red-900/40">LISTEN</button>
           </div>
           <div class="flex items-center gap-4">
@@ -1628,8 +1634,14 @@
         <a href="#schedule" onclick="closeMobileMenu()" class="hover:text-yellow-500 transition-colors">Schedule</a>
         <a href="#hosts" onclick="closeMobileMenu()" class="hover:text-yellow-500 transition-colors">Hosts</a>
         <a href="#community" onclick="closeMobileMenu()" class="hover:text-yellow-500 transition-colors">Community</a>
-        <button id="mobile-install-btn" onclick="installPWA()" class="hidden text-left text-yellow-500 hover:opacity-80">Install App</button>
-        <button id="mobile-ios-install-btn" onclick="showIOSInstructions()" class="hidden text-left text-yellow-500 hover:opacity-80">Add to Home Screen</button>
+        <a href="https://apps.apple.com/us/app/fmp-radio/id6786327806" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()" class="text-white hover:text-yellow-500 flex items-center gap-2">
+          🍎 Download iOS App
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.app.radiofmp&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()" class="text-white hover:text-yellow-500 flex items-center gap-2">
+          🤖 Download Android App
+        </a>
+        <button id="mobile-install-btn" onclick="installPWA(); closeMobileMenu();" class="hidden text-left text-yellow-500 hover:opacity-80">Install Web App</button>
+        <button id="mobile-ios-install-btn" onclick="showIOSInstructions(); closeMobileMenu();" class="hidden text-left text-yellow-500 hover:opacity-80">Add Site to Home Screen</button>
       </div>
     </nav>
 
@@ -1650,7 +1662,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div class="lg:col-span-7 text-center lg:text-left">
             <h2 class="text-yellow-500 font-extrabold tracking-[0.35em] text-xs mb-4 uppercase flex items-center justify-center lg:justify-start gap-2">
-              <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Broadcasting Live from Chicago
+              <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Broadcasting Live from Chicago <span class="ml-2 text-[8px] bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded-full font-bold border border-yellow-500/30 tracking-widest normal-case">EXPERIMENTAL</span>
             </h2>
             <h1 class="text-5xl sm:text-6xl md:text-7xl font-black mb-6 leading-[1.05] tracking-tighter text-white uppercase">
               THE VOICE OF<br>
@@ -1659,10 +1671,36 @@
             <p class="text-lg md:text-xl text-white/70 mb-10 max-w-xl font-light leading-relaxed mx-auto lg:mx-0">
               Broadcasting only the best Urban AC &amp; R&B Throwback music straight from the heart of the Austin community!
             </p>
-            <div class="flex flex-wrap justify-center lg:justify-start gap-4">
-              <a href="#schedule" class="px-8 py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-extrabold uppercase rounded-full hover:shadow-[0_0_25px_rgba(234,179,8,0.4)] hover:scale-105 transition-all text-center tracking-wider text-xs">
+            <div class="flex flex-wrap justify-center lg:justify-start items-center gap-3">
+              <a href="#schedule" class="px-7 py-3.5 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-extrabold uppercase rounded-full hover:shadow-[0_0_25px_rgba(234,179,8,0.4)] hover:scale-105 transition-all text-center tracking-wider text-xs flex items-center gap-2">
                 📻 Broadcast Schedule
               </a>
+              <a href="https://apps.apple.com/us/app/fmp-radio/id6786327806" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 bg-black/80 hover:bg-black border border-white/20 hover:border-yellow-500/50 rounded-xl transition-all flex items-center gap-3 text-left group shadow-lg active:scale-95">
+                <svg class="w-6 h-6 text-white group-hover:text-yellow-500 transition-colors fill-current" viewBox="0 0 384 512">
+                  <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 66.2 32.1 114.9c22.7 34 50 71.3 84.7 69.8 32.2-1.4 44.7-20.9 83.3-20.9 38.6 0 50 20.9 83.8 20.2 35.5-.7 60-33.3 82.2-66.7 15.6-23.4 22.8-46.7 23.3-48-1-1.3-44.7-17.1-44.7-74.1zM249.9 89.8c16.4-20 27.6-47.8 24.6-75.8-23.8 1-52.6 15.9-69.6 35.9-15 17.6-28.3 46.1-24.8 73.4 26.6 2 53.4-13.5 69.8-33.5z"/>
+                </svg>
+                <div>
+                  <div class="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">Download on the</div>
+                  <div class="text-xs font-black text-white group-hover:text-yellow-500 transition-colors tracking-tight leading-snug">App Store</div>
+                </div>
+              </a>
+              <a href="https://play.google.com/store/apps/details?id=com.app.radiofmp&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 bg-black/80 hover:bg-black border border-white/20 hover:border-yellow-500/50 rounded-xl transition-all flex items-center gap-3 text-left group shadow-lg active:scale-95">
+                <svg class="w-6 h-6 text-white group-hover:text-yellow-500 transition-colors fill-current" viewBox="0 0 512 512">
+                  <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
+                </svg>
+                <div>
+                  <div class="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">GET IT ON</div>
+                  <div class="text-xs font-black text-white group-hover:text-yellow-500 transition-colors tracking-tight leading-snug">Google Play</div>
+                </div>
+              </a>
+            </div>
+            <div class="mt-4 flex items-center justify-center lg:justify-start gap-2">
+              <button id="hero-install-btn" onclick="installPWA()" class="hidden text-[10px] font-black tracking-widest text-yellow-500 hover:text-yellow-400 uppercase underline transition-colors">
+                💻 Prefer Web App? Install Site Direct
+              </button>
+              <button id="hero-ios-install-btn" onclick="showIOSInstructions()" class="hidden text-[10px] font-black tracking-widest text-yellow-500 hover:text-yellow-400 uppercase underline transition-colors">
+                📲 Add Site to iPhone Home Screen
+              </button>
             </div>
           </div>
           <div class="lg:col-span-5 flex justify-center relative">
@@ -2270,31 +2308,7 @@
     <script>
     (function() {
       /* ── Default flyer data (overwritten by CMS if content.json has adEvents) ── */
-      window.AD_EVENTS = [
-        {
-          name: 'Rhythm & Roses — Danny Boy',
-          imageUrl: 'https://i.imgur.com/tkoq6F6.png',
-          linkUrl: '',
-          visible: true,
-          cta: {
-            type: 'email',
-            label: '📧 Get Tickets',
-            email: 'hiredannyboy@gmail.com',
-            subject: 'I need my tickets!'
-          }
-        },
-        {
-          name: 'Exclusive Juneteenth Celebration',
-          imageUrl: './assets/vbw9mni.jpg',
-          linkUrl: '',
-          visible: true,
-          cta: {
-            type: 'link',
-            label: '🎟️ Buy Tickets',
-            url: 'https://www.ticketmaster.com/rb-music-experience-a-juneteenth-celebration-chicago-illinois-06-20-2026/event/07006495031282A4?_gl=1*s0ao6x*_ga*MTM1NTMwNzg1NS4xNzc5ODMxMDM0*_ga_C1T806G4DF*czE3Nzk4MzYxMjUkbzIkZzAkdDE3Nzk4MzYxNzUkajEwJGwwJGgw'
-          }
-        }
-      ];
+      window.AD_EVENTS = [];
 
       /* Pin colours cycling through red, blue, green, gold */
       var PIN_COLORS = [
@@ -2698,8 +2712,14 @@
           </a>
           <p class="text-xs text-gray-500">© 2026 FMP Media Group, LLC</p>
         </div>
-        <div class="flex gap-6">
-          <a href="./privacy.html" class="text-xs text-gray-500 hover:text-yellow-500 transition-colors uppercase tracking-widest font-bold">Privacy Policy</a>
+        <div class="flex items-center gap-4 flex-wrap justify-center">
+          <a href="https://apps.apple.com/us/app/fmp-radio/id6786327806" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-black/60 hover:bg-black border border-white/10 rounded-lg text-[10px] font-bold text-gray-300 hover:text-yellow-500 flex items-center gap-1.5 transition-colors">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 384 512"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 66.2 32.1 114.9c22.7 34 50 71.3 84.7 69.8 32.2-1.4 44.7-20.9 83.3-20.9 38.6 0 50 20.9 83.8 20.2 35.5-.7 60-33.3 82.2-66.7 15.6-23.4 22.8-46.7 23.3-48-1-1.3-44.7-17.1-44.7-74.1zM249.9 89.8c16.4-20 27.6-47.8 24.6-75.8-23.8 1-52.6 15.9-69.6 35.9-15 17.6-28.3 46.1-24.8 73.4 26.6 2 53.4-13.5 69.8-33.5z"/></svg> iOS App
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.app.radiofmp&pcampaignid=web_share" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 bg-black/60 hover:bg-black border border-white/10 rounded-lg text-[10px] font-bold text-gray-300 hover:text-yellow-500 flex items-center gap-1.5 transition-colors">
+            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 512 512"><path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg> Android App
+          </a>
+          <a href="./privacy.html" class="text-xs text-gray-500 hover:text-yellow-500 transition-colors uppercase tracking-widest font-bold ml-2">Privacy Policy</a>
         </div>
       </div>
     </footer>
@@ -2947,7 +2967,7 @@
       }
       else {
         // Re-bind source to the stream to flush any buffered cache and guarantee real-time playback
-        audio.src = "https://hello.citrus3.com:2020/stream/fmpradio";
+        audio.src = "https://hello.citrus3.com:8256/stream";
         audio.load();
 
         initAudioContext();
@@ -2972,7 +2992,17 @@
           isPlaying = true;
           if (currentEra === 'modern') updateRealEQ();
         } catch (e) {
-          console.error("Playback failed:", e);
+          console.warn("Citrus3 play failed, falling back to Live365 stream:", e);
+          try {
+            audio.src = "https://streaming.live365.com/a10661";
+            audio.load();
+            await audio.play();
+            isPlaying = true;
+            if (currentEra === 'modern') updateRealEQ();
+          } catch (err2) {
+            console.error("Playback failed completely:", err2);
+            isPlaying = false;
+          }
         }
       }
 
@@ -4051,29 +4081,10 @@
         return;
       }
       
-      // Clean brackets and strip encoding replacement characters (\ufffd)
-      const cleanArtist = artist.replace(/\[.*?\]/g, '').replace(/\uFFFD/g, '').trim();
-      const cleanTitle = title.replace(/\[.*?\]/g, '').replace(/\uFFFD/g, '').trim();
-      
-      try {
-        const searchUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(cleanArtist + ' ' + cleanTitle)}&entity=song&limit=1`;
-        const res = await fetch(searchUrl);
-        if (res.ok) {
-          const searchData = await res.json();
-          if (searchData.results && searchData.results.length > 0 && searchData.results[0].artworkUrl100) {
-            const artUrl = searchData.results[0].artworkUrl100.replace('100x100bb', '300x300bb');
-            if (mainCover) mainCover.src = artUrl;
-            if (coverArt) coverArt.src = artUrl;
-            updateDeviceUI();
-            return;
-          }
-        }
-      } catch (e) {
-        console.error("Error fetching album art from iTunes:", e);
-      }
-      
-      if (mainCover) mainCover.src = defaultArt;
-      if (coverArt) coverArt.src = defaultArt;
+      // Point directly to our new server-side API with a cache-buster timestamp
+      const artUrl = `/api/now_playing_artwork?t=${Date.now()}`;
+      if (mainCover) mainCover.src = artUrl;
+      if (coverArt) coverArt.src = artUrl;
       updateDeviceUI();
     }
 
@@ -4112,131 +4123,16 @@
 
     async function fetchCitrusData() {
       try {
-        let fmpData = null;
-        try {
-          const fmpRes = await fetch('/api/now_playing/json');
-          if (fmpRes.ok) {
-            fmpData = await fmpRes.json();
-          }
-        } catch(e) {}
-
-        if (fmpData && fmpData.title) {
-          setLiveStatus(true);
-          const cleanDisplay = fmpData.artist ? `${fmpData.artist} - ${fmpData.title}` : fmpData.title;
-          const titleEl = document.getElementById('now-playing-title');
-          if (titleEl) titleEl.innerText = cleanDisplay;
-          const stickyTitle = document.getElementById('sticky-title');
-          if (stickyTitle) stickyTitle.innerText = cleanDisplay;
-
-          const isLiveShow = fmpData.source === 'remote_dj';
-          if (cleanDisplay !== lastFetchedTitle) {
-            lastFetchedTitle = cleanDisplay;
-            if (fmpData.album_art) {
-              const mainCover = document.getElementById('main-cover-art');
-              const coverArt = document.getElementById('cover-art');
-              if (mainCover) mainCover.src = fmpData.album_art;
-              if (coverArt) coverArt.src = fmpData.album_art;
-            }
-            updateDeviceUI();
-          }
-          return;
-        }
-
-        const response = await fetch('https://hello.citrus3.com:8256/status-json.xsl?t=' + Date.now());
+        const response = await fetch('/api/now_playing/json?t=' + Date.now());
         const data = await response.json();
-        if (data && data.icestats && data.icestats.source) {
-          setLiveStatus(true);
-          const source = data.icestats.source;
-          let stream_title = "";
-          let listeners = 0;
+        if (data) {
+          setLiveStatus(data.is_running !== false && data.source !== "offline");
+          let artist = data.artist || "FMP Radio";
+          let title = data.title || "Now Playing";
+          let listeners = data.listeners || 0;
+          let isLiveShow = (data.source === "remote_dj");
+          let cleanDisplay = (artist && artist !== "FMP Radio" && artist !== "Unknown Artist" && artist !== "Station Idle") ? `${artist} - ${title}` : title;
           
-          if (Array.isArray(source)) {
-            for (let src of source) {
-              if (src.listenurl && src.listenurl.includes("/stream")) {
-                if (src.artist && src.title && src.artist.trim() && src.title.trim()) {
-                  stream_title = src.artist.trim() + " - " + src.title.trim();
-                } else {
-                  stream_title = src.title || src.yp_currently_playing || "";
-                }
-                listeners = src.listeners || 0;
-                break;
-              }
-            }
-            if (!stream_title && source.length > 0) {
-              const src0 = source[0];
-              if (src0.artist && src0.title && src0.artist.trim() && src0.title.trim()) {
-                stream_title = src0.artist.trim() + " - " + src0.title.trim();
-              } else {
-                stream_title = src0.title || src0.yp_currently_playing || "";
-              }
-              listeners = src0.listeners || 0;
-            }
-          } else {
-            if (source.artist && source.title && source.artist.trim() && source.title.trim()) {
-              stream_title = source.artist.trim() + " - " + source.title.trim();
-            } else {
-              stream_title = source.title || source.yp_currently_playing || "";
-            }
-            listeners = source.listeners || 0;
-          }
-          
-          if (!stream_title) {
-            stream_title = "Stream Offline";
-          }
-          
-          // Clean stream metadata
-          let rawTitle = stream_title.replace(/\uFFFD/g, '');
-          let artist = "Unknown Artist";
-          let title = rawTitle;
-          let showContext = "AutoDJ";
-          
-          if (rawTitle && rawTitle !== "Stream Offline") {
-            const contextMatch = rawTitle.match(/^\[(.*?)\]\s*(.*)$/);
-            if (contextMatch) {
-              showContext = contextMatch[1].trim();
-              rawTitle = contextMatch[2].trim();
-            }
-            
-            const parts = rawTitle.split(" - ");
-            if (parts.length >= 2) {
-              artist = parts[0].trim();
-              title = parts.slice(1).join(" - ").trim();
-            } else {
-              title = rawTitle.trim();
-            }
-          }
-          
-          let cleanDisplay = rawTitle;
-          let isNonMusic = false;
-          
-          let isLive365Comm = stream_title.toLowerCase().includes("365 commercial") || stream_title.toLowerCase().includes("live365");
-          let isCommercial = showContext.toLowerCase().includes("commercial") || showContext.toLowerCase().includes("ad") || title.toLowerCase().includes("commercial") || title.toLowerCase().includes("adbreak");
-          let isStationID = showContext.toLowerCase().includes("station") || showContext.toLowerCase().includes("id") || title.toLowerCase().includes("station id") || title.toLowerCase().includes("jingle");
-          
-          if (isLive365Comm) {
-            artist = "FMP Radio";
-            title = rawTitle;
-            cleanDisplay = `FMP Radio - ${rawTitle}`;
-            isNonMusic = true;
-          } else if (isCommercial) {
-            artist = "Sponsor Segment";
-            title = "Station Advertisement";
-            cleanDisplay = "Sponsor Segment - Station Advertisement";
-            isNonMusic = true;
-          } else if (isStationID) {
-            artist = "FMP Radio";
-            title = "Station ID";
-            cleanDisplay = "FMP Radio - Station ID";
-            isNonMusic = true;
-          } else if (rawTitle === "Stream Offline") {
-            artist = "Citrus3 Playout Active";
-            title = "Stream Offline";
-            cleanDisplay = "Stream Offline";
-            isNonMusic = true;
-          } else {
-            cleanDisplay = `${artist} - ${title}`;
-          }
-
           const titleEl = document.getElementById('now-playing-title');
           if (titleEl) {
             titleEl.innerText = cleanDisplay;
@@ -4252,36 +4148,55 @@
           const deviceListeners = document.getElementById('device-listeners');
           if (deviceListeners) deviceListeners.innerText = listeners + ' Listeners';
 
-          let isLiveShow = stream_title.includes("[Live Show]") || stream_title.includes("Remote Live DJ") || stream_title.includes("Live Performance") || cleanDisplay.includes("Remote Live DJ") || cleanDisplay.includes("Live Show");
-
-          if (cleanDisplay !== lastFetchedTitle) {
-            lastFetchedTitle = cleanDisplay;
-            if (isLiveShow) {
-              const mainCover = document.getElementById('main-cover-art');
-              const coverArt = document.getElementById('cover-art');
-              const liveShowArt = './assets/live_show.jpg?t=' + Date.now();
-              if (mainCover) mainCover.src = liveShowArt;
-              if (coverArt) coverArt.src = liveShowArt;
-              updateDeviceUI();
-            } else if (isNonMusic) {
-              const mainCover = document.getElementById('main-cover-art');
-              const coverArt = document.getElementById('cover-art');
-              const defaultArt = './assets/logo.svg';
-              if (mainCover) mainCover.src = defaultArt;
-              if (coverArt) coverArt.src = defaultArt;
-              updateDeviceUI();
-            } else {
-              updateAlbumArt(artist, title);
-            }
+          // Update album art in sync with audio buffer
+          const mainCover = document.getElementById('main-cover-art');
+          const coverArt = document.getElementById('cover-art');
+          let artUrl = data.album_art || './assets/logo.svg';
+          if (isLiveShow) {
+            artUrl = './assets/live_show.jpg';
           }
-        } else {
-          setLiveStatus(false);
-          handleOfflinePlayout();
+
+          if (mainCover && mainCover.getAttribute('data-src') !== artUrl) {
+            mainCover.setAttribute('data-src', artUrl);
+            mainCover.src = artUrl;
+          }
+          if (coverArt && coverArt.getAttribute('data-src') !== artUrl) {
+            coverArt.setAttribute('data-src', artUrl);
+            coverArt.src = artUrl;
+          }
+          updateDeviceUI();
+          fetchRecentlyPlayed();
         }
       } catch (e) {
-        console.error("Citrus Sync Error:", e);
-        setLiveStatus(false);
-        handleOfflinePlayout();
+        console.error("Now playing poll error:", e);
+      }
+    }
+
+    async function fetchRecentlyPlayed() {
+      try {
+        const response = await fetch('/api/recently_played?limit=5&t=' + Date.now());
+        const data = await response.json();
+        if (data && data.items && Array.isArray(data.items)) {
+          const container = document.querySelector('[data-widget="mcp-recently-played"]');
+          if (container) {
+            let html = '<ul class="space-y-3.5">';
+            for (let item of data.items) {
+              const art = item.album_art || './assets/logo.svg';
+              html += `
+                <li class="flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/5 transition-all duration-200 group">
+                  <img src="${art}" class="w-12 h-12 rounded-lg object-cover shadow-md group-hover:scale-105 transition-transform duration-200" alt="${item.artist}" onerror="this.src='./assets/logo.svg'">
+                  <div class="flex flex-col min-w-0 flex-1">
+                    <span class="text-sm font-bold text-white truncate leading-tight group-hover:text-yellow-400 transition-colors">${item.artist}</span>
+                    <span class="text-xs text-white/60 truncate mt-0.5">${item.title}</span>
+                  </div>
+                </li>`;
+            }
+            html += '</ul>';
+            container.innerHTML = html;
+          }
+        }
+      } catch (e) {
+        console.error("Recently played fetch error:", e);
       }
     }
 
@@ -4366,6 +4281,8 @@
       document.getElementById('install-btn').classList.remove('hidden');
       const mobBtn = document.getElementById('mobile-install-btn');
       if (mobBtn) mobBtn.classList.remove('hidden');
+      const heroBtn = document.getElementById('hero-install-btn');
+      if (heroBtn) heroBtn.classList.remove('hidden');
       
       // Show mobile floating banner if not running standalone and not dismissed
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -4387,6 +4304,8 @@
         document.getElementById('install-btn').classList.add('hidden');
         const mobBtn = document.getElementById('mobile-install-btn');
         if (mobBtn) mobBtn.classList.add('hidden');
+        const heroBtn = document.getElementById('hero-install-btn');
+        if (heroBtn) heroBtn.classList.add('hidden');
         dismissPWABanner();
       }
       deferredPrompt = null;
@@ -4413,6 +4332,8 @@
         document.getElementById('ios-install-btn').classList.remove('hidden');
         const mobIosBtn = document.getElementById('mobile-ios-install-btn');
         if (mobIosBtn) mobIosBtn.classList.remove('hidden');
+        const heroIosBtn = document.getElementById('hero-ios-install-btn');
+        if (heroIosBtn) heroIosBtn.classList.remove('hidden');
         
         // Show iOS banner if not standalone and not dismissed
         const isStandaloneIOS = window.navigator.standalone === true;
@@ -4643,5 +4564,6 @@
     })();
   </script>
   <script type="text/javascript" src="https://hello.citrus3.com:2020/dist/widgets.js" defer></script>
+  <a href="https://getsongbpm.com" style="opacity: 0; position: absolute; pointer-events: none; z-index: -1;">BPM Database</a>
 </body>
 </html>
